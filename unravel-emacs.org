@@ -172,7 +172,7 @@ Now we are ready to load our per-module configuration files:
 
 #+begin_src emacs-lisp :tangle "init.el"
   (require 'unravel-theme)
-  ;; (require 'unravel-essentials)
+  (require 'unravel-essentials)
   ;; (require 'unravel-modeline)
   ;; (require 'unravel-completion)
   ;; (require 'unravel-search)
@@ -737,4 +737,247 @@ Use the entry point ~M-x dictionary-search~
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
 (provide 'unravel-langs)
+#+end_src
+
+* The ~unravel-essentials.el~ module
+
+** Basic configuration in ~unravel-essentials.el~
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el" :mkdirp yes
+  ;;; Essential configurations
+  (use-package emacs
+    :ensure nil
+    :demand t
+    :config
+  ;;;; General settings and common custom functions
+    (setq help-window-select t)
+    (setq next-error-recenter '(4)) ; center of the window
+    (setq find-library-include-other-files nil) ; Emacs 29
+    (setq tramp-connection-timeout (* 60 10)) ; seconds
+    (setq save-interprogram-paste-before-kill t)
+    (setq mode-require-final-newline t)
+    (setq-default truncate-partial-width-windows nil)
+    (setq eval-expression-print-length nil)
+    (setq kill-do-not-save-duplicates t)
+    (setq scroll-error-top-bottom t)
+    (setq echo-keystrokes-help t) ; Emacs 30
+    (setq epa-keys-select-method 'minibuffer)) ; Emacs 30
+#+end_src
+
+** Settings for ~recentf~: keeping track of recent files
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+(use-package recentf
+  :ensure nil
+  :hook (after-init . recentf-mode)
+  :config
+  (setq recentf-max-saved-items 100)
+  (setq recentf-max-menu-items 25) ; I don't use the `menu-bar-mode', but this is good to know
+  (setq recentf-save-file-modes nil)
+  (setq recentf-keep nil)
+  (setq recentf-auto-cleanup nil)
+  (setq recentf-initialize-file-name-history nil)
+  (setq recentf-filename-handlers nil)
+  (setq recentf-show-file-shortcuts-flag nil))
+#+end_src
+
+** Settings for Bookmarks
+:PROPERTIES:
+:CUSTOM_ID: h:581aa0ff-b136-4099-a321-3b86edbfbccb
+:END:
+
+Bookmarks are compartments that store arbitrary information about a file or buffer. The records are used to recreate that file/buffer inside of Emacs. Put differently, we can easily jump back to a file or directory (or anything that has a bookmark recorder+handler, really). Use the ~bookmark-set~ command (=C-x r m= by default) to record a bookmark and then visit one of your bookmarks with ~bookmark-jump~ (=C-x r b= by default).
+
+Also see [[#h:5685df62-4484-42ad-a062-d55ab19022e3][Settings for registers]].
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+;;;; Built-in bookmarking framework (bookmark.el)
+(use-package bookmark
+  :ensure nil
+  :commands (bookmark-set bookmark-jump bookmark-bmenu-list)
+  :hook (bookmark-bmenu-mode . hl-line-mode)
+  :config
+  (setq bookmark-use-annotations nil)
+  (setq bookmark-automatically-show-annotations nil)
+  (setq bookmark-fringe-mark nil) ; Emacs 29 to hide bookmark fringe icon
+  ;; Write changes to the bookmark file as soon as 1 modification is
+  ;; made (addition or deletion).  Otherwise Emacs will only save the
+  ;; bookmarks when it closes, which may never happen properly
+  ;; (e.g. power failure).
+  (setq bookmark-save-flag 1))
+#+end_src
+
+** Settings for registers
+:PROPERTIES:
+:CUSTOM_ID: h:5685df62-4484-42ad-a062-d55ab19022e3
+:END:
+
+Much like bookmarks, registers store data that we can reinstate quickly ([[#h:581aa0ff-b136-4099-a321-3b86edbfbccb][Settings for bookmarks]]). A common use-case is to write some text to a register and then insert that text by calling the given register. This is much better than relying on the ~kill-ring~, because registers are meant to be overwritten by the user, whereas the ~kill-ring~ accumulates lots of text that we do not necessarily need.
+
+To me, registers are essential for keyboard macros. By default, registers do not persist between Emacs sessions, though I do need to re-use them from time to time, hence the arrangement to record them with ~savehist-mode~ ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][Settings for saving the history (~savehist-mode~)]]).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+;;;; Registers (register.el)
+(use-package register
+  :ensure nil
+  :defer t ; its commands are autoloaded, so this will be loaded then
+  :config
+  (setq register-preview-delay 0.8
+        register-preview-function #'register-preview-default)
+
+  (with-eval-after-load 'savehist
+    (add-to-list 'savehist-additional-variables 'register-alist)))
+#+end_src
+
+** Settings for ~delete-selection-mode~
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+;;;; Delete selection
+(use-package delsel
+  :ensure nil
+  :hook (after-init . delete-selection-mode))
+#+end_src
+
+** Settings for tooltips
+:PROPERTIES:
+:CUSTOM_ID: h:26afeb95-7920-45ed-8ff6-3648256c280b
+:END:
+
+With these settings in place, Emacs will use its own faces and frame infrastructure to display tooltips. I prefer it this way because then we can benefit from the text properties that can be added to these messages (e.g. a different colour or a slant).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+;;;; Tooltips (tooltip-mode)
+(use-package tooltip
+  :ensure nil
+  :hook (after-init . tooltip-mode)
+  :config
+  (setq tooltip-delay 0.5
+        tooltip-short-delay 0.5
+        x-gtk-use-system-tooltips t
+        tooltip-frame-parameters
+        '((name . "tooltip")
+          (internal-border-width . 10)
+          (border-width . 0)
+          (no-special-glyphs . t))))
+#+end_src
+
+** Settings for the ~world-clock~
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+;;;; World clock (M-x world-clock)
+(use-package time
+  :ensure nil
+  :commands (world-clock)
+  :config
+  (setq display-time-world-list t)
+  (setq zoneinfo-style-world-list ; M-x shell RET timedatectl list-timezones
+        '(("America/Los_Angeles" "Los Angeles")
+          ("America/Vancouver" "Vancouver")
+          ("Canada/Pacific" "Canada/Pacific")
+          ("America/Chicago" "Chicago")
+          ("Brazil/Acre" "Rio Branco")
+          ("America/Toronto" "Toronto")
+          ("America/New_York" "New York")
+          ("Canada/Atlantic" "Canada/Atlantic")
+          ("Brazil/East" "Brasília")
+          ("UTC" "UTC")
+          ("Europe/Lisbon" "Lisbon")
+          ("Europe/Brussels" "Brussels")
+          ("Europe/Athens" "Athens")
+          ("Asia/Riyadh" "Riyadh")
+          ("Asia/Tehran" "Tehran")
+          ("Asia/Tbilisi" "Tbilisi")
+          ("Asia/Yekaterinburg" "Yekaterinburg")
+          ("Asia/Kolkata" "Kolkata")
+          ("Asia/Singapore" "Singapore")
+          ("Asia/Shanghai" "Shanghai")
+          ("Asia/Seoul" "Seoul")
+          ("Asia/Tokyo" "Tokyo")
+          ("Asia/Vladivostok" "Vladivostok")
+          ("Australia/Brisbane" "Brisbane")
+          ("Australia/Sydney" "Sydney")
+          ("Pacific/Auckland" "Auckland")))
+
+  ;; All of the following variables are for Emacs 28
+  (setq world-clock-list t)
+  (setq world-clock-time-format "%R %z (%Z)	%A %d %B")
+  (setq world-clock-buffer-name "*world-clock*") ; Placement handled by `display-buffer-alist'
+  (setq world-clock-timer-enable t)
+  (setq world-clock-timer-second 60))
+#+end_src
+
+** Run Emacs as a server
+
+The "server" is functionally like the daemon, except it is run by the first Emacs frame we launch. With a running server, we can connect to it through a new ~emacsclient~ call. This is useful if we want to launch new frames that share resources with the existing running process.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+;;;; Emacs server (allow emacsclient to connect to running session)
+(use-package server
+  :ensure nil
+  :defer 1
+  :config
+  (setq server-client-instructions nil)
+  (unless (server-running-p)
+    (server-start)))
+#+end_src
+
+** ~expreg~ (tree-sitter mark syntactically)
+:PROPERTIES:
+:CUSTOM_ID: h:ceb193bf-0de3-4c43-8ab7-6daa50817754
+:END:
+
+The ~expreg~ package by Yuan Fu (aka casouri) uses the tree-sitter framework to incrementally expand the region from the smallest to the largest syntactic unit in the given context. This is a powerful feature, though it (i) requires Emacs to be built with tree-sitter support and (ii) for the user to be running a major mode that is designed for tree-sitter (Lisp seems to work regardless).
+
+The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)
+  (when (treesit-available-p)
+    (use-package expreg
+      :ensure t
+      :functions (prot/expreg-expand prot/expreg-expand-dwim)
+      :bind ("C-M-SPC" . prot/expreg-expand-dwim) ; overrides `mark-sexp'
+      :config
+      (defun prot/expreg-expand (n)
+        "Expand to N syntactic units, defaulting to 1 if none is provided interactively."
+        (interactive "p")
+        (dotimes (_ n)
+          (expreg-expand)))
+
+      (defun prot/expreg-expand-dwim ()
+        "Do-What-I-Mean `expreg-expand' to start with symbol or word.
+  If over a real symbol, mark that directly, else start with a
+  word.  Fall back to regular `expreg-expand'."
+        (interactive)
+        (let ((symbol (bounds-of-thing-at-point 'symbol)))
+          (cond
+           ((equal (bounds-of-thing-at-point 'word) symbol)
+            (prot/expreg-expand 1))
+           (symbol (prot/expreg-expand 2))
+           (t (expreg-expand)))))))
+#+end_src
+
+** Settings for Battery display
+:PROPERTIES:
+:CUSTOM_ID: h:080aa291-95b4-4d54-8783-d156b13190e9
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  ;;;; Show battery status on the mode line (battery.el)
+  (use-package battery
+    :ensure nil
+    :hook (after-init . display-battery-mode)
+    :config
+    (setq battery-mode-line-format
+          (cond
+           ((eq battery-status-function #'battery-linux-proc-acpi)
+            "⏻%b%p%%,%d°C ")
+           (battery-status-function
+            "⏻%b%p%% "))))
+#+end_src
+
+** Finally, we provide ~unravel-essentials.el~ module
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+(provide 'unravel-essentials)
 #+end_src

@@ -45,7 +45,7 @@
 (setq package-install-upgrade-built-in t)
 
 (require 'unravel-theme)
-;; (require 'unravel-essentials)
+(require 'unravel-essentials)
 ;; (require 'unravel-modeline)
 ;; (require 'unravel-completion)
 ;; (require 'unravel-search)
