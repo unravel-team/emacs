@@ -4,46 +4,94 @@
 #+language: en
 #+options: ':t toc:nil num:t author:t email:t
 
-This configuration is inspired from the work of [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][my hero Prot]]. It is not as clean and well-written as his configuration, but I'll get there eventually (probably before announcing this to the world).
+This configuration is inspired from the work of [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][my hero Prot]]. I've copied straight from his config file, because I think the explanations he has created are worthwhile and should be read by everyone. Prot's files are all prefixed with =prot-emacs-*=. I have changed this to =unravel-*=. The reason for this is that I have picked up only what I need and changed it where needed. As such, any issues you face with this configuration are likely introduced by me.
+
+Any quote without attribution is directly taken from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][Prot's org file]]. You should read through it if you want detailed explanations of things you find here.
+
+#+begin_quote
+What you are now reading is not a common literate configuration of
+Emacs. In most such cases, you have a generic =init.el= with a call to
+the ~org-babel-load-file~ function that gets an Org document as its
+value. That method works but is very slow, because we have to load Org
+before starting Emacs (and Org loads a bunch of other things we do not
+need at such an early stage).
+
+Whereas this Org document serves as (i) a single point of entry to my
+Emacs setup and (ii) the origin of all of my Emacs configurations.
+While I am defining everything in a single Org file, I am not actually
+starting Emacs by reading this file. Rather, I am instructing Org to
+put the code blocks defined herein in standalone files, organised by
+scope. The end result is something where you cannot tell whether a
+literate program was executed or not.
+
+This is the beauty of it. I can keep editing a single file as the
+"source of truth", though I can still handle each of the files
+individually (e.g. someone wants to see how I do a specific thing, so
+I share only that file as an email attachment---no need to send over
+this massive document).
+
+When I want to modify my Emacs setup, I edit this file and then
+evaluate the following code block or do =C-c C-v C-t=. All files will
+be updated accordingly.
+#+end_quote
 
 #+src emacs-lisp :tangle no :results none
 (org-babel-tangle)
 #+end_src
 
-#+toc: headlines 1
+#+toc: headlines 2
 
 Here is what the generated directory structure should look like:
 
 #+begin_src sh :dir ~/src/prototypes/emacs-up :results raw
-  tree -F
+  fd -e el -e org -E elpa | tree --fromfile
 #+end_src
 
 #+RESULTS:
-./
+.
 ├── early-init.el
 ├── init.el
 ├── unravel-emacs.org
-└── unravel-modules/
+└── unravel-modules
+    ├── unravel-completion.el
+    ├── unravel-essentials.el
     ├── unravel-langs.el
     └── unravel-theme.el
 
-2 directories, 5 files
+2 directories, 7 files
 
 To make a change to this Emacs configuration, edit this file and then type =C-c C-v C-t= (=M-x org-babel-tangle=) to republish all the relevant files.
 
 * The ~early-init.el~ file
 
-This is the first file that Emacs loads. This file should only contain the absolute basic stuff Emacs needs to load first, before it loads ~init.el~.
+#+begin_quote
+This is the first file that Emacs reads when starting up. It should
+contain code that does not depend on any package or the proportions of
+the Emacs frame. In general, this early initialisation file is meant
+to set up a few basic things before Emacs produces the initial frame
+by delegating to the =init.el
+#+end_quote
 
-** Basic frame settings
+** The =early-init.el= basic frame settings
+:PROPERTIES:
+:CUSTOM_ID: h:a1288a07-93f6-4e14-894e-707d5ad8b6dc
+:END:
 
 #+begin_src emacs-lisp :tangle "early-init.el"
-  ;;; No GUI
-  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-    (when (fboundp mode) (funcall mode -1)))
+  ;;;; No GUI
+  ;; I do not use those graphical elements by default, but I do enable
+  ;; them from time-to-time for testing purposes or to demonstrate
+  ;; something.  NEVER tell a beginner to disable any of these.  They
+  ;; are helpful.
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
 #+end_src
 
-** Tweaking the Garbage collector for faster startup
+** The =early-init.el= tweaks to startup time and garbage collection
+:PROPERTIES:
+:CUSTOM_ID: h:50d28f3c-3ada-4db5-b830-bbbbee7fec4e
+:END:
 
 #+begin_src emacs-lisp :tangle "early-init.el"
   ;; A big contributor to startup times is garbage collection.
@@ -56,6 +104,9 @@ This is the first file that Emacs loads. This file should only contain the absol
 #+end_src
 
 ** If you have both .el and .elc files, load the newer one
+:PROPERTIES:
+:CUSTOM_ID: h:F8987E20-3E36-4E27-9EAE-D0680303A95B
+:END:
 
 #+begin_src emacs-lisp :tangle "early-init.el"
   ;; When both .el and .elc / .eln files are available,
@@ -64,7 +115,10 @@ This is the first file that Emacs loads. This file should only contain the absol
   (setq load-prefer-newer t)
 #+end_src
 
-** Initialize the package cache
+** The =early-init.el= initialises the package cache
+:PROPERTIES:
+:CUSTOM_ID: h:7a037504-8a2f-4df0-8482-ce6476354440
+:END:
 
 #+begin_src emacs-lisp :tangle "early-init.el"
   ;; Ensure that `describe-package' does not require a
@@ -72,7 +126,10 @@ This is the first file that Emacs loads. This file should only contain the absol
   (setq package-enable-at-startup t)
 #+end_src
 
-** Give the default frame a name
+** The =early-init.el= gives a name to the default frame
+:PROPERTIES:
+:CUSTOM_ID: h:ad227f7e-b0a7-43f8-91d6-b50db82da9ad
+:END:
 
 Naming frames allows you to select them using completion (=M-x select-frame-by-name=).
 
@@ -83,12 +140,31 @@ Naming frames allows you to select them using completion (=M-x select-frame-by-n
 #+end_src
 
 * The ~init.el~ file
+:PROPERTIES:
+:CUSTOM_ID: h:dae63bd9-93a8-41c4-af1b-d0f39ba50974
+:END:
 
 This is the main initialisation file of Emacs. Everything loads from here, even if it has been split into multiple files for convenience.
 
-** Silence native-comp warnings
+** The =init.el= tweaks to make native compilation silent
+:PROPERTIES:
+:CUSTOM_ID: h:3563ceb5-b70c-4191-9c81-f2f5a202c4da
+:END:
 
-These are unnecessarily scary
+These warnings are unnecessarily scary.
+
+#+begin_quote
+The =--with-native-compilation=yes= build option of Emacs is very
+nice: it enables the "native compilation" of Emacs Lisp, translating
+it down to machine code. However, the default setting for reporting
+errors is set to a verbose value which, in my coaching experience,
+confuses users: it produces warnings for compilation issues that only
+the developer of the given package needs to deal with. These include
+innocuous facts like docstrings being wider than a certain character
+count. To make things even worse, the buffer that shows these warnings
+uses the stop sign character, resulting in a long list of lines with
+red spots everywhere, as if we have totally broken Emacs.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "init.el"
 ;; Make native compilation silent and prune its cache.
@@ -97,16 +173,27 @@ These are unnecessarily scary
   (setq native-compile-prune-cache t)) ; Emacs 29
 #+end_src
 
-** Ignore the custom file, and just rely on this config
+** The =init.el= setting to send ~custom-file~ to oblivion
+:PROPERTIES:
+:CUSTOM_ID: h:f2ffe0e9-a58d-4bba-9831-cc35940ea83f
+:END:
 
-There is no need to use the ~M-x customize~ infrastructure. It's easier to just rely on the init file instead.
+There is no need to use the =M-x customize= infrastructure. It's easier to just rely on the init file instead.
+
+#+begin_quote
+I would prefer to just have an option to avoid the Custom
+infrastructure altogether, but this is not possible. So here we are...
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "init.el"
   ;; Disable custom.el by making it disposable.
   (setq custom-file (make-temp-file "emacs-custom-"))
 #+end_src
 
-** Enable commands disabled by default
+** The =init.el= settings to enable commands disabled by default
+:PROPERTIES:
+:CUSTOM_ID: h:4ed6593f-6f55-4258-a1c2-ddb50e9e2465
+:END:
 
 These commands are actually useful, especially in org-mode.
 
@@ -118,7 +205,7 @@ These commands are actually useful, especially in org-mode.
  '(list-timers narrow-to-region narrow-to-page upcase-region downcase-region))
 #+end_src
 
-** Disable unnecessary commands enabled by default
+** The =init.el= settings to disable unnecessary commands enabled by default
 
 These commands are "unsafe", in that we should be using the alternatives (like ~vterm~ and ~org~)
 
@@ -131,8 +218,11 @@ These commands are "unsafe", in that we should be using the alternatives (like ~
 #+end_src
 
 ** Add the modules folder to the load-path
+:PROPERTIES:
+:CUSTOM_ID: h:e289a614-4f17-4d6c-a028-42fe45aebe66
+:END:
 
-This is where all the custom configuration sits for all the packages I use. We write configuration on a per-file basis instead of in a giant file, because these smaller files are more readable, approachable and shareable.
+This is where all the custom configuration sits for all the packages we use. We write configuration on a per-file basis instead of in a giant file, because these smaller files are more readable, approachable and shareable.
 
 #+begin_src emacs-lisp :tangle "init.el"
 (mapc
@@ -141,7 +231,22 @@ This is where all the custom configuration sits for all the packages I use. We w
  '("unravel-modules"))
 #+end_src
 
-** Setup ~package.el~ for Package Management
+** The =init.el= settings for packages (=package.el=)
+:PROPERTIES:
+:CUSTOM_ID: h:424340cc-f3d7-4083-93c9-d852d40dfd40
+:END:
+
+#+begin_quote
+The =package.el= is built into Emacs and is perfectly fine for my
+use-case. We do not need to load it explicitly, as it will be called
+by ~use-package~ when it needs it. Since the introduction of the
+=early-init.el= file, we also do not need to initialise the packages
+at this point: we activate the cache instead ([[#h:7a037504-8a2f-4df0-8482-ce6476354440][The =early-init.el= initialises the package cache]]).
+
+With regard to the settings here, make sure to read my article about
+package archives, pinning packages, and setting priorities:
+<https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "init.el"
   ;;;; Packages
@@ -163,10 +268,93 @@ This is where all the custom configuration sits for all the packages I use. We w
           ("melpa" . 2)
           ("nongnu" . 1)))
 
+  ;; Let `package-install' suggest upgrades for built-in packages too.
   (setq package-install-upgrade-built-in t)
 #+end_src
 
-** Load individual modules
+** The =init.el= macro to do nothing with Elisp code (~prot-emacs-comment~)
+:PROPERTIES:
+:CUSTOM_ID: h:3b14faa6-83fd-4d5f-b3bc-85f72fd572d4
+:END:
+
+#+begin_quote
+This is something I learnt while studying Clojure: a ~comment~ macro
+that wraps some code, effectively commenting it out, while keeping
+indentation and syntax highlighting intact.
+
+What I have here is technically not commenting out the code, because
+the expansion of the macro is nil, not the actual code with comments
+around it.
+#+end_quote
+
+#+begin_example emacs-lisp
+(defmacro prot-emacs-comment (&rest body)
+  "Do nothing with BODY and return nil, with no side effects."
+  (declare (indent defun))
+  nil)
+#+end_example
+
+#+begin_quote
+The above is an example. What I actually use is the following. It
+behaves the same as above, except when it reads a plist of the form
+=(:eval t)=. The idea is for me to quickly activate something I want
+to test by passing that to the macro. So here we have it:
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "init.el"
+(defmacro prot-emacs-comment (&rest body)
+  "Determine what to do with BODY.
+
+If BODY contains an unquoted plist of the form (:eval t) then
+return BODY inside a `progn'.
+
+Otherwise, do nothing with BODY and return nil, with no side
+effects."
+  (declare (indent defun))
+  (let ((eval))
+    (dolist (element body)
+      (when-let* (((plistp element))
+                  (key (car element))
+                  ((eq key :eval))
+                  (val (cadr element)))
+        (setq eval val
+              body (delq element body))))
+    (when eval `(progn ,@body))))
+#+end_src
+
+** The =init.el= macro to define abbreviations (~prot-emacs-abbrev~)
+:PROPERTIES:
+:CUSTOM_ID: h:e7a12825-7848-42bd-b99b-b87903012814
+:END:
+
+[ Watch Prot's video: [[https://protesilaos.com/codelog/2024-02-03-emacs-abbrev-mode/][abbreviations with abbrev-mode (quick text expansion)]] (2024-02-03). ]
+
+#+begin_src emacs-lisp :tangle "init.el"
+(defmacro prot-emacs-abbrev (table &rest definitions)
+  "Expand abbrev DEFINITIONS for the given TABLE.
+DEFINITIONS is a sequence of (i) string pairs mapping the
+abbreviation to its expansion or (ii) a string and symbol pair
+making an abbreviation to a function."
+  (declare (indent 1))
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of key+command pairs"))
+  `(if (abbrev-table-p ,table)
+       (progn
+         ,@(mapcar
+            (lambda (pair)
+              (let ((abbrev (nth 0 pair))
+                    (expansion (nth 1 pair)))
+                (if (stringp expansion)
+                    `(define-abbrev ,table ,abbrev ,expansion)
+                  `(define-abbrev ,table ,abbrev "" ,expansion))))
+            (seq-split definitions 2)))
+     (error "%s is not an abbrev table" ,table)))
+#+end_src
+
+** The =init.el= final part to load the individual modules
+:PROPERTIES:
+:CUSTOM_ID: h:e6c4acf5-5b51-4b38-a86a-bf3f698ac872
+:END:
 
 Now we are ready to load our per-module configuration files:
 
@@ -174,27 +362,31 @@ Now we are ready to load our per-module configuration files:
   (require 'unravel-theme)
   (require 'unravel-essentials)
   ;; (require 'unravel-modeline)
-  ;; (require 'unravel-completion)
+  (require 'unravel-completion)
   ;; (require 'unravel-search)
   ;; (require 'unravel-dired)
   ;; (require 'unravel-window)
   ;; (require 'unravel-git)
   ;; (require 'unravel-org)
   (require 'unravel-langs)
-
 #+end_src
 
-* The ~unravel-theme.el~ module
+* The =unravel-theme.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:8cf67c82-1ebb-4be8-b0e7-161bbf5419ce
+:END:
 
 This module defines everything related to the aesthetics of Emacs.
-
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el" :mkdirp yes
   ;;; Everything related to the look of Emacs
 
 #+end_src
 
-** ~ef-themes~ for cool, modern themes
+** The =unravel-theme.el= section for cool, modern themes (~ef-themes~)
+:PROPERTIES:
+:CUSTOM_ID: h:2b2a27a1-6d2e-4b59-bf60-94682e173f2f
+:END:
 
 I use themes from the ~ef-themes~ package exclusively.
 
@@ -238,7 +430,12 @@ Prot is the lead developer and maintainer of this package.
     (ef-themes-select 'ef-elea-light))
 #+end_src
 
-** ~lin~ for an improvement on ~hl-line-mode~
+** The =unravel-theme.el= section for ~lin~
+:PROPERTIES:
+:CUSTOM_ID: h:bf5b4d08-8f33-4a8c-8ecd-fca19bf2497a
+:END:
+
+~lin~ is an improvement on ~hl-line-mode~.
 
 Prot is the lead developer and maintainer of this package.
 
@@ -259,12 +456,19 @@ Prot is the lead developer and maintainer of this package.
     (setopt lin-face 'lin-cyan))
 #+end_src
 
-** ~spacious-padding~ for a comfortable reading experience
+** The =unravel-theme.el= section for ~spacious-padding~
+:PROPERTIES:
+:CUSTOM_ID: h:6c118185-fcb1-4c9a-93af-71814cb84279
+:END:
+
+~spacious-padding~ gives us a comfortable reading experience.
 
 Prot is the lead developer and maintainer of this package.
 
-Inspiration for this package comes from [[https://github.com/rougier][Nicolas Rougier's impressive designs]]
-and [[https://github.com/minad/org-modern][Daniel Mendler's ~org-modern~ package]].
+#+begin_quote
+Inspiration for this package comes from [[https://github.com/rougier][Nicolas Rougier's impressive
+designs]] and [[https://github.com/minad/org-modern][Daniel Mendler's ~org-modern~ package]].
+#+end_quote
 
 + Package name (GNU ELPA): ~spacious-padding~
 + Official manual: <https://protesilaos.com/emacs/spacious-padding>
@@ -296,9 +500,49 @@ and [[https://github.com/minad/org-modern][Daniel Mendler's ~org-modern~ package
     (setq spacious-padding-subtle-mode-line t))
 #+end_src
 
-** ~cursory~ for an improved Emacs cursor
+** The =unravel-theme.el= section for ~rainbow-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:9438236e-a8a4-45e0-8c61-8268c634d50b
+:END:
 
-The ~cursory~ package provides a thin wrapper around built-in variables that affect the style of the Emacs cursor on graphical terminals. The intent is to allow the user to define preset configurations such as "block with slow blinking" or "bar with fast blinking" and set them on demand.
+#+begin_quote
+This package produces an in-buffer preview of a colour value. I use
+those while developing my themes, hence the ~prot/rainbow-mode-in-themes~
+to activate ~rainbow-mode~ if I am editing a theme file.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
+;;;; Rainbow mode for colour previewing (rainbow-mode.el)
+(use-package rainbow-mode
+  :ensure t
+  :init
+  (setq rainbow-ansi-colors nil)
+  (setq rainbow-x-colors nil)
+
+  (defun prot/rainbow-mode-in-themes ()
+    (when-let* ((file (buffer-file-name))
+                ((derived-mode-p 'emacs-lisp-mode))
+                ((string-match-p "-theme" file)))
+      (rainbow-mode 1)))
+  :bind ( :map ctl-x-x-map
+          ("c" . rainbow-mode)) ; C-x x c
+  :hook (emacs-lisp-mode . prot/rainbow-mode-in-themes))
+#+end_src
+
+** The =unravel-theme.el= section for ~cursory~
+:PROPERTIES:
+:CUSTOM_ID: h:34ce98fe-0b57-44d9-b5f3-0224632114a5
+:END:
+
+#+begin_quote
+My ~cursory~ package provides a thin wrapper around built-in variables
+that affect the style of the Emacs cursor on graphical terminals. The
+intent is to allow the user to define preset configurations such as
+"block with slow blinking" or "bar with fast blinking" and set them on
+demand. The use-case for such presets is to adapt to evolving
+interface requirements and concomitant levels of expected comfort,
+such as in the difference between writing and reading.
+#+end_quote
 
 Prot is the lead developer and maintainer.
 
@@ -363,7 +607,12 @@ Prot is the lead developer and maintainer.
   (cursory-mode 1))
 #+end_src
 
-** ~theme-buffet~ for automatically changing the theme based on time of day
+** The =unravel-theme.el= section for ~theme-buffet~
+:PROPERTIES:
+:CUSTOM_ID: h:2af10314-c8c2-4946-bf9c-a5b0f5fe881b
+:END:
+
+The ~theme-buffet~ package automatically changes the theme based on time of day.
 
 Bruno Boal is the lead developer and Prot is a co-maintainer.
 
@@ -385,7 +634,7 @@ Bruno Boal is the lead developer and Prot is a co-maintainer.
     (let ((modus-themes-p (featurep 'modus-themes))
           (ef-themes-p (featurep 'ef-themes)))
       (setq theme-buffet-menu 'end-user)
-      (setq theme-buffet-time-offset 5)
+      (setq theme-buffet-time-offset 0)
       (setq theme-buffet-end-user
             '(:night     (ef-dark ef-winter ef-autumn ef-night ef-duo-dark ef-symbiosis ef-owl)
               :morning   (ef-light ef-cyprus ef-spring ef-frost ef-duo-light ef-eagle)
@@ -396,8 +645,21 @@ Bruno Boal is the lead developer and Prot is a co-maintainer.
         (theme-buffet-timer-hours 2))))
 #+end_src
 
-** ~fontaine~ for beautiful font configuration
-The ~fontaine~ package allows the user to define detailed font configurations and set them on demand. For example, one can have a =regular-editing= preset and another for =presentation-mode= (these are arbitrary, user-defined symbols): the former uses small fonts which are optimised for writing, while the latter applies typefaces that are pleasant to read at comfortable point sizes.
+** The =unravel-theme.el= section about ~fontaine~
+:PROPERTIES:
+:CUSTOM_ID: h:cb41fef0-41a5-4a85-9552-496d96290258
+:END:
+
+[ Watch Prot's video: [[https://protesilaos.com/codelog/2024-01-16-customize-emacs-fonts/][Customise Emacs fonts]] (2024-01-16) ]
+
+#+begin_quote
+My ~fontaine~ package allows the user to define detailed font
+configurations and set them on demand. For example, one can have a
+=regular-editing= preset and another for =presentation-mode= (these
+are arbitrary, user-defined symbols): the former uses small fonts
+which are optimised for writing, while the latter applies typefaces
+that are pleasant to read at comfortable point sizes.
+#+end_quote
 
 Prot is the lead developer and maintainer.
 
@@ -408,6 +670,8 @@ Prot is the lead developer and maintainer.
   - GitHub: <https://github.com/protesilaos/fontaine>
   - GitLab: <https://gitlab.com/protesilaos/fontaine>
 
+Another section defines some complementary functionality
+([[#h:60d6aae2-6e4b-402c-b6a8-411fc49a6857][The =unravel-theme.el= section about ~variable-pitch-mode~ and font resizing]]).
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
   ;;;; Fontaine (font configurations)
@@ -445,11 +709,11 @@ Prot is the lead developer and maintainer.
              :inherit medium
              :default-height 150)
             (live-stream
-             :default-family "Iosevka Comfy Wide Motion"
+             :default-family "Iosevka"
              :default-height 150
              :default-weight medium
-             :fixed-pitch-family "Iosevka Comfy Wide Motion"
-             :variable-pitch-family "Iosevka Comfy Wide Duo"
+             :fixed-pitch-family "Iosevka"
+             :variable-pitch-family "Iosevka"
              :bold-weight extrabold)
             (presentation
              :default-height 180)
@@ -459,13 +723,13 @@ Prot is the lead developer and maintainer.
              ;; I keep all properties for didactic purposes, but most can be
              ;; omitted.  See the fontaine manual for the technicalities:
              ;; <https://protesilaos.com/emacs/fontaine>.
-             :default-family "Iosevka Comfy"
+             :default-family "Iosevka"
              :default-weight regular
              :default-slant normal
              :default-width normal
              :default-height 100
 
-             :fixed-pitch-family "Iosevka Comfy"
+             :fixed-pitch-family "Iosevka Fixed"
              :fixed-pitch-weight nil
              :fixed-pitch-slant nil
              :fixed-pitch-width nil
@@ -477,55 +741,55 @@ Prot is the lead developer and maintainer.
              :fixed-pitch-serif-width nil
              :fixed-pitch-serif-height 1.0
 
-             :variable-pitch-family "Iosevka Comfy Motion Duo"
+             :variable-pitch-family "Iosevka"
              :variable-pitch-weight nil
              :variable-pitch-slant nil
              :variable-pitch-width nil
              :variable-pitch-height 1.0
 
-             :mode-line-active-family nil
+             :mode-line-active-family "Iosevka Term"
              :mode-line-active-weight nil
              :mode-line-active-slant nil
              :mode-line-active-width nil
              :mode-line-active-height 1.0
 
-             :mode-line-inactive-family nil
+             :mode-line-inactive-family "Iosevka Term"
              :mode-line-inactive-weight nil
              :mode-line-inactive-slant nil
              :mode-line-inactive-width nil
              :mode-line-inactive-height 1.0
 
-             :header-line-family nil
+             :header-line-family "Iosevka Term"
              :header-line-weight nil
              :header-line-slant nil
              :header-line-width nil
              :header-line-height 1.0
 
-             :line-number-family nil
+             :line-number-family "Iosevka Term"
              :line-number-weight nil
              :line-number-slant nil
              :line-number-width nil
              :line-number-height 1.0
 
-             :tab-bar-family nil
+             :tab-bar-family "Iosevka Term"
              :tab-bar-weight nil
              :tab-bar-slant nil
              :tab-bar-width nil
              :tab-bar-height 1.0
 
-             :tab-line-family nil
+             :tab-line-family "Iosevka Term"
              :tab-line-weight nil
              :tab-line-slant nil
              :tab-line-width nil
              :tab-line-height 1.0
 
-             :bold-family nil
+             :bold-family "Iosevka"
              :bold-slant nil
              :bold-weight bold
              :bold-width nil
              :bold-height 1.0
 
-             :italic-family nil
+             :italic-family "Iosevka"
              :italic-weight nil
              :italic-slant italic
              :italic-width nil
@@ -534,214 +798,71 @@ Prot is the lead developer and maintainer.
              :line-spacing nil))))
 #+end_src
 
-** Finally, we provide the ~unravel-theme.el~ module
+** The =unravel-theme.el= section about ~variable-pitch-mode~ and font resizing
+:PROPERTIES:
+:CUSTOM_ID: h:60d6aae2-6e4b-402c-b6a8-411fc49a6857
+:END:
+
+[ Watch Prot's video: [[https://protesilaos.com/codelog/2024-01-16-customize-emacs-fonts/][Customise Emacs fonts]] (2024-01-16) ]
+
+#+begin_quote
+The built-in ~variable-pitch-mode~ makes the current buffer use a
+proportionately spaced font. In technical terms, it remaps the
+~default~ face to ~variable-pitch~, so whatever applies to the latter
+takes effect over the former. I take care of their respective font
+families in my ~fontaine~ setup ([[#h:cb41fef0-41a5-4a85-9552-496d96290258][The =prot-emacs-theme.el= section about ~fontaine~]]).
+
+I want to activate ~variable-pitch-mode~ in all buffers where I
+normally focus on prose. The exact mode hooks are specified in the
+variable =prot/enable-variable-pitch-in-hooks=. Exceptions to these
+are major modes that I do not consider related to prose (and which in
+my opinion should not be derived from ~text-mode~): these are excluded
+in the function ~prot/enable-variable-pitch~.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
+;;;;; `variable-pitch-mode' setup
+(use-package face-remap
+  :ensure nil
+  :functions prot/enable-variable-pitch
+  :bind ( :map ctl-x-x-map
+          ("v" . variable-pitch-mode))
+  :hook ((text-mode notmuch-show-mode elfeed-show-mode) . prot/enable-variable-pitch)
+  :config
+  ;; NOTE 2022-11-20: This may not cover every case, though it works
+  ;; fine in my workflow.  I am still undecided by EWW.
+  (defun prot/enable-variable-pitch ()
+    (unless (derived-mode-p 'mhtml-mode 'nxml-mode 'yaml-mode)
+      (variable-pitch-mode 1)))
+;;;;; Resize keys with global effect
+  :bind
+  ;; Emacs 29 introduces commands that resize the font across all
+  ;; buffers (including the minibuffer), which is what I want, as
+  ;; opposed to doing it only in the current buffer.  The keys are the
+  ;; same as the defaults.
+  (("C-x C-=" . global-text-scale-adjust)
+   ("C-x C-+" . global-text-scale-adjust)
+   ("C-x C-0" . global-text-scale-adjust)))
+#+end_src
+
+** Finally, we provide the =unravel-theme.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:bac0ce0a-db68-42e7-ba2c-f350f91f80ef
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
 (provide 'unravel-theme)
 #+end_src
 
-* The ~unravel-langs.el~ module
-
-** Controlling the behaviour of the TAB key
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el" :mkdirp yes
-  ;;;; Tabs, indentation, and the TAB key
-  (use-package emacs
-    :ensure nil
-    :demand t
-    :config
-    (setq tab-always-indent 'complete)
-    (setq tab-first-completion 'word-or-paren-or-punct) ; Emacs 27
-    (setq-default tab-width 4
-                  indent-tabs-mode nil))
-#+end_src
-
-** ~show-paren-mode~ for highlighting matching parens
-
-The built-in ~show-paren-mode~ highlights the parenthesis on the opposite end of the current symbolic expression. It also highlights matching terms of control flow in programming languages that are not using parentheses like Lisp: for instance, in a ~bash~ shell script it highlights the ~if~ and ~fi~ keywords. This mode also works for prose and I use it globally. Simple and effective!
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  ;;;; Parentheses (show-paren-mode)
-  (use-package paren
-    :ensure nil
-    :hook (prog-mode . show-paren-local-mode)
-    :config
-    (setq show-paren-style 'mixed)
-    (setq show-paren-when-point-in-periphery nil)
-    (setq show-paren-when-point-inside-paren nil)
-    (setq show-paren-context-when-offscreen 'overlay)) ; Emacs 29
-#+end_src
-
-** Settings for ~eldoc~: Emacs Live Documentation Feedback
-
-The built-in ~eldoc~ feature is especially useful in programming modes. While we are in a function call, it produces an indicator in the echo area (where the minibuffer appears upon invocation) that shows the name of the function, the arguments it takes, if any, and highlights the current argument we are positioned at. This way, we do not have to go back to review the signature of the function just to remember its arity. Same principle for variables, where ~eldoc-mode~ puts the first line of their documentation string in the echo area.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;;; Eldoc (Emacs live documentation feedback)
-(use-package eldoc
-  :ensure nil
-  :hook (prog-mode . eldoc-mode)
-  :config
-  (setq eldoc-message-function #'message)) ; don't use mode line for M-x eval-expression, etc.
-#+end_src
-
-** Settings for ~eglot~ (LSP client)
+* The ~unravel-essentials.el~ module
 :PROPERTIES:
-:CUSTOM_ID: h:92258aa8-0d8c-4c12-91b4-5f44420435ce
+:CUSTOM_ID: h:0ef52ed9-7b86-4329-ae4e-eff9ab8d07f2
 :END:
 
-The built-in ~eglot~ feature, developed and maintained by João Távora, is Emacs' own client for the Language Server Protocol (LSP). The LSP technology is all about enhancing the ability of a text editor to work with a given programming language. This works by installing a so-called "language server" on your computer, which the "LSP client" (i.e. ~eglot~) will plug into. A typical language server provides the following capabilities:
-
-- Code completion :: This can be visualised for in-buffer automatic expansion of function calls, variables, and the like.
-
-- Code linting :: To display suggestions, warnings, or errors. These are highlighted in the buffer, usually with an underline, and can also be displayed in a standalone buffer with the commands ~flymake-show-buffer-diagnostics~, ~flymake-show-project-diagnostics~
-
-- Code navigation and cross-referencing :: While over a symbol, use a command to jump directly to its definition. The default key bindings for going forth and then back are =M-.= (~xref-find-definitions~) and =M-,= (~xref-go-back~).
-
-Assuming the language server is installed, to start using the LSP client in a given file, do =M-x eglot=.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  ;;;; Eglot (built-in client for the language server protocol)
-  (use-package eglot
-    :ensure nil
-    :functions (eglot-ensure)
-    :commands (eglot)
-    :config
-    (setq eglot-sync-connect nil)
-    (setq eglot-autoshutdown t))
-#+end_src
-
-** Settings for ~markdown-mode~
-
-The ~markdown-mode~ lets us edit Markdown files. We get syntax highlighting and several extras, such as the folding of headings and navigation between them. The mode actually provides lots of added functionality for GitHub-flavoured Markdown and to preview a Markdown file's HTML representation on a web page. Though I only use it for basic text editing.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;; Markdown (markdown-mode)
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :config
-  (setq markdown-fontify-code-blocks-natively t))
-#+end_src
-
-** Settings for ~csv-mode~
-
-The package ~csv-mode~ provides support for =.csv= files. I do need this on occasion, even though my use-case is pretty basic. For me, the killer feature is the ability to create a virtual tabulated listing with the command ~csv-align-mode~: it hides the field delimiter (comma or space) and shows a tab stop in its stead.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;; csv-mode
-(use-package csv-mode
-  :ensure t
-  :commands (csv-align-mode))
-#+end_src
-
-** Settings for spell checking (~flyspell~)
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  ;;; Flyspell
-  (use-package flyspell
-    :ensure nil
-    :bind
-    ( :map flyspell-mode-map
-      ("C-;" . nil)
-      :map flyspell-mouse-map
-      ("<mouse-3>" . flyspell-correct-word))
-    :config
-    (setq flyspell-issue-message-flag nil)
-    (setq flyspell-issue-welcome-flag nil)
-    (setq ispell-program-name "aspell")
-    (setq ispell-dictionary "en_GB"))
-#+end_src
-
-** Settings for code linting (~flymake~)
-
-The built-in ~flymake~ feature defines an interface for viewing the output of linter programs. A "linter" parses a file and reports possible notes/warnings/errors in it. With ~flymake~ we get these diagnostics in the form of a standalone buffer as well as inline highlights (typically underlines combined with fringe indicators) for the portion of text in question. The linter report is displayed with the command ~flymake-show-buffer-diagnostics~, or ~flymake-show-project-diagnostics~. Highlights are shown in the context of the file.
-
-The built-in ~eglot~ feature uses ~flymake~ internally to handle the LSP linter output ([[#h:92258aa8-0d8c-4c12-91b4-5f44420435ce][Settings for ~eglot~]]).
-
-As for what I have in this configuration block, the essentials for me are the user options ~flymake-start-on-save-buffer~ and ~flymake-start-on-flymake-mode~ as they make the linter update its report when the buffer is saved and when ~flymake-mode~ is started, respectively. Otherwise, we have to run it manually, which is cumbersome.
-
-The ~package-lint-flymake~ package by Steve Purcell adds the glue code to make ~flymake~ report issues with Emacs Lisp files for the purposes of packaging.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;; Flymake
-(use-package flymake
-  :ensure nil
-  :bind
-  (:map flymake-mode-map
-    ("C-c ! s" . flymake-start)
-    ("C-c ! l" . flymake-show-buffer-diagnostics) ; Emacs28
-    ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
-    ("C-c ! n" . flymake-goto-next-error)
-    ("C-c ! p" . flymake-goto-prev-error))
-  :config
-  (setq flymake-fringe-indicator-position 'left-fringe)
-  (setq flymake-suppress-zero-counters t)
-  (setq flymake-no-changes-timeout nil)
-  (setq flymake-start-on-flymake-mode t)
-  (setq flymake-start-on-save-buffer t)
-  (setq flymake-proc-compilation-prevents-syntax-check t)
-  (setq flymake-wrap-around nil)
-  (setq flymake-mode-line-format
-        '("" flymake-mode-line-exception flymake-mode-line-counters))
-  ;; NOTE 2023-07-03: `prot-modeline.el' actually defines the counters
-  ;; itself and ignores this.
-  (setq flymake-mode-line-counter-format
-        '("" flymake-mode-line-error-counter
-          flymake-mode-line-warning-counter
-          flymake-mode-line-note-counter ""))
-  (setq flymake-show-diagnostics-at-end-of-line nil)) ; Emacs 30
-
-;;; Elisp packaging requirements
-(use-package package-lint-flymake
-  :ensure t
-  :after flymake
-  :config
-  (add-hook 'flymake-diagnostic-functions #'package-lint-flymake))
-#+end_src
-
-** Settings for ~outline-minor-mode~
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;; General configurations for prose/writing
-
-;;;; `outline' (`outline-mode' and `outline-minor-mode')
-(use-package outline
-  :ensure nil
-  :bind
-  ("<f10>" . outline-minor-mode)
-  :config
-  (setq outline-minor-mode-highlight nil) ; emacs28
-  (setq outline-minor-mode-cycle t) ; emacs28
-  (setq outline-minor-mode-use-buttons nil) ; emacs29---bless you for the nil option!
-  (setq outline-minor-mode-use-margins nil)) ; as above
-#+end_src
-
-** Settings for ~dictionary~
-
-Use the entry point ~M-x dictionary-search~
-
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;;; `dictionary'
-(use-package dictionary
-  :ensure nil
-  :config
-  (setq dictionary-server "dict.org"
-        dictionary-default-popup-strategy "lev" ; read doc string
-        dictionary-create-buttons nil
-        dictionary-use-single-buffer t))
-#+end_src
-
-** Finally, we provide the ~unravel-langs.el~ module
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-(provide 'unravel-langs)
-#+end_src
-
-* The ~unravel-essentials.el~ module
-
-** Basic configuration in ~unravel-essentials.el~
+** The =unravel-essentials.el= block with basic configurations
+:PROPERTIES:
+:CUSTOM_ID: h:713ede33-3802-40c6-a8e3-7e1fc0d0a924
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el" :mkdirp yes
   ;;; Essential configurations
@@ -764,7 +885,10 @@ Use the entry point ~M-x dictionary-search~
     (setq epa-keys-select-method 'minibuffer)) ; Emacs 30
 #+end_src
 
-** Settings for ~recentf~: keeping track of recent files
+** The =unravel-essentials.el= configuration to track recently visited files (~recentf~)
+:PROPERTIES:
+:CUSTOM_ID: h:f9aa7523-d88a-4080-add6-073f36cb8b9a
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 (use-package recentf
@@ -781,14 +905,22 @@ Use the entry point ~M-x dictionary-search~
   (setq recentf-show-file-shortcuts-flag nil))
 #+end_src
 
-** Settings for Bookmarks
+** The =unravel-essentials.el= settings for bookmarks
 :PROPERTIES:
 :CUSTOM_ID: h:581aa0ff-b136-4099-a321-3b86edbfbccb
 :END:
 
-Bookmarks are compartments that store arbitrary information about a file or buffer. The records are used to recreate that file/buffer inside of Emacs. Put differently, we can easily jump back to a file or directory (or anything that has a bookmark recorder+handler, really). Use the ~bookmark-set~ command (=C-x r m= by default) to record a bookmark and then visit one of your bookmarks with ~bookmark-jump~ (=C-x r b= by default).
+#+begin_quote
+Bookmarks are compartments that store arbitrary information about a
+file or buffer. The records are used to recreate that file/buffer
+inside of Emacs. Put differently, we can easily jump back to a file or
+directory (or anything that has a bookmark recorder+handler, really).
+Use the ~bookmark-set~ command (=C-x r m= by default) to record a
+bookmark and then visit one of your bookmarks with ~bookmark-jump~
+(=C-x r b= by default).
 
-Also see [[#h:5685df62-4484-42ad-a062-d55ab19022e3][Settings for registers]].
+Also see [[#h:5685df62-4484-42ad-a062-d55ab19022e3][the =unravel-essentials.el= settings for registers]].
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 ;;;; Built-in bookmarking framework (bookmark.el)
@@ -807,14 +939,27 @@ Also see [[#h:5685df62-4484-42ad-a062-d55ab19022e3][Settings for registers]].
   (setq bookmark-save-flag 1))
 #+end_src
 
-** Settings for registers
+** The =unravel-essentials.el= settings for registers
 :PROPERTIES:
 :CUSTOM_ID: h:5685df62-4484-42ad-a062-d55ab19022e3
 :END:
 
-Much like bookmarks, registers store data that we can reinstate quickly ([[#h:581aa0ff-b136-4099-a321-3b86edbfbccb][Settings for bookmarks]]). A common use-case is to write some text to a register and then insert that text by calling the given register. This is much better than relying on the ~kill-ring~, because registers are meant to be overwritten by the user, whereas the ~kill-ring~ accumulates lots of text that we do not necessarily need.
+[ Watch Prot's video: [[https://protesilaos.com/codelog/2023-06-28-emacs-mark-register-basics/][Mark and register basics]] (2023-06-28). ]
 
-To me, registers are essential for keyboard macros. By default, registers do not persist between Emacs sessions, though I do need to re-use them from time to time, hence the arrangement to record them with ~savehist-mode~ ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][Settings for saving the history (~savehist-mode~)]]).
+#+begin_quote
+Much like bookmarks, registers store data that we can reinstate
+quickly ([[#h:581aa0ff-b136-4099-a321-3b86edbfbccb][The =unravel-essentials.el= settings for bookmarks]]). A
+common use-case is to write some text to a register and then insert
+that text by calling the given register. This is much better than
+relying on the ~kill-ring~, because registers are meant to be
+overwritten by the user, whereas the ~kill-ring~ accumulates lots of
+text that we do not necessarily need.
+
+To me, registers are essential for keyboard macros. By default,
+registers do not persist between Emacs sessions, though I do need to
+re-use them from time to time, hence the arrangement to record them
+with ~savehist-mode~ ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][The =unravel-completion.el= settings for saving the history (~savehist-mode~)]]).
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 ;;;; Registers (register.el)
@@ -829,7 +974,10 @@ To me, registers are essential for keyboard macros. By default, registers do not
     (add-to-list 'savehist-additional-variables 'register-alist)))
 #+end_src
 
-** Settings for ~delete-selection-mode~
+** The =unravel-essentials.el= section for ~delete-selection-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:d551b90d-d730-4eb5-976a-24b010fd4db3
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 ;;;; Delete selection
@@ -838,12 +986,17 @@ To me, registers are essential for keyboard macros. By default, registers do not
   :hook (after-init . delete-selection-mode))
 #+end_src
 
-** Settings for tooltips
+** The =unravel-essentials.el= settings for tooltips
 :PROPERTIES:
 :CUSTOM_ID: h:26afeb95-7920-45ed-8ff6-3648256c280b
 :END:
 
-With these settings in place, Emacs will use its own faces and frame infrastructure to display tooltips. I prefer it this way because then we can benefit from the text properties that can be added to these messages (e.g. a different colour or a slant).
+#+begin_quote
+With these settings in place, Emacs will use its own faces and frame
+infrastructure to display tooltips. I prefer it this way because then
+we can benefit from the text properties that can be added to these
+messages (e.g. a different colour or a slant).
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 ;;;; Tooltips (tooltip-mode)
@@ -861,54 +1014,18 @@ With these settings in place, Emacs will use its own faces and frame infrastruct
           (no-special-glyphs . t))))
 #+end_src
 
-** Settings for the ~world-clock~
+** The =unravel-essentials.el= arrangement to run Emacs as a server
+:PROPERTIES:
+:CUSTOM_ID: h:7709b7e9-844f-49f3-badf-784aacec4bca
+:END:
 
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
-;;;; World clock (M-x world-clock)
-(use-package time
-  :ensure nil
-  :commands (world-clock)
-  :config
-  (setq display-time-world-list t)
-  (setq zoneinfo-style-world-list ; M-x shell RET timedatectl list-timezones
-        '(("America/Los_Angeles" "Los Angeles")
-          ("America/Vancouver" "Vancouver")
-          ("Canada/Pacific" "Canada/Pacific")
-          ("America/Chicago" "Chicago")
-          ("Brazil/Acre" "Rio Branco")
-          ("America/Toronto" "Toronto")
-          ("America/New_York" "New York")
-          ("Canada/Atlantic" "Canada/Atlantic")
-          ("Brazil/East" "Brasília")
-          ("UTC" "UTC")
-          ("Europe/Lisbon" "Lisbon")
-          ("Europe/Brussels" "Brussels")
-          ("Europe/Athens" "Athens")
-          ("Asia/Riyadh" "Riyadh")
-          ("Asia/Tehran" "Tehran")
-          ("Asia/Tbilisi" "Tbilisi")
-          ("Asia/Yekaterinburg" "Yekaterinburg")
-          ("Asia/Kolkata" "Kolkata")
-          ("Asia/Singapore" "Singapore")
-          ("Asia/Shanghai" "Shanghai")
-          ("Asia/Seoul" "Seoul")
-          ("Asia/Tokyo" "Tokyo")
-          ("Asia/Vladivostok" "Vladivostok")
-          ("Australia/Brisbane" "Brisbane")
-          ("Australia/Sydney" "Sydney")
-          ("Pacific/Auckland" "Auckland")))
-
-  ;; All of the following variables are for Emacs 28
-  (setq world-clock-list t)
-  (setq world-clock-time-format "%R %z (%Z)	%A %d %B")
-  (setq world-clock-buffer-name "*world-clock*") ; Placement handled by `display-buffer-alist'
-  (setq world-clock-timer-enable t)
-  (setq world-clock-timer-second 60))
-#+end_src
-
-** Run Emacs as a server
-
-The "server" is functionally like the daemon, except it is run by the first Emacs frame we launch. With a running server, we can connect to it through a new ~emacsclient~ call. This is useful if we want to launch new frames that share resources with the existing running process.
+#+begin_quote
+The "server" is functionally like the daemon, except it is run by the
+first Emacs frame we launch. With a running server, we can connect to
+it through a new ~emacsclient~ call. This is useful if we want to
+launch new frames that share resources with the existing running
+process.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 ;;;; Emacs server (allow emacsclient to connect to running session)
@@ -921,14 +1038,21 @@ The "server" is functionally like the daemon, except it is run by the first Emac
     (server-start)))
 #+end_src
 
-** ~expreg~ (tree-sitter mark syntactically)
+** The =prot-emacs-essentials.el= section about ~expreg~ (tree-sitter mark syntactically)
 :PROPERTIES:
 :CUSTOM_ID: h:ceb193bf-0de3-4c43-8ab7-6daa50817754
 :END:
 
-The ~expreg~ package by Yuan Fu (aka casouri) uses the tree-sitter framework to incrementally expand the region from the smallest to the largest syntactic unit in the given context. This is a powerful feature, though it (i) requires Emacs to be built with tree-sitter support and (ii) for the user to be running a major mode that is designed for tree-sitter (Lisp seems to work regardless).
+#+begin_quote
+The ~expreg~ package by Yuan Fu (aka casouri) uses the tree-sitter
+framework to incrementally expand the region from the smallest to the
+largest syntactic unit in the given context. This is a powerful
+feature, though it (i) requires Emacs to be built with tree-sitter
+support and (ii) for the user to be running a major mode that is
+designed for tree-sitter (Lisp seems to work regardless).
 
 The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)
@@ -957,7 +1081,7 @@ The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
            (t (expreg-expand)))))))
 #+end_src
 
-** Settings for Battery display
+** The =unravel-essentials.el= section for Battery display
 :PROPERTIES:
 :CUSTOM_ID: h:080aa291-95b4-4d54-8783-d156b13190e9
 :END:
@@ -971,12 +1095,15 @@ The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
     (setq battery-mode-line-format
           (cond
            ((eq battery-status-function #'battery-linux-proc-acpi)
-            "⏻%b%p%%,%d°C ")
+            "⏻ %b%p%%,%d°C ")
            (battery-status-function
-            "⏻%b%p%% "))))
+            "⏻ %b%p%% "))))
 #+end_src
 
-** Finally, we provide the ~unravel-essentials.el~ module
+** Finally, we provide the =unravel-essentials.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 (provide 'unravel-essentials)
@@ -987,28 +1114,63 @@ The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
 :CUSTOM_ID: h:15edf2c3-4419-4101-928a-6e224958a741
 :END:
 
-** Settings for completion styles
+** The =unravel-completion.el= settings for completion styles
 :PROPERTIES:
 :CUSTOM_ID: h:14b09958-279e-4069-81e3-5a16c9b69892
 :END:
 
-The ~completion-styles~ are pattern matching algorithms. They interpret user input and match candidates accordingly.
+#+begin_quote
+The ~completion-styles~ are pattern matching algorithms. They
+interpret user input and match candidates accordingly.
 
-- emacs22 :: Prefix completion that only operates on the text before point. If we are in =prefix|suffix=, with =|= representing the cursor, it will consider everything that expands =prefix= and then add back to it the =suffix=.
+- emacs22 :: Prefix completion that only operates on the text before
+  point. If we are in =prefix|suffix=, with =|= representing the
+  cursor, it will consider everything that expands =prefix= and then
+  add back to it the =suffix=.
 
-- basic :: Prefix completion that also accounts for the text after point. Using the above example, this one will consider patterns that match all of ~emacs22~ as well as anything that completes =suffix=.
+- basic :: Prefix completion that also accounts for the text after
+  point. Using the above example, this one will consider patterns that
+  match all of ~emacs22~ as well as anything that completes =suffix=.
 
-- partial-completion :: This is used for file navigation. Instead of typing out a full path like =~/.local/share/fonts=, we do =~/.l/s/f= or variants thereof to make the matches unique such as =~/.l/sh/fon=. It is a joy to navigate the file system in this way.
+- partial-completion :: This is used for file navigation. Instead of
+  typing out a full path like =~/.local/share/fonts=, we do =~/.l/s/f=
+  or variants thereof to make the matches unique such as =~/.l/sh/fon=.
+  It is a joy to navigate the file system in this way.
 
-- substring :: Matches the given sequence of characters literally regardless of where it is in a word. So =pro= will match =professional= as well as =reproduce=.
+- substring :: Matches the given sequence of characters literally
+  regardless of where it is in a word. So =pro= will match
+  =professional= as well as =reproduce=.
 
-- flex :: Completion of an in-order subset of characters. It does not matter where the charactes are in the word, so long as they are encountered in the given order. The input =lad= will thus match ~list-faces-display~ as well as ~pulsar-highlight-dwim~.
+- flex :: Completion of an in-order subset of characters. It does not
+  matter where the charactes are in the word, so long as they are
+  encountered in the given order. The input =lad= will thus match
+  ~list-faces-display~ as well as ~pulsar-highlight-dwim~.
 
-- initials :: Completion of acronyms and initialisms. Typing =lfd= will thus match ~list-faces-display~. This completion style can also be used for file system navigation, though I prefer to only have ~partial-completion~ handle that task.
+- initials :: Completion of acronyms and initialisms. Typing =lfd=
+  will thus match ~list-faces-display~. This completion style can also
+  be used for file system navigation, though I prefer to only have
+  ~partial-completion~ handle that task.
 
-- orderless :: This is the only completion style I use which is not built into Emacs and which I tweak further in a separate section ([[#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2][The ~orderless~ completion style]]). It matches patterns out-of-order. Patterns are typically words separated by spaces, though they can also be regular expressions, and even styles that are the same as the aforementioned ~flex~ and ~initials~.
+- orderless :: This is the only completion style I use which is not
+  built into Emacs and which I tweak further in a separate section
+  ([[#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2][The =prot-emacs-completion.el= for the ~orderless~ completion style]]).
+  It matches patterns out-of-order. Patterns are typically words
+  separated by spaces, though they can also be regular expressions,
+  and even styles that are the same as the aforementioned ~flex~ and
+  ~initials~.
 
-Now that you know about the completion styles I use, take a look at the value of my ~completion-styles~. You will notice that ~orderless~, which is the most powerful/flexible is placed last. I do this because Emacs tries the styles in the given order from left to right, moving the next one until it finds a match. As such, I usually want to start with tight matches (e.g. =li-fa-di= for ~list-faces-display~) and only widen the scope of the search as I need to. This is easy to do because none of the built-in completion styles parses the empty space, so as soon as I type a space after some characters I am using ~orderless~.
+Now that you know about the completion styles I use, take a look at
+the value of my ~completion-styles~. You will notice that ~orderless~,
+which is the most powerful/flexible is placed last. I do this because
+Emacs tries the styles in the given order from left to right, moving
+the next one until it finds a match. As such, I usually want to start
+with tight matches (e.g. =li-fa-di= for ~list-faces-display~) and only
+widen the scope of the search as I need to. This is easy to do because
+none of the built-in completion styles parses the empty space, so as
+soon as I type a space after some characters I am using ~orderless~.
+#+end_quote
+
+(There are more details in Prot's file, for the interested reader)
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el" :mkdirp yes
 ;;; General minibuffer settings
@@ -1080,12 +1242,23 @@ Now that you know about the completion styles I use, take a look at the value of
           (eglot (styles . (emacs22 substring orderless))))))
 #+end_src
 
-** Settings for the ~orderless~ completion style
+** The =unravel-completion.el= for the ~orderless~ completion style
 :PROPERTIES:
 :CUSTOM_ID: h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2
 :END:
 
-The ~orderless~ package by Omar Antolín Camarena provides one of the completion styles that I use ([[#h:14b09958-279e-4069-81e3-5a16c9b69892][Settings for completion styles]]). It is a powerful pattern matching algorithm that parses user input and interprets it out-of-order, so that =in pa= will cover ~insert-pair~ as well as ~package-install~. Components of the search are space-separated, by default, though we can modify the user option ~orderless-component-separator~ to have something else (but I cannot think of a better value). In the section about completion styles, I explain how I use ~orderless~ and why its power does not result in lots of false positives.
+#+begin_quote
+The ~orderless~ package by Omar Antolín Camarena provides one of the
+completion styles that I use ([[#h:14b09958-279e-4069-81e3-5a16c9b69892][The =prot-emacs-completion.el= settings for completion styles]]).
+It is a powerful pattern matching algorithm that parses user input and
+interprets it out-of-order, so that =in pa= will cover ~insert-pair~
+as well as ~package-install~. Components of the search are
+space-separated, by default, though we can modify the user option
+~orderless-component-separator~ to have something else (but I cannot
+think of a better value). In the section about completion styles, I
+explain how I use ~orderless~ and why its power does not result in
+lots of false positives.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Orderless completion style
@@ -1100,17 +1273,20 @@ The ~orderless~ package by Omar Antolín Camarena provides one of the completion
 
     ;; SPC should never complete: use it for `orderless' groups.
     ;; The `?' is a regexp construct.
-    :bind (:map minibuffer-local-completion-map
+    :bind ( :map minibuffer-local-completion-map
             ("SPC" . nil)
             ("?" . nil)))
 #+end_src
 
-** Settings to ignore letter casing
+** The =unravel-completion.el= settings to ignore letter casing
 :PROPERTIES:
 :CUSTOM_ID: h:7fe1787d-dba3-46fe-82a9-5dc5f8ea6217
 :END:
 
-I never really need to match letters case-sensitively in the minibuffer. Let's have everything ignore casing by default.
+#+begin_quote
+I never really need to match letters case-sensitively in the
+minibuffer. Let's have everything ignore casing by default.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (setq completion-ignore-case t)
@@ -1118,19 +1294,62 @@ I never really need to match letters case-sensitively in the minibuffer. Let's h
 (setq-default case-fold-search t)   ; For general regexp
 (setq read-file-name-completion-ignore-case t)
 #+end_src
-** Completion settings for common interactions
+
+** The =unravel-completion.el= settings for common interactions
 :PROPERTIES:
 :CUSTOM_ID: h:b640f032-ad11-413e-ad8f-63408671d500
 :END:
 
-Here I combine several small tweaks to improve the overall minibuffer experience.
+#+begin_quote
+Here I combine several small tweaks to improve the overall minibuffer
+experience.
 
-- The need to ~resize-mini-windows~ arises on some occasions where Emacs has to show text spanning multiple lines in the "mini windows".
-- The ~read-answer-short~ is complementary to ~use-short-answers~. This is about providing the shorter version to some confirmation prompt, such as =y= instead of =yes=.
-- The ~echo-keystrokes~ is set to a low value to show in the echo area the incomplete key sequence I have just typed. This is especially helpful for demonstration purposes but also to double check that I did not mistype something (I cannot touch-type, so this happens a lot).
-- The ~minibuffer-prompt-properties~ and advice to ~completing-read-multiple~ make it so that (i) the minibuffer prompt is not accessible with regular motions to avoid mistakes and (ii) prompts that complete multiple targets show an indicator about this fact. With regard to the latter in particular, we have prompts like that of Org to set tags for a heading (with =C-c C-q= else =M-x org-set-tags-command=) where more than one candidate can be provided using completion, provided each candidate is separated by the ~crm-separator~ (a comma by default, though Org uses =:= in that scenario).
-  Remember that when using completion in the minibuffer, you can hit =TAB= to expand the selected choice without exiting with it. For cases when multiple candidates can be selected, you select the candidate, =TAB=, then input the ~crm-separator~, and repeat until you are done selecting at which point you type =RET=.
-- Finally the ~file-name-shadow-mode~ is a neat little feature to remove the "shadowed" part of a file prompt while using something like =C-x C-f= (=M-x find-file=).
+- The need to ~resize-mini-windows~ arises on some occasions where
+  Emacs has to show text spanning multiple lines in the "mini
+  windows". A common scenario for me is in Org mode buffers where I
+  set the =TODO= keyword of a task with =C-c C-t= (=M-x org-todo=) and
+  have this as my setting: ~(setq org-use-fast-todo-selection 'expert)~
+  Otherwise, this is not an issue anyway and I may also like other
+  options for ~org-use-fast-todo-selection~.
+
+- The ~read-answer-short~ is complementary to ~use-short-answers~.
+  This is about providing the shorter version to some confirmation
+  prompt, such as =y= instead of =yes=.
+
+- The ~echo-keystrokes~ is set to a low value to show in the echo area
+  the incomplete key sequence I have just typed. This is especially
+  helpful for demonstration purposes but also to double check that I
+  did not mistype something (I cannot touch-type, so this happens a lot).
+
+- The ~minibuffer-prompt-properties~ and advice to ~completing-read-multiple~
+  make it so that (i) the minibuffer prompt is not accessible with
+  regular motions to avoid mistakes and (ii) prompts that complete
+  multiple targets show an indicator about this fact. With regard to
+  the latter in particular, we have prompts like that of Org to set
+  tags for a heading (with =C-c C-q= else =M-x org-set-tags-command=)
+  where more than one candidate can be provided using completion,
+  provided each candidate is separated by the ~crm-separator~ (a comma
+  by default, though Org uses =:= in that scenario).
+
+  Remember that when using completion in the minibuffer, you can hit
+  =TAB= to expand the selected choice without exiting with it. For
+  cases when multiple candidates can be selected, you select the
+  candidate, =TAB=, then input the ~crm-separator~, and repeat until
+  you are done selecting at which point you type =RET=.
+
+- Finally the ~file-name-shadow-mode~ is a neat little feature to
+  remove the "shadowed" part of a file prompt while using something
+  like =C-x C-f= (=M-x find-file=). File name shadowing happens when
+  we invoke ~find-file~ and instead of first deleting the contents of
+  the minibuffer, we start typing out the file system path we wish to
+  visit. For example, I am in =~/Git/Projects/= and type directly
+  after it something like =~/.local/share/fonts/=, so Emacs displays
+  =~/Git/Projects/~/.local/share/fonts/= with the original part greyed
+  out. With ~file-name-shadow-mode~ the "shadowed" part is removed
+  altogether. This is especially nice when combined with the
+  completion style called ~partial-completion~
+  ([[#h:14b09958-279e-4069-81e3-5a16c9b69892][The =unravel-completion.el= settings for completion styles]]).
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   (use-package rfn-eshadow
@@ -1171,7 +1390,7 @@ Here I combine several small tweaks to improve the overall minibuffer experience
     (file-name-shadow-mode 1))
 #+end_src
 
-** Generic minibuffer UI settings
+** The =unravel-completion.el= generic minibuffer UI settings
 :PROPERTIES:
 :CUSTOM_ID: h:de61a607-0bdf-462b-94cd-c0898319590e
 :END:
@@ -1197,21 +1416,34 @@ These are some settings for the default completion user interface.
     (setq completions-sort 'historical))
 #+end_src
 
-** Completion settings for saving the history (~savehist-mode~)
+** The =unravel-completion.el= settings for saving the history (~savehist-mode~)
 :PROPERTIES:
 :CUSTOM_ID: h:25765797-27a5-431e-8aa4-cc890a6a913a
 :END:
 
-Minibuffer prompts can have their own history. When they do not, they share a common history of user inputs. Emacs keeps track of that history in the current session, but loses it as soon as we close it. With ~savehist-mode~ enabled, all minibuffer histories are written to a file and are restored when we start Emacs again.
+#+begin_quote
+Minibuffer prompts can have their own history. When they do not, they
+share a common history of user inputs. Emacs keeps track of that
+history in the current session, but loses it as soon as we close it.
+With ~savehist-mode~ enabled, all minibuffer histories are written to
+a file and are restored when we start Emacs again.
+#+end_quote
 
-Since we are already recording minibuffer histories, we can instruct ~savehist-mode~ to also keep track of additional variables and restore them next time we use Emacs. Hence ~savehist-additional-variables~. I do this in a few of places:
+#+begin_quote
+Since we are already recording minibuffer histories, we can instruct
+~savehist-mode~ to also keep track of additional variables and restore
+them next time we use Emacs. Hence ~savehist-additional-variables~. I
+do this in a few of places:
 
-- [[#h:804b858f-7913-47ef-aaf4-8eef5b59ecb4][In-buffer completion popup and preview (~corfu~)]]
-- [[#h:5685df62-4484-42ad-a062-d55ab19022e3][Settings for registers]]
+- [[#h:804b858f-7913-47ef-aaf4-8eef5b59ecb4][The =unravel-completion.el= for in-buffer completion popup and preview (~corfu~)]]
+- [[#h:5685df62-4484-42ad-a062-d55ab19022e3][The =unravel-essentials.el= settings for registers]]
 
-Note that the user option ~history-length~ applies to each individual history variable: it is not about all histories combined.
+Note that the user option ~history-length~ applies to each individual
+history variable: it is not about all histories combined.
 
-Overall, I am happy with this feature and benefit from it on a daily basis.
+Overall, I am happy with this feature and benefit from it on a daily
+basis.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 ;;;; `savehist' (minibuffer and related histories)
@@ -1231,9 +1463,16 @@ Overall, I am happy with this feature and benefit from it on a daily basis.
 :CUSTOM_ID: h:567bb00f-1d82-4746-93e5-e0f60721728a
 :END:
 
-The built-in ~dabbrev~ package provides a text completion method that reads the contents of a buffer and expands the text before the cursor to match possible candidates. This is done with =M-/= (~dabbrev-expand~) which is what I use most of the time to perform in-buffer completions.
+#+begin_quote
+The built-in ~dabbrev~ package provides a text completion method that
+reads the contents of a buffer and expands the text before the cursor
+to match possible candidates. This is done with =M-/= (~dabbrev-expand~)
+which is what I use most of the time to perform in-buffer completions.
 
-The term "dabbrev" stands for "dynamic abbreviation". Emacs also has static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][Settings for static text expansion (~abbrev~)]]).
+The term "dabbrev" stands for "dynamic abbreviation". Emacs also has
+static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][Settings for static text expansion
+(~abbrev~)]]).
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (use-package dabbrev
@@ -1254,16 +1493,25 @@ The term "dabbrev" stands for "dynamic abbreviation". Emacs also has static, use
         '(archive-mode image-mode docview-mode pdf-view-mode)))
 #+end_src
 
-** In-buffer completion popup (~corfu~)
+** The =unravel-completion.el= for in-buffer completion popup (~corfu~)
 :PROPERTIES:
 :CUSTOM_ID: h:804b858f-7913-47ef-aaf4-8eef5b59ecb4
 :END:
 
-I generally do not rely on in-buffer text completion. I feel it slows me down and distracts me. When I do, however, need to rely on it, I have the ~corfu~ package by Daniel Mendler: it handles the task splendidly as it works with Emacs' underlying infrastructure for ~completion-at-point-functions~.
+#+begin_quote
+I generally do not rely on in-buffer text completion. I feel it slows
+me down and distracts me. When I do, however, need to rely on it, I
+have the ~corfu~ package by Daniel Mendler: it handles the task
+splendidly as it works with Emacs' underlying infrastructure for
+~completion-at-point-functions~.
 
-Completion is triggered with the =TAB= key, which produces a popup where the cursor is. The companion ~corfu-popupinfo-mode~ will show a secondary documentation popup if we move over a candidate but do not do anything with it.
+Completion is triggered with the =TAB= key, which produces a popup
+where the cursor is. The companion ~corfu-popupinfo-mode~ will show a
+secondary documentation popup if we move over a candidate but do not
+do anything with it.
 
-Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][Settings for dynamic text expansion (~dabbrev~)]].
+Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][the =prot-emacs-completion.el= settings for dynamic text expansion (~dabbrev~)]].
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 ;;; Corfu (in-buffer completion popup)
@@ -1286,20 +1534,53 @@ Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][Settings for dynamic text ex
     (add-to-list 'savehist-additional-variables 'corfu-history)))
 #+end_src
 
-** COMMENT Settings for ~consult~
+** The =unravel-completion.el= settings for ~consult~
 :PROPERTIES:
 :CUSTOM_ID: h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d
 :END:
 
-~consult~ is another wonderful package by Daniel Mendler. It provides a number of commands that turbocharge the minibuffer with advanced capabilities for filtering, asynchronous input, and previewing of the current candidate's context.
+#+begin_quote
+consult~ is another wonderful package by Daniel Mendler. It provides
+a number of commands that turbocharge the minibuffer with advanced
+capabilities for filtering, asynchronous input, and previewing of the
+current candidate's context.
 
-- A case where filtering is in use is the ~consult-buffer~ command, which many users have as a drop-in replacement to the generic =C-x b= (=M-x switch-to-buffer=). It is a one-stop-shop for buffers, recently visited files, bookmarks ([[#h:581aa0ff-b136-4099-a321-3b86edbfbccb][Settings for bookmarks]]), and, in principle, anything else that defines a source for this interface. To filter those source, we can type at the empty minibuffer =b SPC=, which will insert a filter specific to buffers. Delete back to remove the =[Buffer]= filter and insert another filter. Available filters are displayed by typing =?= at the prompt (I define it this way to call the command ~consult-narrow-help~). Every multi-source command from ~consult~ relies on this paradigm.
+- A case where filtering is in use is the ~consult-buffer~ command,
+  which many users have as a drop-in replacement to the generic =C-x b=
+  (=M-x switch-to-buffer=). It is a one-stop-shop for buffers,
+  recently visited files (if ~recentf-mode~ is used---I don't),
+  bookmarks ([[#h:581aa0ff-b136-4099-a321-3b86edbfbccb][The =unravel-essentials.el= settings for bookmarks]]),
+  and, in principle, anything else that defines a source for this
+  interface. To filter those source, we can type at the empty
+  minibuffer =b SPC=, which will insert a filter specific to buffers.
+  Delete back to remove the =[Buffer]= filter and insert another
+  filter. Available filters are displayed by typing =?= at the prompt
+  (I define it this way to call the command ~consult-narrow-help~).
+  Every multi-source command from ~consult~ relies on this paradigm.
 
-- Asynchronous input pertains to the intersection between Emacs and external search programs. A case in point is ~consult-grep~, which calls the system's ~grep~ program. The prompt distinguishes between what is sent to the external program and what is only shown to Emacs by wrapping the former inside of =#=. So the input =#prot-#completion= will send =prot-= to the ~grep~ program and then use =completion= inside of the minibuffer to perform the subsequent pattern-matching (e.g. with help from ~orderless~ ([[#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2][The ~orderless~ completion style]]). The part that is sent to the external program does not block Emacs. It is handled asynchronously, so everything stays responsive.
+- Asynchronous input pertains to the intersection between Emacs and
+  external search programs. A case in point is ~consult-grep~, which
+  calls the system's ~grep~ program. The prompt distinguishes between
+  what is sent to the external program and what is only shown to Emacs
+  by wrapping the former inside of =#=. So the input =#prot-#completion=
+  will send =prot-= to the ~grep~ program and then use =completion=
+  inside of the minibuffer to perform the subsequent pattern-matching
+  (e.g. with help from ~orderless~ ([[#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2][The =unravel-completion.el= for the ~orderless~ completion style]]).
+  The part that is sent to the external program does not block Emacs.
+  It is handled asynchronously, so everything stays responsive.
 
-- As for previewing, ~consult~ commands show the context of the current match and update the window as we move between completion candidates in the minibuffer. For example, the ~consult-line~ command performs an in-buffer search and lets us move between matches in the minibuffer while seeing in the window above what the surrounding text looks like. This is an excellent feature when we are trying to find something and do not quite remember all the search terms to narrow down to it simply by typing at the minibuffer prompt.
+- As for previewing, ~consult~ commands show the context of the
+  current match and update the window as we move between completion
+  candidates in the minibuffer. For example, the ~consult-line~
+  command performs an in-buffer search and lets us move between
+  matches in the minibuffer while seeing in the window above what the
+  surrounding text looks like. This is an excellent feature when we
+  are trying to find something and do not quite remember all the
+  search terms to narrow down to it simply by typing at the minibuffer
+  prompt.
 
 Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= module]].
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Enhanced minibuffer commands (consult.el)
@@ -1341,31 +1622,71 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
     (require 'consult-imenu))
 #+end_src
 
-** Settings for ~embark~
+** The =unravel-completion.el= section about ~embark~
 :PROPERTIES:
 :CUSTOM_ID: h:61863da4-8739-42ae-a30f-6e9d686e1995
 :END:
 
-The ~embark~ package by Omar Antolín Camarena provides a mechanism to perform relevant actions in the given context. What constitutes "the given context" depends on where the cursor is, such as if it is at the end of a symbolic expression in Lisp code or inside the minibuffer. The single point of entry is the ~embark-act~ command or variants like ~embark-dwim~.
-
-With ~embark-act~ we gain access to a customisable list of commands for the given context. If we are over a Lisp symbol, one possible action is to describe it (i.e. produce documentation about it). If we are browsing files in the minibuffer, possible actions include file operations such as to delete or rename the file. And so on for everything.
-
-The ~embark-dwim~ command always performs the default action for the given context. It is like invoking ~embark-act~ and then typing the =RET= key.
-
-A killer feature of ~embark~ is the concepts of "collect" and "export". These are used in the minibuffer to produce a dedicated buffer that contains all the completion candidates. For example, if we are reading documentation about =embark-= and have 10 items there, we can "collect" the results in their own buffer and then navigate it as if it were the minibuffer: =RET= will perform the action that the actual minibuffer would have carried out (to show documentation, in this case). Similarly, the export mechanism takes the completion candidates out of the minibuffer, though it also puts them in a major mode that is appropriate for them. Files, for instance, will be placed in a Dired buffer ([[#h:f8b08a77-f3a8-42fa-b1a9-f940348889c3][The =unravel-dired.el= module]]).
-
-Depending on the configurations about the "indicator", the ~embark-act~ command will display an informative buffer with keys and their corresponding commands.
-
-One downside of ~embark~ is that it is hard to know what the context is. I have had this experience myself several times, where I though I was targeting the URL at point while the actions were about Org source blocks, headings, and whatnot. Embark is probably correct in such a case, though I cannot make my brain think the way it expects.
-
-Another downside is the sheer number of options for each context. I feel that the defaults should be more conservative, to have 3-4 actions per context to make it easier to find stuff. Those who need more, can add them. Documentation can also be provided to that end. Adding commands to such a list is not a trivial task, because the user must modify keymaps and thus understand the relevant concepts. Sure, we can all learn, but this is not your usual ~setq~ tweak.
-
-All things considered, I do not recommend ~embark~ to new users as I know for a fact that people have trouble using it effectively. Whether it is worth it or not depends on one's use-case.
-
-Karthik Chikmagalur has an excellently written and presented essay on [[https://karthinks.com/software/fifteen-ways-to-use-embark/][Fifteen ways to use Embark]]. If you plan on becoming an ~embark~ power user, this will help you. Quote from Karthik:
-
 #+begin_quote
-Despite what these examples suggest, I estimate that I use less than a third of what Embark provides. Even so, in allowing me to change or chain actions at any time, it lets me pilot Emacs by the seat of my pants. A second, unforeseen benefit is that it makes commands and listings that I would never use available in a frictionless way: commands like ~transpose-regions~ and ~apply-macro-to-region-lines~, or custom ~dired~, ~ibuffer~ and ~package-menu~ listings that are interactively inaccessible otherwise. The ability to quickly whip up such buffers makes knowing how to use dired or ibuffer pay off several fold. In composing such features seamlessly with minibuffer interaction or with text-regions, Embark acts as a lever to amplify the power of Emacs’ myriad built in commands and libraries.
+The ~embark~ package by Omar Antolín Camarena provides a mechanism to
+perform relevant actions in the given context. What constitutes "the
+given context" depends on where the cursor is, such as if it is at the
+end of a symbolic expression in Lisp code or inside the minibuffer.
+The single point of entry is the ~embark-act~ command or variants like
+~embark-dwim~.
+
+With ~embark-act~ we gain access to a customisable list of commands
+for the given context. If we are over a Lisp symbol, one possible
+action is to describe it (i.e. produce documentation about it). If we
+are browsing files in the minibuffer, possible actions include file
+operations such as to delete or rename the file. And so on for
+everything.
+
+The ~embark-dwim~ command always performs the default action for the
+given context. It is like invoking ~embark-act~ and then typing the
+=RET= key.
+
+A killer feature of ~embark~ is the concepts of "collect" and
+"export". These are used in the minibuffer to produce a dedicated
+buffer that contains all the completion candidates. For example, if we
+are reading documentation about =embark-= and have 10 items there, we
+can "collect" the results in their own buffer and then navigate it as
+if it were the minibuffer: =RET= will perform the action that the
+actual minibuffer would have carried out (to show documentation, in
+this case). Similarly, the export mechanism takes the completion
+candidates out of the minibuffer, though it also puts them in a major
+mode that is appropriate for them. Files, for instance, will be placed
+in a Dired buffer ([[#h:f8b08a77-f3a8-42fa-b1a9-f940348889c3][The =unravel-dired.el= module]]).
+
+Depending on the configurations about the "indicator", the ~embark-act~
+command will display an informative buffer with keys and their
+corresponding commands.
+
+One downside of ~embark~ is that it is hard to know what the context
+is. I have had this experience myself several times, where I though I
+was targeting the URL at point while the actions were about Org source
+blocks, headings, and whatnot. Embark is probably correct in such a
+case, though I cannot make my brain think the way it expects.
+
+Another downside, which is also true for ~which-key~,
+is the sheer number of options for each context. I feel that the
+defaults should be more conservative, to have 3-4 actions per context
+to make it easier to find stuff. Those who need more, can add them.
+Documentation can also be provided to that end. Adding commands to
+such a list is not a trivial task, because the user must modify
+keymaps and thus understand the relevant concepts. Sure, we can all
+learn, but this is not your usual ~setq~ tweak.
+
+All things considered, I do not recommend ~embark~ to new users as I
+know for a fact that people have trouble using it effectively. Power
+users can benefit from it, though you will notice in the following
+code block and in =prot-embark.el= how even power users need to put in
+some work ([[#h:fb034be5-c316-4c4f-a46f-cebcab332a47][The =prot-embark.el= library]]). Whether it is worth it or
+not depends on one's use-case.
+
+Karthik Chikmagalur has an excellently written and presented essay on
+[[https://karthinks.com/software/fifteen-ways-to-use-embark/][Fifteen ways to use Embark]]. If you plan on becoming an ~embark~ power
+user, this will help you.
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
@@ -1413,33 +1734,33 @@ Despite what these examples suggest, I estimate that I use less than a third of 
 
   ;; I define my own keymaps because I only use a few functions in a
   ;; limited number of contexts.
-  ;; (use-package prot-embark
-  ;;   :ensure nil
-  ;;   :after embark
-  ;;   :bind
-  ;;   ( :map global-map
-  ;;     ("C-," . prot-embark-act-no-quit)
-  ;;     ("C-." . prot-embark-act-quit)
-  ;;     :map embark-collect-mode-map
-  ;;     ("C-," . prot-embark-act-no-quit)
-  ;;     ("C-." . prot-embark-act-quit)
-  ;;     :map minibuffer-local-filename-completion-map
-  ;;     ("C-," . prot-embark-act-no-quit)
-  ;;     ("C-." . prot-embark-act-quit))
-  ;;   :config
-  ;;   (setq embark-keymap-alist
-  ;;         '((buffer prot-embark-buffer-map)
-  ;;           (command prot-embark-command-map)
-  ;;           (expression prot-embark-expression-map)
-  ;;           (file prot-embark-file-map)
-  ;;           (function prot-embark-function-map)
-  ;;           (identifier prot-embark-identifier-map)
-  ;;           (package prot-embark-package-map)
-  ;;           (region prot-embark-region-map)
-  ;;           (symbol prot-embark-symbol-map)
-  ;;           (url prot-embark-url-map)
-  ;;           (variable prot-embark-variable-map)
-  ;;           (t embark-general-map))))
+  (use-package prot-embark
+    :ensure nil
+    :after embark
+    :bind
+    ( :map global-map
+      ("C-," . prot-embark-act-no-quit)
+      ("C-." . prot-embark-act-quit)
+      :map embark-collect-mode-map
+      ("C-," . prot-embark-act-no-quit)
+      ("C-." . prot-embark-act-quit)
+      :map minibuffer-local-filename-completion-map
+      ("C-," . prot-embark-act-no-quit)
+      ("C-." . prot-embark-act-quit))
+    :config
+    (setq embark-keymap-alist
+          '((buffer prot-embark-buffer-map)
+            (command prot-embark-command-map)
+            (expression prot-embark-expression-map)
+            (file prot-embark-file-map)
+            (function prot-embark-function-map)
+            (identifier prot-embark-identifier-map)
+            (package prot-embark-package-map)
+            (region prot-embark-region-map)
+            (symbol prot-embark-symbol-map)
+            (url prot-embark-url-map)
+            (variable prot-embark-variable-map)
+            (t embark-general-map))))
 
   ;; Needed for correct exporting while using Embark with Consult
   ;; commands.
@@ -1448,12 +1769,18 @@ Despite what these examples suggest, I estimate that I use less than a third of 
     :after (embark consult))
 #+end_src
 
-** Settings for ~marginalia~: to configure completion annotations
+** The =unravel-completion.el= section to configure completion annotations (~marginalia~)
 :PROPERTIES:
 :CUSTOM_ID: h:bd3f7a1d-a53d-4d3e-860e-25c5b35d8e7e
 :END:
 
-The ~marginalia~ package, co-authored by Daniel Mendler and Omar Antolín Camarena, provides helpful annotations to the side of completion candidates. We see its effect, for example, when we call =M-x=: each command has a brief description next to it (taken from its doc string) as well as a key binding, if it has one.
+#+begin_quote
+The ~marginalia~ package, co-authored by Daniel Mendler and Omar
+Antolín Camarena, provides helpful annotations to the side of
+completion candidates. We see its effect, for example, when we call =M-x=:
+each command has a brief description next to it (taken from its doc
+string) as well as a key binding, if it has one.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Detailed completion annotations (marginalia.el)
@@ -1464,14 +1791,16 @@ The ~marginalia~ package, co-authored by Daniel Mendler and Omar Antolín Camare
     (setq marginalia-max-relative-age 0)) ; absolute time
 #+end_src
 
-** Settings for ~vertico~
+** The =unravel-completion.el= section for ~vertico~
 :PROPERTIES:
 :CUSTOM_ID: h:cff33514-d3ac-4c16-a889-ea39d7346dc5
 :END:
 
-The ~vertico~ package by Daniel Mendler displays the minibuffer in a vertical layout. Under the hood, it takes care to be responsive and to handle even massive completion tables gracefully.
-
-All we need to get a decent experience with ~vertico~ is to enable the ~vertico-mode~. For most users this is enough.
+#+begin_quote
+The ~vertico~ package by Daniel Mendler displays the minibuffer in a
+vertical layout. Under the hood, it takes care to be responsive and to
+handle even massive completion tables gracefully.
+#+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Vertical completion layout (vertico)
@@ -1496,4 +1825,471 @@ All we need to get a decent experience with ~vertico~ is to enable the ~vertico-
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (provide 'unravel-completion)
+#+end_src
+* The ~unravel-langs.el~ module
+:PROPERTIES:
+:CUSTOM_ID: h:f44afb76-a1d7-4591-934d-b698cc79a792
+:END:
+
+** The =unravel-langs.el= settings for TAB
+:PROPERTIES:
+:CUSTOM_ID: h:559713c8-0e1e-44aa-bca8-0caae01cc8bb
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el" :mkdirp yes
+  ;;;; Tabs, indentation, and the TAB key
+  (use-package emacs
+    :ensure nil
+    :demand t
+    :config
+    (setq tab-always-indent 'complete)
+    (setq tab-first-completion 'word-or-paren-or-punct) ; Emacs 27
+    (setq-default tab-width 4
+                  indent-tabs-mode nil))
+#+end_src
+
+** The =unravel-langs.el= settings ~show-paren-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:7cd21ea6-c5d8-4258-999d-ad94cac2d8bf
+:END:
+
+#+begin_quote
+The built-in ~show-paren-mode~ highlights the parenthesis on the
+opposite end of the current symbolic expression. It also highlights
+matching terms of control flow in programming languages that are not
+using parentheses like Lisp: for instance, in a ~bash~ shell script it
+highlights the ~if~ and ~fi~ keywords. This mode also works for prose
+and I use it globally. Simple and effective!
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Parentheses (show-paren-mode)
+  (use-package paren
+    :ensure nil
+    :hook (prog-mode . show-paren-local-mode)
+    :config
+    (setq show-paren-style 'mixed)
+    (setq show-paren-when-point-in-periphery nil)
+    (setq show-paren-when-point-inside-paren nil)
+    (setq show-paren-context-when-offscreen 'overlay)) ; Emacs 29
+#+end_src
+
+** The =unravel-langs.el= settings for ~eldoc~
+:PROPERTIES:
+:CUSTOM_ID: h:a5773a39-a78f-43fa-8feb-669492c1d5a9
+:END:
+
+#+begin_quote
+The built-in ~eldoc~ feature is especially useful in programming
+modes. While we are in a function call, it produces an indicator in
+the echo area (where the minibuffer appears upon invocation) that
+shows the name of the function, the arguments it takes, if any, and
+highlights the current argument we are positioned at. This way, we do
+not have to go back to review the signature of the function just to
+remember its arity. Same principle for variables, where ~eldoc-mode~
+puts the first line of their documentation string in the echo area.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;;; Eldoc (Emacs live documentation feedback)
+(use-package eldoc
+  :ensure nil
+  :hook (prog-mode . eldoc-mode)
+  :config
+  (setq eldoc-message-function #'message)) ; don't use mode line for M-x eval-expression, etc.
+#+end_src
+
+** The =unravel-langs.el= settings for ~eglot~ (LSP client)
+:PROPERTIES:
+:CUSTOM_ID: h:92258aa8-0d8c-4c12-91b4-5f44420435ce
+:END:
+
+#+begin_quote
+The built-in ~eglot~ feature, developed and maintained by João Távora,
+is Emacs' own client for the Language Server Protocol (LSP). The LSP
+technology is all about enhancing the ability of a text editor to work
+with a given programming language. This works by installing a
+so-called "language server" on your computer, which the "LSP client"
+(i.e. ~eglot~) will plug into. A typical language server provides the
+following capabilities:
+
+- Code completion :: This can be visualised for in-buffer
+  automatic expansion of function calls, variables, and the like
+  ([[#h:804b858f-7913-47ef-aaf4-8eef5b59ecb4][The =unravel-completion.el= for in-buffer completion popup (~corfu~)]]).
+
+- Code linting :: To display suggestions, warnings, or errors. These
+  are highlighted in the buffer, usually with an underline, and can
+  also be displayed in a standalone buffer with the commands
+  ~flymake-show-buffer-diagnostics~, ~flymake-show-project-diagnostics~
+  ([[#h:df6d1b52-0306-4ace-9099-17dded11fbed][The =unravel-langs.el= settings for code linting (~flymake~)]]).
+
+- Code navigation and cross-referencing :: While over a symbol, use a
+  command to jump directly to its definition. The default key bindings
+  for going forth and then back are =M-.= (~xref-find-definitions~)
+  and =M-,= (~xref-go-back~).
+
+...
+
+Assuming the language server is installed, to start using the LSP
+client in a given file, do =M-x eglot=. To make this happen
+automatically for every newly visited file, add a hook like this:
+
+(add-hook 'SOME-MAJOR-mode #'eglot-ensure)
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Eglot (built-in client for the language server protocol)
+  (use-package eglot
+    :ensure nil
+    :functions (eglot-ensure)
+    :commands (eglot)
+    :config
+    (setq eglot-sync-connect nil)
+    (setq eglot-autoshutdown t))
+#+end_src
+
+** The =unravel-langs.el= settings for ~markdown-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:c9063898-07ae-4635-8853-bb5f4bbab421
+:END:
+
+#+begin_quote
+The ~markdown-mode~ lets us edit Markdown files. We get syntax
+highlighting and several extras, such as the folding of headings and
+navigation between them. The mode actually provides lots of added
+functionality for GitHub-flavoured Markdown and to preview a Markdown
+file's HTML representation on a web page. Though I only use it for
+basic text editing.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;; Markdown (markdown-mode)
+(use-package markdown-mode
+  :ensure t
+  :defer t
+  :config
+  (setq markdown-fontify-code-blocks-natively t))
+#+end_src
+
+** The =prot-emacs-langs.el= settings for ~csv-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:bae58479-86c1-410f-867e-c548def65b1c
+:END:
+
+#+begin_quote
+The package ~csv-mode~ provides support for =.csv= files. I do need
+this on occasion, even though my use-case is pretty basic. For me, the
+killer feature is the ability to create a virtual tabulated listing
+with the command ~csv-align-mode~: it hides the field delimiter (comma
+or space) and shows a tab stop in its stead.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;; csv-mode
+(use-package csv-mode
+  :ensure t
+  :commands (csv-align-mode))
+#+end_src
+
+** The =unravel-langs.el= settings for spell checking (~flyspell~)
+:PROPERTIES:
+:CUSTOM_ID: h:115806c4-88b0-43c1-8db2-d9d8d20a5c17
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;; Flyspell
+  (use-package flyspell
+    :ensure nil
+    :bind
+    ( :map flyspell-mode-map
+      ("C-;" . nil)
+      :map flyspell-mouse-map
+      ("<mouse-3>" . flyspell-correct-word))
+    :config
+    (setq flyspell-issue-message-flag nil)
+    (setq flyspell-issue-welcome-flag nil)
+    (setq ispell-program-name "aspell")
+    (setq ispell-dictionary "en_GB"))
+#+end_src
+
+** The =unravel-langs.el= settings for code linting (~flymake~)
+:PROPERTIES:
+:CUSTOM_ID: h:df6d1b52-0306-4ace-9099-17dded11fbed
+:END:
+
+#+begin_quote
+The built-in ~flymake~ feature defines an interface for viewing the
+output of linter programs. A "linter" parses a file and reports
+possible notes/warnings/errors in it. With ~flymake~ we get these
+diagnostics in the form of a standalone buffer as well as inline
+highlights (typically underlines combined with fringe indicators) for
+the portion of text in question. The linter report is displayed with
+the command ~flymake-show-buffer-diagnostics~, or ~flymake-show-project-diagnostics~.
+Highlights are shown in the context of the file.
+
+The built-in ~eglot~ feature uses ~flymake~ internally to handle the
+LSP linter output ([[#h:92258aa8-0d8c-4c12-91b4-5f44420435ce][The =unravel-langs.el= settings for ~eglot~]]).
+
+As for what I have in this configuration block, the essentials for me
+are the user options ~flymake-start-on-save-buffer~ and ~flymake-start-on-flymake-mode~
+as they make the linter update its report when the buffer is saved and
+when ~flymake-mode~ is started, respectively. Otherwise, we have to
+run it manually, which is cumbersome.
+
+The ~package-lint-flymake~ package by Steve Purcell adds the glue code
+to make ~flymake~ report issues with Emacs Lisp files for the purposes
+of packaging. I use it whenever I work on my numerous Emacs packages.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;; Flymake
+(use-package flymake
+  :ensure nil
+  :bind
+  (:map flymake-mode-map
+    ("C-c ! s" . flymake-start)
+    ("C-c ! l" . flymake-show-buffer-diagnostics) ; Emacs28
+    ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
+    ("C-c ! n" . flymake-goto-next-error)
+    ("C-c ! p" . flymake-goto-prev-error))
+  :config
+  (setq flymake-fringe-indicator-position 'left-fringe)
+  (setq flymake-suppress-zero-counters t)
+  (setq flymake-no-changes-timeout nil)
+  (setq flymake-start-on-flymake-mode t)
+  (setq flymake-start-on-save-buffer t)
+  (setq flymake-proc-compilation-prevents-syntax-check t)
+  (setq flymake-wrap-around nil)
+  (setq flymake-mode-line-format
+        '("" flymake-mode-line-exception flymake-mode-line-counters))
+  ;; NOTE 2023-07-03: `prot-modeline.el' actually defines the counters
+  ;; itself and ignores this.
+  (setq flymake-mode-line-counter-format
+        '("" flymake-mode-line-error-counter
+          flymake-mode-line-warning-counter
+          flymake-mode-line-note-counter ""))
+  (setq flymake-show-diagnostics-at-end-of-line nil)) ; Emacs 30
+
+;;; Elisp packaging requirements
+(use-package package-lint-flymake
+  :ensure t
+  :after flymake
+  :config
+  (add-hook 'flymake-diagnostic-functions #'package-lint-flymake))
+#+end_src
+
+** The =unravel-langs.el= settings for ~outline-minor-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:ffff5f7b-a62b-4d4a-ae29-af75402e5c35
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;; General configurations for prose/writing
+
+;;;; `outline' (`outline-mode' and `outline-minor-mode')
+(use-package outline
+  :ensure nil
+  :bind
+  ("<f10>" . outline-minor-mode)
+  :config
+  (setq outline-minor-mode-highlight nil) ; emacs28
+  (setq outline-minor-mode-cycle t) ; emacs28
+  (setq outline-minor-mode-use-buttons nil) ; emacs29---bless you for the nil option!
+  (setq outline-minor-mode-use-margins nil)) ; as above
+#+end_src
+
+** The =prot-emacs-langs.el= settings for ~dictionary~
+:PROPERTIES:
+:CUSTOM_ID: h:f91563d8-f176-4555-b45b-ece56de03279
+:END:
+
+Use the entry point ~M-x dictionary-search~
+
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;;; `dictionary'
+(use-package dictionary
+  :ensure nil
+  :config
+  (setq dictionary-server "dict.org"
+        dictionary-default-popup-strategy "lev" ; read doc string
+        dictionary-create-buttons nil
+        dictionary-use-single-buffer t))
+#+end_src
+
+** The =unravel-langs.el= settings for ~denote~ (notes and file-naming)
+:PROPERTIES:
+:CUSTOM_ID: h:e86a66dc-7ef9-4f09-ad7e-946de2034e8d
+:END:
+
+#+begin_quote
+This is another one of my packages and is extended by my
+~consult-denote~ package ([[#h:ee82e629-fb05-4c75-9175-48a760a25691][The =unravel-langs.el= integration between Consult and Denote (~consult-denote~)]]).
+
+Denote is a simple note-taking tool for Emacs. It is based on the idea
+that notes should follow a predictable and descriptive file-naming
+scheme. The file name must offer a clear indication of what the note is
+about, without reference to any other metadata. Denote basically
+streamlines the creation of such files while providing facilities to
+link between them.
+
+Denote's file-naming scheme is not limited to "notes". It can be used
+for all types of file, including those that are not editable in Emacs,
+such as videos. Naming files in a consistent way makes their
+filtering and retrieval considerably easier. Denote provides relevant
+facilities to rename files, regardless of file type.
+#+end_quote
+
+Prot is the developer and maintainer of this package.
+
++ Package name (GNU ELPA): ~denote~
++ Official manual: <https://protesilaos.com/emacs/denote>
++ Change log: <https://protesilaos.com/emacs/denote-changelog>
++ Git repositories:
+  - GitHub: <https://github.com/protesilaos/denote>
+  - GitLab: <https://gitlab.com/protesilaos/denote>
++ Video demo: <https://protesilaos.com/codelog/2022-06-18-denote-demo/>
++ Backronyms: Denote Everything Neatly; Omit The Excesses.  Don't Ever
+  Note Only The Epiphenomenal.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+;;; Denote (simple note-taking and file-naming)
+
+;; Read the manual: <https://protesilaos.com/emacs/denote>.  This does
+;; not include all the useful features of Denote.  I have a separate
+;; private setup for those, as I need to test everything is in order.
+(use-package denote
+  :ensure t
+  :hook
+  ;; If you use Markdown or plain text files you want to fontify links
+  ;; upon visiting the file (Org renders links as buttons right away).
+  ((text-mode . denote-fontify-links-mode-maybe)
+
+   ;; Highlight Denote file names in Dired buffers.  Below is the
+   ;; generic approach, which is great if you rename files Denote-style
+   ;; in lots of places as I do.
+   ;;
+   ;; If you only want the `denote-dired-mode' in select directories,
+   ;; then modify the variable `denote-dired-directories' and use the
+   ;; following instead:
+   ;;
+   ;;  (dired-mode . denote-dired-mode-in-directories)
+   (dired-mode . denote-dired-mode))
+  :bind
+  ;; Denote DOES NOT define any key bindings.  This is for the user to
+  ;; decide.  Here I only have a subset of what Denote offers.
+  ( :map global-map
+    ("C-c n n" . denote)
+    ("C-c n N" . denote-type)
+    ("C-c n o" . denote-sort-dired) ; "order" mnemonic
+    ;; Note that `denote-rename-file' can work from any context, not
+    ;; just Dired buffers.  That is why we bind it here to the
+    ;; `global-map'.
+    ;;
+    ;; Also see `denote-rename-file-using-front-matter' further below.
+    ("C-c n r" . denote-rename-file)
+    ;; If you intend to use Denote with a variety of file types, it is
+    ;; easier to bind the link-related commands to the `global-map', as
+    ;; shown here.  Otherwise follow the same pattern for
+    ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
+    :map text-mode-map
+    ("C-c n i" . denote-link) ; "insert" mnemonic
+    ("C-c n I" . denote-add-links)
+    ("C-c n b" . denote-backlinks)
+    ;; Also see `denote-rename-file' further above.
+    ("C-c n R" . denote-rename-file-using-front-matter)
+    :map org-mode-map
+    ("C-c n d l" . denote-org-extras-dblock-insert-links)
+    ("C-c n d b" . denote-org-extras-dblock-insert-backlinks)
+    ;; Key bindings specifically for Dired.
+    :map dired-mode-map
+    ("C-c C-d C-i" . denote-dired-link-marked-notes)
+    ("C-c C-d C-r" . denote-dired-rename-marked-files)
+    ("C-c C-d C-k" . denote-dired-rename-marked-files-with-keywords)
+    ("C-c C-d C-f" . denote-dired-rename-marked-files-using-front-matter))
+  :config
+  ;; Remember to check the doc strings of those variables.
+  (setq denote-directory (expand-file-name "~/Documents/notes/"))
+  (setq denote-file-type 'text) ; Org is the default file type
+
+  ;; If you want to have a "controlled vocabulary" of keywords,
+  ;; meaning that you only use a predefined set of them, then you want
+  ;; `denote-infer-keywords' to be nil and `denote-known-keywords' to
+  ;; have the keywords you need.
+  (setq denote-known-keywords '("emacs" "philosophy" "politics" "economics"))
+  (setq denote-infer-keywords t)
+  (setq denote-sort-keywords t)
+
+  (setq denote-excluded-directories-regexp nil)
+  (setq denote-date-format nil) ; read its doc string
+  (setq denote-rename-confirmations nil) ; CAREFUL with this if you are not familiar with Denote!
+
+  (setq denote-backlinks-show-context nil)
+
+  (setq denote-rename-buffer-format "[D] %t%b")
+  (setq denote-buffer-has-backlinks-string " (<--->)")
+
+  ;; Automatically rename Denote buffers when opening them so that
+  ;; instead of their long file name they have a literal "[D]"
+  ;; followed by the file's title.  Read the doc string of
+  ;; `denote-rename-buffer-format' for how to modify this.
+  (denote-rename-buffer-mode 1)
+
+  ;; ----- PERSONAL TWEAKS FOR EXPERIMENTS -----
+  (setq denote-text-front-matter "title: %s\n\n")
+
+  (defun prot/denote-add-text-front-matter-separator ()
+    "Add separator equal to the length of the title.
+Do this when the `denote-file-type' is `text'."
+    (when (and (eq denote-file-type 'text)
+              ;; Not `string=' because there may be a .gpg extension as well.
+              (string-match-p (file-name-extension buffer-file-name) "txt"))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "title:" nil t)
+          (let ((text (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+            (if (re-search-forward "^$" nil t)
+                (insert (make-string (length text) ?-))
+              (error "Could not find an empty line after the front matter")))))))
+
+  (add-hook 'denote-after-new-note-hook #'prot/denote-add-text-front-matter-separator))
+#+end_src
+
+*** The =unravel-langs.el= integration between Consult and Denote (~consult-denote~)
+:PROPERTIES:
+:CUSTOM_ID: h:ee82e629-fb05-4c75-9175-48a760a25691
+:END:
+
+#+begin_quote
+This is another package of mine which extends my ~denote~ package
+([[#h:e86a66dc-7ef9-4f09-ad7e-946de2034e8d][The =unravel-langs.el= settings for ~denote~ (notes and file-naming)]]).
+
+This is glue code to integrate ~denote~ with Daniel Mendler's
+~consult~ ([[#h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d][The =unravel-completion.el= settings for ~consult~]]). The
+idea is to enhance minibuffer interactions, such as by providing a
+preview of the file-to-linked/opened and by adding more sources to the
+~consult-buffer~ command.
+#+end_quote
+
+Prot is the developer of this package.
+
++ Package name (GNU ELPA): ~consult-denote~
++ Official manual: not available yet.
++ Git repositories:
+  + GitHub: <https://github.com/protesilaos/consult-denote>
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package consult-denote
+    :ensure t
+    :bind
+    (("C-c n f" . consult-denote-find)
+     ("C-c n g" . consult-denote-grep))
+    :config
+    (consult-denote-mode 1))
+#+end_src
+
+** Finally, we provide the ~unravel-langs.el~ module
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+(provide 'unravel-langs)
 #+end_src
