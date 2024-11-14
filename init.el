@@ -21,7 +21,7 @@
 (mapc
  (lambda (string)
    (add-to-list 'load-path (locate-user-emacs-file string)))
- '("unravel-modules"))
+ '("unravel-modules" "custom-lisp"))
 
 ;;;; Packages
 
