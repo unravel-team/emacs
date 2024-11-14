@@ -534,7 +534,7 @@ Prot is the lead developer and maintainer.
              :line-spacing nil))))
 #+end_src
 
-** Finally, we provide ~unravel-theme.el~ module
+** Finally, we provide the ~unravel-theme.el~ module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
 (provide 'unravel-theme)
@@ -733,7 +733,7 @@ Use the entry point ~M-x dictionary-search~
         dictionary-use-single-buffer t))
 #+end_src
 
-** Finally, we provide ~unravel-langs.el~ module
+** Finally, we provide the ~unravel-langs.el~ module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
 (provide 'unravel-langs)
@@ -976,8 +976,524 @@ The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
             "⏻%b%p%% "))))
 #+end_src
 
-** Finally, we provide ~unravel-essentials.el~ module
+** Finally, we provide the ~unravel-essentials.el~ module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 (provide 'unravel-essentials)
+#+end_src
+
+* The ~unravel-completion.el~ module
+:PROPERTIES:
+:CUSTOM_ID: h:15edf2c3-4419-4101-928a-6e224958a741
+:END:
+
+** Settings for completion styles
+:PROPERTIES:
+:CUSTOM_ID: h:14b09958-279e-4069-81e3-5a16c9b69892
+:END:
+
+The ~completion-styles~ are pattern matching algorithms. They interpret user input and match candidates accordingly.
+
+- emacs22 :: Prefix completion that only operates on the text before point. If we are in =prefix|suffix=, with =|= representing the cursor, it will consider everything that expands =prefix= and then add back to it the =suffix=.
+
+- basic :: Prefix completion that also accounts for the text after point. Using the above example, this one will consider patterns that match all of ~emacs22~ as well as anything that completes =suffix=.
+
+- partial-completion :: This is used for file navigation. Instead of typing out a full path like =~/.local/share/fonts=, we do =~/.l/s/f= or variants thereof to make the matches unique such as =~/.l/sh/fon=. It is a joy to navigate the file system in this way.
+
+- substring :: Matches the given sequence of characters literally regardless of where it is in a word. So =pro= will match =professional= as well as =reproduce=.
+
+- flex :: Completion of an in-order subset of characters. It does not matter where the charactes are in the word, so long as they are encountered in the given order. The input =lad= will thus match ~list-faces-display~ as well as ~pulsar-highlight-dwim~.
+
+- initials :: Completion of acronyms and initialisms. Typing =lfd= will thus match ~list-faces-display~. This completion style can also be used for file system navigation, though I prefer to only have ~partial-completion~ handle that task.
+
+- orderless :: This is the only completion style I use which is not built into Emacs and which I tweak further in a separate section ([[#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2][The ~orderless~ completion style]]). It matches patterns out-of-order. Patterns are typically words separated by spaces, though they can also be regular expressions, and even styles that are the same as the aforementioned ~flex~ and ~initials~.
+
+Now that you know about the completion styles I use, take a look at the value of my ~completion-styles~. You will notice that ~orderless~, which is the most powerful/flexible is placed last. I do this because Emacs tries the styles in the given order from left to right, moving the next one until it finds a match. As such, I usually want to start with tight matches (e.g. =li-fa-di= for ~list-faces-display~) and only widen the scope of the search as I need to. This is easy to do because none of the built-in completion styles parses the empty space, so as soon as I type a space after some characters I am using ~orderless~.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el" :mkdirp yes
+;;; General minibuffer settings
+(use-package minibuffer
+  :ensure nil
+  :config
+;;;; Completion styles
+  (setq completion-styles '(basic substring initials flex orderless)) ; also see `completion-category-overrides'
+  (setq completion-pcm-leading-wildcard t) ; Emacs 31: make `partial-completion' behave like `substring'
+
+  ;; Reset all the per-category defaults so that (i) we use the
+  ;; standard `completion-styles' and (ii) can specify our own styles
+  ;; in the `completion-category-overrides' without having to
+  ;; explicitly override everything.
+  (setq completion-category-defaults nil)
+
+  ;; A non-exhaustve list of known completion categories:
+  ;;
+  ;; - `bookmark'
+  ;; - `buffer'
+  ;; - `charset'
+  ;; - `coding-system'
+  ;; - `color'
+  ;; - `command' (e.g. `M-x')
+  ;; - `customize-group'
+  ;; - `environment-variable'
+  ;; - `expression'
+  ;; - `face'
+  ;; - `file'
+  ;; - `function' (the `describe-function' command bound to `C-h f')
+  ;; - `info-menu'
+  ;; - `imenu'
+  ;; - `input-method'
+  ;; - `kill-ring'
+  ;; - `library'
+  ;; - `minor-mode'
+  ;; - `multi-category'
+  ;; - `package'
+  ;; - `project-file'
+  ;; - `symbol' (the `describe-symbol' command bound to `C-h o')
+  ;; - `theme'
+  ;; - `unicode-name' (the `insert-char' command bound to `C-x 8 RET')
+  ;; - `variable' (the `describe-variable' command bound to `C-h v')
+  ;; - `consult-grep'
+  ;; - `consult-isearch'
+  ;; - `consult-kmacro'
+  ;; - `consult-location'
+  ;; - `embark-keybinding'
+  ;;
+  (setq completion-category-overrides
+        ;; NOTE 2021-10-25: I am adding `basic' because it works better as a
+        ;; default for some contexts.  Read:
+        ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=50387>.
+        ;;
+        ;; `partial-completion' is a killer app for files, because it
+        ;; can expand ~/.l/s/fo to ~/.local/share/fonts.
+        ;;
+        ;; If `basic' cannot match my current input, Emacs tries the
+        ;; next completion style in the given order.  In other words,
+        ;; `orderless' kicks in as soon as I input a space or one of its
+        ;; style dispatcher characters.
+        '((file (styles . (basic partial-completion orderless)))
+          (bookmark (styles . (basic substring)))
+          (library (styles . (basic substring)))
+          (embark-keybinding (styles . (basic substring)))
+          (imenu (styles . (basic substring orderless)))
+          (consult-location (styles . (basic substring orderless)))
+          (kill-ring (styles . (emacs22 orderless)))
+          (eglot (styles . (emacs22 substring orderless))))))
+#+end_src
+
+** Settings for the ~orderless~ completion style
+:PROPERTIES:
+:CUSTOM_ID: h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2
+:END:
+
+The ~orderless~ package by Omar Antolín Camarena provides one of the completion styles that I use ([[#h:14b09958-279e-4069-81e3-5a16c9b69892][Settings for completion styles]]). It is a powerful pattern matching algorithm that parses user input and interprets it out-of-order, so that =in pa= will cover ~insert-pair~ as well as ~package-install~. Components of the search are space-separated, by default, though we can modify the user option ~orderless-component-separator~ to have something else (but I cannot think of a better value). In the section about completion styles, I explain how I use ~orderless~ and why its power does not result in lots of false positives.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; Orderless completion style
+  (use-package orderless
+    :ensure t
+    :demand t
+    :after minibuffer
+    :config
+    ;; Remember to check my `completion-styles' and the
+    ;; `completion-category-overrides'.
+    (setq orderless-matching-styles '(orderless-prefixes orderless-regexp))
+
+    ;; SPC should never complete: use it for `orderless' groups.
+    ;; The `?' is a regexp construct.
+    :bind (:map minibuffer-local-completion-map
+            ("SPC" . nil)
+            ("?" . nil)))
+#+end_src
+
+** Settings to ignore letter casing
+:PROPERTIES:
+:CUSTOM_ID: h:7fe1787d-dba3-46fe-82a9-5dc5f8ea6217
+:END:
+
+I never really need to match letters case-sensitively in the minibuffer. Let's have everything ignore casing by default.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+(setq completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq-default case-fold-search t)   ; For general regexp
+(setq read-file-name-completion-ignore-case t)
+#+end_src
+** Completion settings for common interactions
+:PROPERTIES:
+:CUSTOM_ID: h:b640f032-ad11-413e-ad8f-63408671d500
+:END:
+
+Here I combine several small tweaks to improve the overall minibuffer experience.
+
+- The need to ~resize-mini-windows~ arises on some occasions where Emacs has to show text spanning multiple lines in the "mini windows".
+- The ~read-answer-short~ is complementary to ~use-short-answers~. This is about providing the shorter version to some confirmation prompt, such as =y= instead of =yes=.
+- The ~echo-keystrokes~ is set to a low value to show in the echo area the incomplete key sequence I have just typed. This is especially helpful for demonstration purposes but also to double check that I did not mistype something (I cannot touch-type, so this happens a lot).
+- The ~minibuffer-prompt-properties~ and advice to ~completing-read-multiple~ make it so that (i) the minibuffer prompt is not accessible with regular motions to avoid mistakes and (ii) prompts that complete multiple targets show an indicator about this fact. With regard to the latter in particular, we have prompts like that of Org to set tags for a heading (with =C-c C-q= else =M-x org-set-tags-command=) where more than one candidate can be provided using completion, provided each candidate is separated by the ~crm-separator~ (a comma by default, though Org uses =:= in that scenario).
+  Remember that when using completion in the minibuffer, you can hit =TAB= to expand the selected choice without exiting with it. For cases when multiple candidates can be selected, you select the candidate, =TAB=, then input the ~crm-separator~, and repeat until you are done selecting at which point you type =RET=.
+- Finally the ~file-name-shadow-mode~ is a neat little feature to remove the "shadowed" part of a file prompt while using something like =C-x C-f= (=M-x find-file=).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  (use-package rfn-eshadow
+    :ensure nil
+    :hook (minibuffer-setup . cursor-intangible-mode)
+    :config
+    ;; Not everything here comes from rfn-eshadow.el, but this is fine.
+
+    (setq resize-mini-windows t)
+    (setq read-answer-short t) ; also check `use-short-answers' for Emacs28
+    (setq echo-keystrokes 0.25)
+    (setq kill-ring-max 60) ; Keep it small
+
+    ;; Do not allow the cursor to move inside the minibuffer prompt.  I
+    ;; got this from the documentation of Daniel Mendler's Vertico
+    ;; package: <https://github.com/minad/vertico>.
+    (setq minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+
+    ;; Add prompt indicator to `completing-read-multiple'.  We display
+    ;; [`completing-read-multiple': <separator>], e.g.,
+    ;; [`completing-read-multiple': ,] if the separator is a comma.  This
+    ;; is adapted from the README of the `vertico' package by Daniel
+    ;; Mendler.  I made some small tweaks to propertize the segments of
+    ;; the prompt.
+    (defun crm-indicator (args)
+      (cons (format "[`completing-read-multiple': %s]  %s"
+                    (propertize
+                     (replace-regexp-in-string
+                      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                      crm-separator)
+                     'face 'error)
+                    (car args))
+            (cdr args)))
+
+    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+    (file-name-shadow-mode 1))
+#+end_src
+
+** Generic minibuffer UI settings
+:PROPERTIES:
+:CUSTOM_ID: h:de61a607-0bdf-462b-94cd-c0898319590e
+:END:
+
+These are some settings for the default completion user interface.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  (use-package minibuffer
+    :ensure nil
+    :demand t
+    :config
+    (setq completions-format 'one-column)
+    (setq completion-show-help nil)
+    (setq completion-auto-help 'always)
+    (setq completion-auto-select nil)
+    (setq completions-detailed t)
+    (setq completion-show-inline-help nil)
+    (setq completions-max-height 6)
+    (setq completions-header-format (propertize "%s candidates:\n" 'face 'bold-italic))
+    (setq completions-highlight-face 'completions-highlight)
+    (setq minibuffer-completion-auto-choose t)
+    (setq minibuffer-visible-completions t) ; Emacs 30
+    (setq completions-sort 'historical))
+#+end_src
+
+** Completion settings for saving the history (~savehist-mode~)
+:PROPERTIES:
+:CUSTOM_ID: h:25765797-27a5-431e-8aa4-cc890a6a913a
+:END:
+
+Minibuffer prompts can have their own history. When they do not, they share a common history of user inputs. Emacs keeps track of that history in the current session, but loses it as soon as we close it. With ~savehist-mode~ enabled, all minibuffer histories are written to a file and are restored when we start Emacs again.
+
+Since we are already recording minibuffer histories, we can instruct ~savehist-mode~ to also keep track of additional variables and restore them next time we use Emacs. Hence ~savehist-additional-variables~. I do this in a few of places:
+
+- [[#h:804b858f-7913-47ef-aaf4-8eef5b59ecb4][In-buffer completion popup and preview (~corfu~)]]
+- [[#h:5685df62-4484-42ad-a062-d55ab19022e3][Settings for registers]]
+
+Note that the user option ~history-length~ applies to each individual history variable: it is not about all histories combined.
+
+Overall, I am happy with this feature and benefit from it on a daily basis.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+;;;; `savehist' (minibuffer and related histories)
+(use-package savehist
+  :ensure nil
+  :hook (after-init . savehist-mode)
+  :config
+  (setq savehist-file (locate-user-emacs-file "savehist"))
+  (setq history-length 100)
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history t)
+  (add-to-list 'savehist-additional-variables 'kill-ring))
+#+end_src
+
+** The =unravel-completion.el= settings for dynamic text expansion (~dabbrev~)
+:PROPERTIES:
+:CUSTOM_ID: h:567bb00f-1d82-4746-93e5-e0f60721728a
+:END:
+
+The built-in ~dabbrev~ package provides a text completion method that reads the contents of a buffer and expands the text before the cursor to match possible candidates. This is done with =M-/= (~dabbrev-expand~) which is what I use most of the time to perform in-buffer completions.
+
+The term "dabbrev" stands for "dynamic abbreviation". Emacs also has static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][Settings for static text expansion (~abbrev~)]]).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+(use-package dabbrev
+  :ensure nil
+  :commands (dabbrev-expand dabbrev-completion)
+  :config
+;;;; `dabbrev' (dynamic word completion (dynamic abbreviations))
+  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+  (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
+  (setq dabbrev-backward-only nil)
+  (setq dabbrev-case-distinction 'case-replace)
+  (setq dabbrev-case-fold-search nil)
+  (setq dabbrev-case-replace 'case-replace)
+  (setq dabbrev-check-other-buffers t)
+  (setq dabbrev-eliminate-newlines t)
+  (setq dabbrev-upcase-means-case-search t)
+  (setq dabbrev-ignored-buffer-modes
+        '(archive-mode image-mode docview-mode pdf-view-mode)))
+#+end_src
+
+** In-buffer completion popup (~corfu~)
+:PROPERTIES:
+:CUSTOM_ID: h:804b858f-7913-47ef-aaf4-8eef5b59ecb4
+:END:
+
+I generally do not rely on in-buffer text completion. I feel it slows me down and distracts me. When I do, however, need to rely on it, I have the ~corfu~ package by Daniel Mendler: it handles the task splendidly as it works with Emacs' underlying infrastructure for ~completion-at-point-functions~.
+
+Completion is triggered with the =TAB= key, which produces a popup where the cursor is. The companion ~corfu-popupinfo-mode~ will show a secondary documentation popup if we move over a candidate but do not do anything with it.
+
+Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][Settings for dynamic text expansion (~dabbrev~)]].
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+;;; Corfu (in-buffer completion popup)
+(use-package corfu
+  :ensure t
+  :hook (after-init . global-corfu-mode)
+  ;; I also have (setq tab-always-indent 'complete) for TAB to complete
+  ;; when it does not need to perform an indentation change.
+  :bind (:map corfu-map ("<tab>" . corfu-complete))
+  :config
+  (setq corfu-preview-current nil)
+  (setq corfu-min-width 20)
+
+  (setq corfu-popupinfo-delay '(1.25 . 0.5))
+  (corfu-popupinfo-mode 1) ; shows documentation after `corfu-popupinfo-delay'
+
+  ;; Sort by input history (no need to modify `corfu-sort-function').
+  (with-eval-after-load 'savehist
+    (corfu-history-mode 1)
+    (add-to-list 'savehist-additional-variables 'corfu-history)))
+#+end_src
+
+** COMMENT Settings for ~consult~
+:PROPERTIES:
+:CUSTOM_ID: h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d
+:END:
+
+~consult~ is another wonderful package by Daniel Mendler. It provides a number of commands that turbocharge the minibuffer with advanced capabilities for filtering, asynchronous input, and previewing of the current candidate's context.
+
+- A case where filtering is in use is the ~consult-buffer~ command, which many users have as a drop-in replacement to the generic =C-x b= (=M-x switch-to-buffer=). It is a one-stop-shop for buffers, recently visited files, bookmarks ([[#h:581aa0ff-b136-4099-a321-3b86edbfbccb][Settings for bookmarks]]), and, in principle, anything else that defines a source for this interface. To filter those source, we can type at the empty minibuffer =b SPC=, which will insert a filter specific to buffers. Delete back to remove the =[Buffer]= filter and insert another filter. Available filters are displayed by typing =?= at the prompt (I define it this way to call the command ~consult-narrow-help~). Every multi-source command from ~consult~ relies on this paradigm.
+
+- Asynchronous input pertains to the intersection between Emacs and external search programs. A case in point is ~consult-grep~, which calls the system's ~grep~ program. The prompt distinguishes between what is sent to the external program and what is only shown to Emacs by wrapping the former inside of =#=. So the input =#prot-#completion= will send =prot-= to the ~grep~ program and then use =completion= inside of the minibuffer to perform the subsequent pattern-matching (e.g. with help from ~orderless~ ([[#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2][The ~orderless~ completion style]]). The part that is sent to the external program does not block Emacs. It is handled asynchronously, so everything stays responsive.
+
+- As for previewing, ~consult~ commands show the context of the current match and update the window as we move between completion candidates in the minibuffer. For example, the ~consult-line~ command performs an in-buffer search and lets us move between matches in the minibuffer while seeing in the window above what the surrounding text looks like. This is an excellent feature when we are trying to find something and do not quite remember all the search terms to narrow down to it simply by typing at the minibuffer prompt.
+
+Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= module]].
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; Enhanced minibuffer commands (consult.el)
+  (use-package consult
+    :ensure t
+    :hook (completion-list-mode . consult-preview-at-point-mode)
+    :bind
+    (:map global-map
+          ("M-g M-g" . consult-goto-line)
+          ("M-K" . consult-keep-lines) ; M-S-k is similar to M-S-5 (M-%)
+          ("M-F" . consult-focus-lines) ; same principle
+          ("M-s M-b" . consult-buffer)
+          ("M-s M-f" . consult-find)
+          ("M-s M-g" . consult-grep)
+          ("M-s M-h" . consult-history)
+          ("M-s M-i" . consult-imenu)
+          ("M-s M-l" . consult-line)
+          ("M-s M-m" . consult-mark)
+          ("M-s M-y" . consult-yank-pop)
+          ("M-s M-s" . consult-outline)
+          :map consult-narrow-map
+          ("?" . consult-narrow-help))
+    :config
+    (setq consult-line-numbers-widen t)
+    ;; (setq completion-in-region-function #'consult-completion-in-region)
+    (setq consult-async-min-input 3)
+    (setq consult-async-input-debounce 0.5)
+    (setq consult-async-input-throttle 0.8)
+    (setq consult-narrow-key nil)
+    (setq consult-find-args
+          (concat "find . -not ( "
+                  "-path */.git* -prune "
+                  "-or -path */.cache* -prune )"))
+    (setq consult-preview-key 'any)
+    (setq consult-project-function nil) ; always work from the current directory (use `cd' to switch directory)
+
+    (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring))
+    ;; the `imenu' extension is in its own file
+    (require 'consult-imenu))
+#+end_src
+
+** Settings for ~embark~
+:PROPERTIES:
+:CUSTOM_ID: h:61863da4-8739-42ae-a30f-6e9d686e1995
+:END:
+
+The ~embark~ package by Omar Antolín Camarena provides a mechanism to perform relevant actions in the given context. What constitutes "the given context" depends on where the cursor is, such as if it is at the end of a symbolic expression in Lisp code or inside the minibuffer. The single point of entry is the ~embark-act~ command or variants like ~embark-dwim~.
+
+With ~embark-act~ we gain access to a customisable list of commands for the given context. If we are over a Lisp symbol, one possible action is to describe it (i.e. produce documentation about it). If we are browsing files in the minibuffer, possible actions include file operations such as to delete or rename the file. And so on for everything.
+
+The ~embark-dwim~ command always performs the default action for the given context. It is like invoking ~embark-act~ and then typing the =RET= key.
+
+A killer feature of ~embark~ is the concepts of "collect" and "export". These are used in the minibuffer to produce a dedicated buffer that contains all the completion candidates. For example, if we are reading documentation about =embark-= and have 10 items there, we can "collect" the results in their own buffer and then navigate it as if it were the minibuffer: =RET= will perform the action that the actual minibuffer would have carried out (to show documentation, in this case). Similarly, the export mechanism takes the completion candidates out of the minibuffer, though it also puts them in a major mode that is appropriate for them. Files, for instance, will be placed in a Dired buffer ([[#h:f8b08a77-f3a8-42fa-b1a9-f940348889c3][The =unravel-dired.el= module]]).
+
+Depending on the configurations about the "indicator", the ~embark-act~ command will display an informative buffer with keys and their corresponding commands.
+
+One downside of ~embark~ is that it is hard to know what the context is. I have had this experience myself several times, where I though I was targeting the URL at point while the actions were about Org source blocks, headings, and whatnot. Embark is probably correct in such a case, though I cannot make my brain think the way it expects.
+
+Another downside is the sheer number of options for each context. I feel that the defaults should be more conservative, to have 3-4 actions per context to make it easier to find stuff. Those who need more, can add them. Documentation can also be provided to that end. Adding commands to such a list is not a trivial task, because the user must modify keymaps and thus understand the relevant concepts. Sure, we can all learn, but this is not your usual ~setq~ tweak.
+
+All things considered, I do not recommend ~embark~ to new users as I know for a fact that people have trouble using it effectively. Whether it is worth it or not depends on one's use-case.
+
+Karthik Chikmagalur has an excellently written and presented essay on [[https://karthinks.com/software/fifteen-ways-to-use-embark/][Fifteen ways to use Embark]]. If you plan on becoming an ~embark~ power user, this will help you. Quote from Karthik:
+
+#+begin_quote
+Despite what these examples suggest, I estimate that I use less than a third of what Embark provides. Even so, in allowing me to change or chain actions at any time, it lets me pilot Emacs by the seat of my pants. A second, unforeseen benefit is that it makes commands and listings that I would never use available in a frictionless way: commands like ~transpose-regions~ and ~apply-macro-to-region-lines~, or custom ~dired~, ~ibuffer~ and ~package-menu~ listings that are interactively inaccessible otherwise. The ability to quickly whip up such buffers makes knowing how to use dired or ibuffer pay off several fold. In composing such features seamlessly with minibuffer interaction or with text-regions, Embark acts as a lever to amplify the power of Emacs’ myriad built in commands and libraries.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; Extended minibuffer actions and more (embark.el and prot-embark.el)
+  (use-package embark
+    :ensure t
+    :defer 1
+    :config
+    (setq embark-confirm-act-all nil)
+    (setq embark-mixed-indicator-both nil)
+    (setq embark-mixed-indicator-delay 1.0)
+    (setq embark-indicators '(embark-mixed-indicator embark-highlight-indicator))
+    (setq embark-verbose-indicator-nested nil) ; I think I don't have them, but I do not want them either
+    (setq embark-verbose-indicator-buffer-sections '(bindings))
+    (setq embark-verbose-indicator-excluded-actions
+          '(embark-cycle embark-act-all embark-collect embark-export embark-insert))
+
+    ;; I never cycle and want to disable the damn thing.  Normally, a
+    ;; nil value disables a key binding but here that value is
+    ;; interpreted as the binding for `embark-act'.  So I just add
+    ;; some obscure key that I do not have.  I absolutely do not want
+    ;; to cycle!
+    (setq embark-cycle-key "<XF86Travel>")
+
+    ;; I do not want `embark-org' and am not sure what is loading it.
+    ;; So I just unsert all the keymaps... This is the nuclear option
+    ;; but here we are.
+    (with-eval-after-load 'embark-org
+      (defvar prot/embark-org-keymaps
+        '(embark-org-table-cell-map
+          embark-org-table-map
+          embark-org-link-copy-map
+          embark-org-link-map
+          embark-org-src-block-map
+          embark-org-item-map
+          embark-org-plain-list-map
+          embark-org-export-in-place-map)
+        "List of Embark keymaps for Org.")
+
+      ;; Reset `prot/embark-org-keymaps'.
+      (seq-do
+       (lambda (keymap)
+         (set keymap (make-sparse-keymap)))
+       prot/embark-org-keymaps)))
+
+  ;; I define my own keymaps because I only use a few functions in a
+  ;; limited number of contexts.
+  ;; (use-package prot-embark
+  ;;   :ensure nil
+  ;;   :after embark
+  ;;   :bind
+  ;;   ( :map global-map
+  ;;     ("C-," . prot-embark-act-no-quit)
+  ;;     ("C-." . prot-embark-act-quit)
+  ;;     :map embark-collect-mode-map
+  ;;     ("C-," . prot-embark-act-no-quit)
+  ;;     ("C-." . prot-embark-act-quit)
+  ;;     :map minibuffer-local-filename-completion-map
+  ;;     ("C-," . prot-embark-act-no-quit)
+  ;;     ("C-." . prot-embark-act-quit))
+  ;;   :config
+  ;;   (setq embark-keymap-alist
+  ;;         '((buffer prot-embark-buffer-map)
+  ;;           (command prot-embark-command-map)
+  ;;           (expression prot-embark-expression-map)
+  ;;           (file prot-embark-file-map)
+  ;;           (function prot-embark-function-map)
+  ;;           (identifier prot-embark-identifier-map)
+  ;;           (package prot-embark-package-map)
+  ;;           (region prot-embark-region-map)
+  ;;           (symbol prot-embark-symbol-map)
+  ;;           (url prot-embark-url-map)
+  ;;           (variable prot-embark-variable-map)
+  ;;           (t embark-general-map))))
+
+  ;; Needed for correct exporting while using Embark with Consult
+  ;; commands.
+  (use-package embark-consult
+    :ensure t
+    :after (embark consult))
+#+end_src
+
+** Settings for ~marginalia~: to configure completion annotations
+:PROPERTIES:
+:CUSTOM_ID: h:bd3f7a1d-a53d-4d3e-860e-25c5b35d8e7e
+:END:
+
+The ~marginalia~ package, co-authored by Daniel Mendler and Omar Antolín Camarena, provides helpful annotations to the side of completion candidates. We see its effect, for example, when we call =M-x=: each command has a brief description next to it (taken from its doc string) as well as a key binding, if it has one.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; Detailed completion annotations (marginalia.el)
+  (use-package marginalia
+    :ensure t
+    :hook (after-init . marginalia-mode)
+    :config
+    (setq marginalia-max-relative-age 0)) ; absolute time
+#+end_src
+
+** Settings for ~vertico~
+:PROPERTIES:
+:CUSTOM_ID: h:cff33514-d3ac-4c16-a889-ea39d7346dc5
+:END:
+
+The ~vertico~ package by Daniel Mendler displays the minibuffer in a vertical layout. Under the hood, it takes care to be responsive and to handle even massive completion tables gracefully.
+
+All we need to get a decent experience with ~vertico~ is to enable the ~vertico-mode~. For most users this is enough.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; Vertical completion layout (vertico)
+  (use-package vertico
+    :ensure t
+    :hook (after-init . vertico-mode)
+    :config
+    (setq vertico-scroll-margin 0)
+    (setq vertico-count 5)
+    (setq vertico-resize t)
+    (setq vertico-cycle t)
+
+    (with-eval-after-load 'rfn-eshadow
+      ;; This works with `file-name-shadow-mode' enabled.  When you are in
+      ;; a sub-directory and use, say, `find-file' to go to your home '~/'
+      ;; or root '/' directory, Vertico will clear the old path to keep
+      ;; only your current input.
+      (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)))
+#+end_src
+
+** Finally, we provide the ~unravel-completion.el~ module
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+(provide 'unravel-completion)
 #+end_src
