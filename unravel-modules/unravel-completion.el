@@ -78,7 +78,7 @@
 
   ;; SPC should never complete: use it for `orderless' groups.
   ;; The `?' is a regexp construct.
-  :bind (:map minibuffer-local-completion-map
+  :bind ( :map minibuffer-local-completion-map
           ("SPC" . nil)
           ("?" . nil)))
 
@@ -188,6 +188,44 @@
     (corfu-history-mode 1)
     (add-to-list 'savehist-additional-variables 'corfu-history)))
 
+;;; Enhanced minibuffer commands (consult.el)
+(use-package consult
+  :ensure t
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :bind
+  (:map global-map
+        ("M-g M-g" . consult-goto-line)
+        ("M-K" . consult-keep-lines) ; M-S-k is similar to M-S-5 (M-%)
+        ("M-F" . consult-focus-lines) ; same principle
+        ("M-s M-b" . consult-buffer)
+        ("M-s M-f" . consult-find)
+        ("M-s M-g" . consult-grep)
+        ("M-s M-h" . consult-history)
+        ("M-s M-i" . consult-imenu)
+        ("M-s M-l" . consult-line)
+        ("M-s M-m" . consult-mark)
+        ("M-s M-y" . consult-yank-pop)
+        ("M-s M-s" . consult-outline)
+        :map consult-narrow-map
+        ("?" . consult-narrow-help))
+  :config
+  (setq consult-line-numbers-widen t)
+  ;; (setq completion-in-region-function #'consult-completion-in-region)
+  (setq consult-async-min-input 3)
+  (setq consult-async-input-debounce 0.5)
+  (setq consult-async-input-throttle 0.8)
+  (setq consult-narrow-key nil)
+  (setq consult-find-args
+        (concat "find . -not ( "
+                "-path */.git* -prune "
+                "-or -path */.cache* -prune )"))
+  (setq consult-preview-key 'any)
+  (setq consult-project-function nil) ; always work from the current directory (use `cd' to switch directory)
+
+  (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring))
+  ;; the `imenu' extension is in its own file
+  (require 'consult-imenu))
+
 ;;; Extended minibuffer actions and more (embark.el and prot-embark.el)
 (use-package embark
   :ensure t
@@ -232,33 +270,33 @@
 
 ;; I define my own keymaps because I only use a few functions in a
 ;; limited number of contexts.
-;; (use-package prot-embark
-;;   :ensure nil
-;;   :after embark
-;;   :bind
-;;   ( :map global-map
-;;     ("C-," . prot-embark-act-no-quit)
-;;     ("C-." . prot-embark-act-quit)
-;;     :map embark-collect-mode-map
-;;     ("C-," . prot-embark-act-no-quit)
-;;     ("C-." . prot-embark-act-quit)
-;;     :map minibuffer-local-filename-completion-map
-;;     ("C-," . prot-embark-act-no-quit)
-;;     ("C-." . prot-embark-act-quit))
-;;   :config
-;;   (setq embark-keymap-alist
-;;         '((buffer prot-embark-buffer-map)
-;;           (command prot-embark-command-map)
-;;           (expression prot-embark-expression-map)
-;;           (file prot-embark-file-map)
-;;           (function prot-embark-function-map)
-;;           (identifier prot-embark-identifier-map)
-;;           (package prot-embark-package-map)
-;;           (region prot-embark-region-map)
-;;           (symbol prot-embark-symbol-map)
-;;           (url prot-embark-url-map)
-;;           (variable prot-embark-variable-map)
-;;           (t embark-general-map))))
+(use-package prot-embark
+  :ensure nil
+  :after embark
+  :bind
+  ( :map global-map
+    ("C-," . prot-embark-act-no-quit)
+    ("C-." . prot-embark-act-quit)
+    :map embark-collect-mode-map
+    ("C-," . prot-embark-act-no-quit)
+    ("C-." . prot-embark-act-quit)
+    :map minibuffer-local-filename-completion-map
+    ("C-," . prot-embark-act-no-quit)
+    ("C-." . prot-embark-act-quit))
+  :config
+  (setq embark-keymap-alist
+        '((buffer prot-embark-buffer-map)
+          (command prot-embark-command-map)
+          (expression prot-embark-expression-map)
+          (file prot-embark-file-map)
+          (function prot-embark-function-map)
+          (identifier prot-embark-identifier-map)
+          (package prot-embark-package-map)
+          (region prot-embark-region-map)
+          (symbol prot-embark-symbol-map)
+          (url prot-embark-url-map)
+          (variable prot-embark-variable-map)
+          (t embark-general-map))))
 
 ;; Needed for correct exporting while using Embark with Consult
 ;; commands.

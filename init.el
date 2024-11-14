@@ -42,12 +42,52 @@
         ("melpa" . 2)
         ("nongnu" . 1)))
 
+;; Let `package-install' suggest upgrades for built-in packages too.
 (setq package-install-upgrade-built-in t)
+
+(defmacro prot-emacs-comment (&rest body)
+  "Determine what to do with BODY.
+
+If BODY contains an unquoted plist of the form (:eval t) then
+return BODY inside a `progn'.
+
+Otherwise, do nothing with BODY and return nil, with no side
+effects."
+  (declare (indent defun))
+  (let ((eval))
+    (dolist (element body)
+      (when-let* (((plistp element))
+                  (key (car element))
+                  ((eq key :eval))
+                  (val (cadr element)))
+        (setq eval val
+              body (delq element body))))
+    (when eval `(progn ,@body))))
+
+(defmacro prot-emacs-abbrev (table &rest definitions)
+  "Expand abbrev DEFINITIONS for the given TABLE.
+DEFINITIONS is a sequence of (i) string pairs mapping the
+abbreviation to its expansion or (ii) a string and symbol pair
+making an abbreviation to a function."
+  (declare (indent 1))
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of key+command pairs"))
+  `(if (abbrev-table-p ,table)
+       (progn
+         ,@(mapcar
+            (lambda (pair)
+              (let ((abbrev (nth 0 pair))
+                    (expansion (nth 1 pair)))
+                (if (stringp expansion)
+                    `(define-abbrev ,table ,abbrev ,expansion)
+                  `(define-abbrev ,table ,abbrev "" ,expansion))))
+            (seq-split definitions 2)))
+     (error "%s is not an abbrev table" ,table)))
 
 (require 'unravel-theme)
 (require 'unravel-essentials)
 ;; (require 'unravel-modeline)
-;; (require 'unravel-completion)
+(require 'unravel-completion)
 ;; (require 'unravel-search)
 ;; (require 'unravel-dired)
 ;; (require 'unravel-window)

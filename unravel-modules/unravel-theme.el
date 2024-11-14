@@ -59,6 +59,22 @@
   ;; it is very flexible.
   (setq spacious-padding-subtle-mode-line t))
 
+;;;; Rainbow mode for colour previewing (rainbow-mode.el)
+(use-package rainbow-mode
+  :ensure t
+  :init
+  (setq rainbow-ansi-colors nil)
+  (setq rainbow-x-colors nil)
+
+  (defun prot/rainbow-mode-in-themes ()
+    (when-let* ((file (buffer-file-name))
+                ((derived-mode-p 'emacs-lisp-mode))
+                ((string-match-p "-theme" file)))
+      (rainbow-mode 1)))
+  :bind ( :map ctl-x-x-map
+          ("c" . rainbow-mode)) ; C-x x c
+  :hook (emacs-lisp-mode . prot/rainbow-mode-in-themes))
+
 ;;; Cursor appearance (cursory)
 ;; Read the manual: <https://protesilaos.com/emacs/cursory>.
 (use-package cursory
@@ -121,7 +137,7 @@
   (let ((modus-themes-p (featurep 'modus-themes))
         (ef-themes-p (featurep 'ef-themes)))
     (setq theme-buffet-menu 'end-user)
-    (setq theme-buffet-time-offset 5)
+    (setq theme-buffet-time-offset 0)
     (setq theme-buffet-end-user
           '(:night     (ef-dark ef-winter ef-autumn ef-night ef-duo-dark ef-symbiosis ef-owl)
             :morning   (ef-light ef-cyprus ef-spring ef-frost ef-duo-light ef-eagle)
@@ -166,11 +182,11 @@
            :inherit medium
            :default-height 150)
           (live-stream
-           :default-family "Iosevka Comfy Wide Motion"
+           :default-family "Iosevka"
            :default-height 150
            :default-weight medium
-           :fixed-pitch-family "Iosevka Comfy Wide Motion"
-           :variable-pitch-family "Iosevka Comfy Wide Duo"
+           :fixed-pitch-family "Iosevka"
+           :variable-pitch-family "Iosevka"
            :bold-weight extrabold)
           (presentation
            :default-height 180)
@@ -180,13 +196,13 @@
            ;; I keep all properties for didactic purposes, but most can be
            ;; omitted.  See the fontaine manual for the technicalities:
            ;; <https://protesilaos.com/emacs/fontaine>.
-           :default-family "Iosevka Comfy"
+           :default-family "Iosevka"
            :default-weight regular
            :default-slant normal
            :default-width normal
            :default-height 100
 
-           :fixed-pitch-family "Iosevka Comfy"
+           :fixed-pitch-family "Iosevka Fixed"
            :fixed-pitch-weight nil
            :fixed-pitch-slant nil
            :fixed-pitch-width nil
@@ -198,60 +214,83 @@
            :fixed-pitch-serif-width nil
            :fixed-pitch-serif-height 1.0
 
-           :variable-pitch-family "Iosevka Comfy Motion Duo"
+           :variable-pitch-family "Iosevka"
            :variable-pitch-weight nil
            :variable-pitch-slant nil
            :variable-pitch-width nil
            :variable-pitch-height 1.0
 
-           :mode-line-active-family nil
+           :mode-line-active-family "Iosevka Term"
            :mode-line-active-weight nil
            :mode-line-active-slant nil
            :mode-line-active-width nil
            :mode-line-active-height 1.0
 
-           :mode-line-inactive-family nil
+           :mode-line-inactive-family "Iosevka Term"
            :mode-line-inactive-weight nil
            :mode-line-inactive-slant nil
            :mode-line-inactive-width nil
            :mode-line-inactive-height 1.0
 
-           :header-line-family nil
+           :header-line-family "Iosevka Term"
            :header-line-weight nil
            :header-line-slant nil
            :header-line-width nil
            :header-line-height 1.0
 
-           :line-number-family nil
+           :line-number-family "Iosevka Term"
            :line-number-weight nil
            :line-number-slant nil
            :line-number-width nil
            :line-number-height 1.0
 
-           :tab-bar-family nil
+           :tab-bar-family "Iosevka Term"
            :tab-bar-weight nil
            :tab-bar-slant nil
            :tab-bar-width nil
            :tab-bar-height 1.0
 
-           :tab-line-family nil
+           :tab-line-family "Iosevka Term"
            :tab-line-weight nil
            :tab-line-slant nil
            :tab-line-width nil
            :tab-line-height 1.0
 
-           :bold-family nil
+           :bold-family "Iosevka"
            :bold-slant nil
            :bold-weight bold
            :bold-width nil
            :bold-height 1.0
 
-           :italic-family nil
+           :italic-family "Iosevka"
            :italic-weight nil
            :italic-slant italic
            :italic-width nil
            :italic-height 1.0
 
            :line-spacing nil))))
+
+;;;;; `variable-pitch-mode' setup
+(use-package face-remap
+  :ensure nil
+  :functions prot/enable-variable-pitch
+  :bind ( :map ctl-x-x-map
+          ("v" . variable-pitch-mode))
+  :hook ((text-mode notmuch-show-mode elfeed-show-mode) . prot/enable-variable-pitch)
+  :config
+  ;; NOTE 2022-11-20: This may not cover every case, though it works
+  ;; fine in my workflow.  I am still undecided by EWW.
+  (defun prot/enable-variable-pitch ()
+    (unless (derived-mode-p 'mhtml-mode 'nxml-mode 'yaml-mode)
+      (variable-pitch-mode 1)))
+;;;;; Resize keys with global effect
+  :bind
+  ;; Emacs 29 introduces commands that resize the font across all
+  ;; buffers (including the minibuffer), which is what I want, as
+  ;; opposed to doing it only in the current buffer.  The keys are the
+  ;; same as the defaults.
+  (("C-x C-=" . global-text-scale-adjust)
+   ("C-x C-+" . global-text-scale-adjust)
+   ("C-x C-0" . global-text-scale-adjust)))
 
 (provide 'unravel-theme)

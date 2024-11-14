@@ -1,6 +1,11 @@
-;;; No GUI
-(dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-  (when (fboundp mode) (funcall mode -1)))
+;;;; No GUI
+;; I do not use those graphical elements by default, but I do enable
+;; them from time-to-time for testing purposes or to demonstrate
+;; something.  NEVER tell a beginner to disable any of these.  They
+;; are helpful.
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
 
 ;; A big contributor to startup times is garbage collection.
 

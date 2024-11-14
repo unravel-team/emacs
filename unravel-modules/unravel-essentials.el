@@ -75,47 +75,6 @@
           (border-width . 0)
           (no-special-glyphs . t))))
 
-;;;; World clock (M-x world-clock)
-(use-package time
-  :ensure nil
-  :commands (world-clock)
-  :config
-  (setq display-time-world-list t)
-  (setq zoneinfo-style-world-list ; M-x shell RET timedatectl list-timezones
-        '(("America/Los_Angeles" "Los Angeles")
-          ("America/Vancouver" "Vancouver")
-          ("Canada/Pacific" "Canada/Pacific")
-          ("America/Chicago" "Chicago")
-          ("Brazil/Acre" "Rio Branco")
-          ("America/Toronto" "Toronto")
-          ("America/New_York" "New York")
-          ("Canada/Atlantic" "Canada/Atlantic")
-          ("Brazil/East" "Brasília")
-          ("UTC" "UTC")
-          ("Europe/Lisbon" "Lisbon")
-          ("Europe/Brussels" "Brussels")
-          ("Europe/Athens" "Athens")
-          ("Asia/Riyadh" "Riyadh")
-          ("Asia/Tehran" "Tehran")
-          ("Asia/Tbilisi" "Tbilisi")
-          ("Asia/Yekaterinburg" "Yekaterinburg")
-          ("Asia/Kolkata" "Kolkata")
-          ("Asia/Singapore" "Singapore")
-          ("Asia/Shanghai" "Shanghai")
-          ("Asia/Seoul" "Seoul")
-          ("Asia/Tokyo" "Tokyo")
-          ("Asia/Vladivostok" "Vladivostok")
-          ("Australia/Brisbane" "Brisbane")
-          ("Australia/Sydney" "Sydney")
-          ("Pacific/Auckland" "Auckland")))
-
-  ;; All of the following variables are for Emacs 28
-  (setq world-clock-list t)
-  (setq world-clock-time-format "%R %z (%Z)	%A %d %B")
-  (setq world-clock-buffer-name "*world-clock*") ; Placement handled by `display-buffer-alist'
-  (setq world-clock-timer-enable t)
-  (setq world-clock-timer-second 60))
-
 ;;;; Emacs server (allow emacsclient to connect to running session)
 (use-package server
   :ensure nil
@@ -158,8 +117,8 @@ word.  Fall back to regular `expreg-expand'."
   (setq battery-mode-line-format
         (cond
          ((eq battery-status-function #'battery-linux-proc-acpi)
-          "⏻%b%p%%,%d°C ")
+          "⏻ %b%p%%,%d°C ")
          (battery-status-function
-          "⏻%b%p%% "))))
+          "⏻ %b%p%% "))))
 
 (provide 'unravel-essentials)
