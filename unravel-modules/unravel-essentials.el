@@ -121,4 +121,35 @@ word.  Fall back to regular `expreg-expand'."
          (battery-status-function
           "⏻ %b%p%% "))))
 
+;;;; Configuration on Mac OS X machine
+(when (eq system-type 'darwin)
+  (use-package ns-win
+    :ensure nil
+    :config
+    (defun copy-from-osx ()
+      "Make cut and paste work with the OS X clipboard"
+      (shell-command-to-string "pbpaste"))
+
+    (defun paste-to-osx (text &optional push)
+      "Make cut and paste work with the OS X clipboard"
+      (let ((process-connection-type nil))
+        (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+          (process-send-string proc text)
+          (process-send-eof proc))))
+
+    (setq mac-command-modifier 'meta)
+    (setq mac-option-modifier 'alt)
+    (setq interprogram-cut-function #'paste-to-osx)
+    (setq interprogram-paste-function #'copy-from-osx)
+    ;; Work around a bug on OS X where system-name is a fully qualified
+    ;; domain name
+    (setq system-name (car (split-string system-name "\\.")))
+;;; Binaries
+    (setq vc-git-program (or (executable-find "git") "/usr/local/bin/git"))
+    (setq epg-gpg-program (or (executable-find "gpg") "/usr/local/bin/gpg"))
+;;; Source dirs
+    ;; Note: These are hard-coded to my machine.
+    (setq source-directory (expand-file-name "~/src/emacs/src/"))
+    (setq find-function-C-source-directory (expand-file-name "~/src/emacs/src/"))))
+
 (provide 'unravel-essentials)

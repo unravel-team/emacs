@@ -1100,6 +1100,43 @@ The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
             "⏻ %b%p%% "))))
 #+end_src
 
+** The =unravel-essentials.el= section for OSX changes
+
+These are modifications to basic configuration I use on my Mac OSX machine.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  ;;;; Configuration on Mac OS X machine
+  (when (eq system-type 'darwin)
+    (use-package ns-win
+      :ensure nil
+      :config
+      (defun copy-from-osx ()
+        "Make cut and paste work with the OS X clipboard"
+        (shell-command-to-string "pbpaste"))
+
+      (defun paste-to-osx (text &optional push)
+        "Make cut and paste work with the OS X clipboard"
+        (let ((process-connection-type nil))
+          (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+            (process-send-string proc text)
+            (process-send-eof proc))))
+
+      (setq mac-command-modifier 'meta)
+      (setq mac-option-modifier 'alt)
+      (setq interprogram-cut-function #'paste-to-osx)
+      (setq interprogram-paste-function #'copy-from-osx)
+      ;; Work around a bug on OS X where system-name is a fully qualified
+      ;; domain name
+      (setq system-name (car (split-string system-name "\\.")))
+  ;;; Binaries
+      (setq vc-git-program (or (executable-find "git") "/usr/local/bin/git"))
+      (setq epg-gpg-program (or (executable-find "gpg") "/usr/local/bin/gpg"))
+  ;;; Source dirs
+      ;; Note: These are hard-coded to my machine.
+      (setq source-directory (expand-file-name "~/src/emacs/src/"))
+      (setq find-function-C-source-directory (expand-file-name "~/src/emacs/src/"))))
+#+end_src
+
 ** Finally, we provide the =unravel-essentials.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
