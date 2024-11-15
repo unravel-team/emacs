@@ -29,9 +29,7 @@
             (project-shell "Shell")
             (keyboard-quit "Quit")))
   (setq project-vc-extra-root-markers '(".project")) ; Emacs 29
-  (setq project-key-prompt-style t) ; Emacs 30
-
-  (advice-add #'project-switch-project :after #'prot-common-clear-minibuffer-message))
+  (setq project-key-prompt-style t)) ; Emacs 30
 
 ;;;; `diff-mode'
 (use-package diff-mode
