@@ -4,3 +4,6 @@ fontaine-latest-state.eld
 projects
 recentf
 savehist
+auto-save-list/
+eln-cache/
+transient/
