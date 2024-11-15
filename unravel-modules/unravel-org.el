@@ -182,9 +182,9 @@
   (setq org-src-window-setup 'current-window)
   (setq org-edit-src-persistent-message nil)
   (setq org-src-fontify-natively t)
-  (setq org-src-preserve-indentation t)
+  (setq org-src-preserve-indentation nil)
   (setq org-src-tab-acts-natively t)
-  (setq org-edit-src-content-indentation 0))
+  (setq org-edit-src-content-indentation 2))
 
 ;;;; export
 (use-package org
