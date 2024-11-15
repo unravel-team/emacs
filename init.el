@@ -91,6 +91,6 @@ making an abbreviation to a function."
 ;; (require 'unravel-search)
 ;; (require 'unravel-dired)
 ;; (require 'unravel-window)
-;; (require 'unravel-git)
-;; (require 'unravel-org)
+(require 'unravel-git)
+(require 'unravel-org)
 (require 'unravel-langs)

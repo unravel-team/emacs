@@ -62,7 +62,7 @@ Here is what the generated directory structure should look like:
 
 To make a change to this Emacs configuration, edit this file and then type =C-c C-v C-t= (=M-x org-babel-tangle=) to republish all the relevant files.
 
-* The ~early-init.el~ file
+* The =early-init.el= file
 
 #+begin_quote
 This is the first file that Emacs reads when starting up. It should
@@ -139,7 +139,7 @@ Naming frames allows you to select them using completion (=M-x select-frame-by-n
   (add-hook 'after-init-hook (lambda () (set-frame-name "unravel")))
 #+end_src
 
-* The ~init.el~ file
+* The =init.el= file
 :PROPERTIES:
 :CUSTOM_ID: h:dae63bd9-93a8-41c4-af1b-d0f39ba50974
 :END:
@@ -366,8 +366,8 @@ Now we are ready to load our per-module configuration files:
   ;; (require 'unravel-search)
   ;; (require 'unravel-dired)
   ;; (require 'unravel-window)
-  ;; (require 'unravel-git)
-  ;; (require 'unravel-org)
+  (require 'unravel-git)
+  (require 'unravel-org)
   (require 'unravel-langs)
 #+end_src
 
@@ -854,7 +854,7 @@ in the function ~prot/enable-variable-pitch~.
 (provide 'unravel-theme)
 #+end_src
 
-* The ~unravel-essentials.el~ module
+* The =unravel-essentials.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:0ef52ed9-7b86-4329-ae4e-eff9ab8d07f2
 :END:
@@ -1109,7 +1109,7 @@ The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
 (provide 'unravel-essentials)
 #+end_src
 
-* The ~unravel-completion.el~ module
+* The =unravel-completion.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:15edf2c3-4419-4101-928a-6e224958a741
 :END:
@@ -1826,7 +1826,7 @@ handle even massive completion tables gracefully.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (provide 'unravel-completion)
 #+end_src
-* The ~unravel-langs.el~ module
+* The =unravel-langs.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:f44afb76-a1d7-4591-934d-b698cc79a792
 :END:
@@ -2440,3 +2440,1246 @@ Prot is the developer of this package.
 (provide 'prot-embark)
 ;;; prot-embark.el ends here
 #+end_src
+
+** The =unravel-git.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:65e3eff5-0bff-4e1f-b6c5-0d3aa1a0d232
+:END:
+
+[ Watch Prot's talk: [[https://protesilaos.com/codelog/2023-08-03-contribute-core-emacs/][Contribute to GNU Emacs core]] (2023-08-03). ]
+
+#+begin_quote
+This section covers my settings for version control per se, but more
+widely for tools related to checking different versions of files and
+working with so-called "projects".
+#+end_quote
+
+*** The =unravel-git.el= section about ediff
+:PROPERTIES:
+:CUSTOM_ID: h:89edea05-4d94-4ea1-b2a8-5ad01422618c
+:END:
+
+[ Watch Prot's talk: [[https://protesilaos.com/codelog/2023-11-17-emacs-ediff-basics/][Emacs: ediff basics]] (2023-12-30) ]
+
+#+begin_quote
+The built-in ~ediff~ feature provides several commands that let us
+compare files or buffers side-by-side. The defaults of ~ediff~ are bad,
+in my opinion: it puts buffers one on top of the other and places the
+"control panel" in a separate Emacs frame. The first time I tried to
+use it, I thought I broke my setup because it is unlike anything we
+normally interact with. As such, the settings I have for
+~ediff-split-window-function~ and ~ediff-window-setup-function~ are
+what I would expect Emacs maintainers to adopt as the new default. I
+strongly encourage everyone to start with them.
+
+In my workflow, the points of entry to the ~ediff~ feature are the
+commands ~ediff-files~, ~ediff-buffers~. Sometimes I use the 3-way
+variants with ~ediff-files3~ and ~ediff-buffers3~, though this is rare.
+Do watch the video I link to in the beginning of this section, as it
+covers the main functionality of this neat tool. I also show how it
+integrates with ~magit~ ([[#h:b08af527-9ebf-4425-ac3a-24b4f371a4fd][The =unravel-git.el= section about ~magit~ (great Git client)]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el" :mkdirp yes
+;;;; `ediff'
+(use-package ediff
+  :ensure nil
+  :commands (ediff-buffers ediff-files ediff-buffers3 ediff-files3)
+  :init
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  :config
+  (setq ediff-keep-variants nil)
+  (setq ediff-make-buffers-readonly-at-startup nil)
+  (setq ediff-merge-revisions-with-ancestor t)
+  (setq ediff-show-clashes-only t))
+#+end_src
+
+*** The =unravel-git.el= section about =project.el=
+:PROPERTIES:
+:CUSTOM_ID: h:7dcbcadf-8af6-487d-b864-e4ce56d69530
+:END:
+
+#+begin_quote
+In Emacs parlance, a "project" is a collection of files and/or
+directories that share the same root. The root of a project is
+identified by a special file or directory, with =.git/= being one of
+the defaults as it is a version control system supported by the
+built-in =vc.el= ([[#h:50add1d8-f0f4-49be-9e57-ab280a4aa300][The =unravel-git.el= section about =vc.el= and related]]).
+
+We can specify more project roots as a list of strings in the user
+option ~project-vc-extra-root-markers~. I work exclusively with Git
+repositories, so I just add there a =.project= file in case I ever
+need to register a project without it being controlled by ~git~. In
+that case, the =.project= file is just an empty file in a directory
+that I want to treat as the root of this project.
+
+The common way to switch to a project is to type =C-x p p=, which
+calls the command ~project-switch-project~. It lists all registered
+projects and also includes a =... (choose a dir)= option. By choosing
+a new directory, we register it in our project list if it has a
+recognisable root. Once we select a project, we are presented with a
+list of common actions to start working on the project. These are
+defined in the user option ~project-switch-commands~ and are activated
+by the final key that accesses them from the =C-x p= prefix. As such,
+do =M-x describe-keymap= and check the ~project-prefix-map~. For
+example, I bind ~project-dired~ to =C-x p RET=, so =RET= accesses this
+command after =C-x p p= as well.
+
+If any of the =project.el= commands is called from outside a project,
+it first prompts for a project and then carries out its action. For
+example, ~project-find-file~ will ask for a project to use, then
+switch to it, and then prompt for a file inside of the specified
+project.
+
+While inside a project, we have many commands that operate on the
+project level. For example, =C-x p f= (~project-find-file~) searches
+for a file across the project, while =C-x p b= (~project-switch-to-buffer~)
+switches to a buffer that is specific to the project. Again, check the
+~project-prefix-map~ for available commands.
+
+If not inside a project, the project-related commands will first
+prompt to select a project (same as typing =C-x p p=) and then carry
+out their action.
+
+I combine projects with my ~beframe~ package, so that when I switch to
+a project I get a new frame that limits the buffers I visit there
+limited to that frame ([[#h:77e4f174-0c86-460d-8a54-47545f922ae9][The =unravel-window.el= section about ~beframe~]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el"
+  ;;;; `project'
+  (use-package project
+    :ensure nil
+    :bind
+    (("C-x p ." . project-dired)
+     ("C-x p C-g" . keyboard-quit)
+     ("C-x p <return>" . project-dired)
+     ("C-x p <delete>" . project-forget-project))
+    :config
+    (setopt project-switch-commands
+            '((project-find-file "Find file")
+              (project-find-regexp "Find regexp")
+              (project-find-dir "Find directory")
+              (project-dired "Root dired")
+              (project-vc-dir "VC-Dir")
+              (project-shell "Shell")
+              (keyboard-quit "Quit")))
+    (setq project-vc-extra-root-markers '(".project")) ; Emacs 29
+    (setq project-key-prompt-style t) ; Emacs 30
+
+    (advice-add #'project-switch-project :after #'prot-common-clear-minibuffer-message))
+#+end_src
+
+*** The =unravel-git.el= section about ~diff-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:8b426a69-e3cd-42ac-8788-f41f6629f879
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el"
+;;;; `diff-mode'
+(use-package diff-mode
+  :ensure nil
+  :defer t
+  :config
+  (setq diff-default-read-only t)
+  (setq diff-advance-after-apply-hunk t)
+  (setq diff-update-on-the-fly t)
+  ;; The following are from Emacs 27.1
+  (setq diff-refine nil) ; I do it on demand, with my `agitate' package (more below)
+  (setq diff-font-lock-prettify t) ; I think nil is better for patches, but let me try this for a while
+  (setq diff-font-lock-syntax 'hunk-also))
+#+end_src
+
+*** The =unravel-git.el= section about ~magit~ (great Git client)
+:PROPERTIES:
+:CUSTOM_ID: h:b08af527-9ebf-4425-ac3a-24b4f371a4fd
+:END:
+
+#+begin_quote
+The ~magit~ package, maintained by Jonas Bernoulli, is the best
+front-end to ~git~ I have ever used. Not only is it excellent at
+getting the job done, it also helps you learn more about what ~git~
+has to offer.
+
+At the core of its interface is ~transient~. This is a library that
+was originally developed as Magit-specific code that was then
+abstracted away and ultimately incorporated into Emacs version 29.
+With ~transient~, we get a window pop up with keys and commands
+corresponding to them. The window is interactive, as the user can set
+a value or toggle an option and have it take effect when the relevant
+command is eventually invoked. For ~git~, in particular, this
+interface is a genious way to surface the plethora of options.
+
+To start, call the command ~magit-status~. It brings up a buffer that
+shows information about the state of the repository. Sections include
+an overview of the current =HEAD=, untracked files, unstaged changes,
+staged changes, and recent commits. Each section's visibility state
+can be cycled by pressing =TAB= (variations of this are available---remember
+to do =C-h m= (~describe-mode~) in an unfamiliar major mode to get
+information about its key bindings).
+
+From the status buffer, we can perform all the usual version control
+operations. By typing =?= (~magit-dispatch~), we bring up the main
+~transient~ menu, with keys that then bring up their own submenus,
+such as for viewing commit logs, setting the remotes, switching
+branches, etc.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el"
+  ;;; Interactive and powerful git front-end (Magit)
+  (use-package transient
+    :defer t
+    :config
+    (setq transient-show-popup 0.5))
+
+  (use-package magit
+    :ensure t
+    :bind ("C-c g" . magit-status)
+    :init
+    (setq magit-define-global-key-bindings nil)
+    ;; (setq magit-section-visibility-indicator '("⮧"))
+    :config
+    (setq git-commit-summary-max-length 50)
+    ;; NOTE 2023-01-24: I used to also include `overlong-summary-line'
+    ;; in this list, but I realised I do not need it.  My summaries are
+    ;; always in check.  When I exceed the limit, it is for a good
+    ;; reason.
+    ;; (setq git-commit-style-convention-checks '(non-empty-second-line))
+
+    (setq magit-diff-refine-hunk t))
+
+  (use-package magit-repos
+    :ensure nil ; part of `magit'
+    :commands (magit-list-repositories)
+    :init
+    (setq magit-repository-directories
+          '(("~/src/prototypes" . 1))))
+#+end_src
+
+*** The =unravel-git.el= call to ~provide~
+:PROPERTIES:
+:CUSTOM_ID: h:4e7035c5-9350-4c51-be85-85f2539ed295
+:END:
+
+Finally, we ~provide~ the module. 
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el"
+(provide 'unravel-git)
+#+end_src
+
+** The =unravel-org.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:d799c3c0-bd6a-40bb-bd1a-ba4ea5367840
+:END:
+
+Watch these talks by Prot:
+
+- [[https://protesilaos.com/codelog/2023-12-18-emacs-org-advanced-literate-conf/][Advanced literate configuration with Org]] (2023-12-18)
+- [[https://protesilaos.com/codelog/2023-05-23-emacs-org-basics/][Basics of Org mode]] (2023-05-23)
+- [[https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/][Demo of my custom Org block agenda]] (2021-12-09)
+- [[https://protesilaos.com/codelog/2020-02-04-emacs-org-capture-intro/][Primer on "org-capture"]] (2020-02-04)
+
+#+begin_quote
+At its core, Org is a plain text markup language. By "markup
+language", we refer to the use of common characters to apply styling,
+such as how a word wrapped in asterisks acquires strong emphasis.
+Check the video I link to above on the basics of Org mode.
+
+Though what makes Org powerful is not the markup per se, but the fact
+that it has a rich corpus of Emacs Lisp code that does a lot with this
+otherwise plain text notation. Some of the headline features:
+
+- Cycle the visibility of any heading and its subheadings. This lets
+  you quickly fold a section you do not need to see (or reveal the one
+  you care about).
+- Mix prose with code in a single document to either make the whole
+  thing an actual program or to evaluate/demonstrate some snippets.
+- Convert ("export") an Org file to a variety of formats, including
+  HTML and PDF.
+- Use LaTeX inside of Org files to produce a scientific paper without
+  all the markup of LaTeX.
+- Manage TODO lists and implement a concomitant methodology of
+  labelling task states.
+- Quickly shift a "thing" (heading, list item, paragraph, ...) further
+  up or down in the file.
+- Use tables with formulas as a lightweight alternative to spreadsheet
+  software.
+- Capture data or fleeting thoughts efficiently using templates.
+- Maintain an agenda for all your date-bound activities.
+- Clock in and out of tasks, to eventually track how you are spending
+  your time.
+- Link to files regardless of file type. This includes special links
+  such as to an Info manual or an email, if you also have that running
+  locally and integrated with Emacs ([[#h:755e195b-9471-48c7-963b-33055969b4e2][The =unravel-email.el= module]]).
+
+In other words, Org is highly capable and widely considered one of the
+killer apps of Emacs.
+
+This section covers the relevant configurations. You will notice that
+it is not limited to Org, as some other built-in features are also
+relevant here.
+#+end_quote
+
+*** The =unravel-org.el= section on the ~calendar~
+:PROPERTIES:
+:CUSTOM_ID: h:94d48381-1711-4d6b-8449-918bc1e3836c
+:END:
+
+#+begin_quote
+The ~calendar~ is technically independent of Org, though it tightly
+integrates with it. We witness this when we are setting timestamps,
+such as while setting a =SCHEDULED= or =DEADLINE= entry for a given
+heading. All I do here is set some stylistic preferences.
+
+Note that Emacs also has a ~diary~ command. I used it for a while, but
+Org is far more capable, so I switched to it completely.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el" :mkdirp yes
+;;; Calendar
+(use-package calendar
+  :ensure nil
+  :commands (calendar)
+  :config
+  (setq calendar-mark-diary-entries-flag nil)
+  (setq calendar-mark-holidays-flag t)
+  (setq calendar-mode-line-format nil)
+  (setq calendar-time-display-form
+        '( 24-hours ":" minutes
+           (when time-zone (format "(%s)" time-zone))))
+  (setq calendar-week-start-day 1)      ; Monday
+  (setq calendar-date-style 'iso)
+  (setq calendar-time-zone-style 'numeric) ; Emacs 28.1
+
+  (require 'solar)
+  (setq calendar-latitude 35.17         ; Not my actual coordinates
+        calendar-longitude 33.36)
+
+  (require 'cal-dst)
+  (setq calendar-standard-time-zone-name "+0200")
+  (setq calendar-daylight-time-zone-name "+0300"))
+#+end_src
+
+*** The =unravel-org.el= section about appointment reminders (=appt.el=)
+:PROPERTIES:
+:CUSTOM_ID: h:bd4b0dcb-a925-4bd7-90db-6379a7ca6f5e
+:END:
+
+#+begin_quote
+The built in =appt.el= defines functionality for handling
+notifications about appointments. It is originally designed to work
+with the generic diary feature (the =M-x diary= one, I mean), which I
+do not use anymore, but also integrates nicely with the Org agenda
+([[#h:7fe87b83-2815-4617-a5f9-d3417dd9d248][The =unravel-org.el= Org agenda settings]]). I deepen this
+integration further, such that after adding a task or changing its
+state, the appointments mechanism re-reads my data to register new
+notifications. This is done via a series of hooks and with the use of
+the advice feature of Emacs Lisp.
+
+Here I am setting some simple settings to keep appointment notifations
+minimal. I do not need them to inform me about the contents of my next
+entry on the agenda: just show text on the mode line telling me how
+many minutes are left until the event.
+
+In Org files, every heading can have an =APPT_WARNTIME= property: it takes
+a numeric value representing minutes for a forewarning from =appt.el=.
+I use this in tandem with ~org-capture~ for tasks that need to be
+done at a specific time, such as coaching sessions ([[#h:f8f06938-0dfe-45c3-b4cf-996d36cba82d][The =unravel-org.el= Org capture templates (~org-capture~)]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;; Appt (appointment reminders which also integrate with Org agenda)
+(use-package appt
+  :ensure nil
+  :commands (appt-activate)
+  :config
+  (setq appt-display-diary nil
+        appt-display-format nil
+        appt-display-mode-line t
+        appt-display-interval 3
+        appt-audible nil ; TODO 2023-01-25: t does nothing because I disable `ring-bell-function'?
+        appt-warning-time-regexp "appt \\([0-9]+\\)" ; This is for the diary
+        appt-message-warning-time 6)
+
+  (with-eval-after-load 'org-agenda
+    (appt-activate 1)
+
+    ;; NOTE 2021-12-07: In my `prot-org.el' (see further below), I add
+    ;; `org-agenda-to-appt' to various relevant hooks.
+    ;;
+    ;; Create reminders for tasks with a due date when this file is read.
+    (org-agenda-to-appt)))
+#+end_src
+
+*** The =unravel-org.el= section with basic Org settings
+:PROPERTIES:
+:CUSTOM_ID: h:e03df1e0-b43e-49b5-978e-6a511165617c
+:END:
+
+#+begin_quote
+Org, also known as "Org mode", is one of the potentially most useful
+feature sets available to every Emacs user. At its core, Org is a
+lightweight markup language: you can have headings and paragraphs,
+mark a portion of text with emphasis, produce bullet lists, include
+code blocks, and the like. Though what really sets Org apart from
+other markup languages is the rich corpus of Emacs Lisp written around
+it to do all sorts of tasks with this otherwise plain text format.
+
+With Org you can write technical documents (e.g. the manuals of all my
+Emacs packages), maintain a simple or highly sophisticated system for
+task management, organise your life using the agenda, write tables
+that can evaluate formulas to have spreadsheet functionality, have
+embedded LaTeX, evaluate code blocks in a wide range of programming
+languages and reuse their results for literate programming, include
+the contents of other files into a singular file, use one file to
+generate other files/directories with all their contents, and export
+the Org document to a variety of formats like =.pdf= and =.odt=.
+Furthermore, Org can be used as a lightweight, plain text database, as
+each heading can have its own metadata. This has practical
+applications in most of the aforementioned.
+
+In short, if something can be done with plain text, Org probably does
+it already or has all the elements for piecing it together. This
+document, among many of my published works, is testament to Org's
+sheer power, which I explained at greater length in a video
+demonstration: [[https://protesilaos.com/codelog/2023-12-18-emacs-org-advanced-literate-conf/][Advanced literate configuration with Org]] (2023-12-18).
+
+This being Emacs, everything is customisable and Org is a good example
+of this. There are a lot of user options for us to tweak things to our
+liking. I do as much, though know that Org is perfectly usable without
+any configuration. The following sections contain further commentary
+on how I use Org.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  ;;; Org-mode (personal information manager)
+  (use-package org
+    :ensure nil
+    :init
+    (setq org-directory (expand-file-name "~/Documents/org/"))
+    (setq org-imenu-depth 7)
+
+    (add-to-list 'safe-local-variable-values '(org-hide-leading-stars . t))
+    (add-to-list 'safe-local-variable-values '(org-hide-macro-markers . t))
+    :bind
+    ( :map global-map
+      ("C-c l" . org-store-link)
+      ("C-c o" . org-open-at-point-global)
+      :map org-mode-map
+      ;; I don't like that Org binds one zillion keys, so if I want one
+      ;; for something more important, I disable it from here.
+      ("C-'" . nil)
+      ("C-," . nil)
+      ("M-;" . nil)
+      ("C-c M-l" . org-insert-last-stored-link)
+      ("C-c C-M-l" . org-toggle-link-display)
+      ("M-." . org-edit-special) ; alias for C-c ' (mnenomic is global M-. that goes to source)
+      :map org-src-mode-map
+      ("M-," . org-edit-src-exit) ; see M-. above
+      :map narrow-map
+      ("b" . org-narrow-to-block)
+      ("e" . org-narrow-to-element)
+      ("s" . org-narrow-to-subtree)
+      :map ctl-x-x-map
+      ("i" . prot-org-id-headlines)
+      ("h" . prot-org-ox-html))
+    :config
+    ;; My custom extras, which I use for the agenda and a few other Org features.
+    (require 'prot-org)
+
+  ;;;; general settings
+    (setq org-ellipsis "⮧")
+    (setq org-adapt-indentation nil)      ; No, non, nein, όχι!
+    (setq org-special-ctrl-a/e nil)
+    (setq org-special-ctrl-k nil)
+    (setq org-M-RET-may-split-line '((default . nil)))
+    (setq org-hide-emphasis-markers nil)
+    (setq org-hide-macro-markers nil)
+    (setq org-hide-leading-stars nil)
+    (setq org-cycle-separator-lines 0)
+    (setq org-structure-template-alist
+          '(("s" . "src")
+            ("e" . "src emacs-lisp")
+            ("E" . "src emacs-lisp :results value code :lexical t")
+            ("t" . "src emacs-lisp :tangle FILENAME")
+            ("T" . "src emacs-lisp :tangle FILENAME :mkdirp yes")
+            ("x" . "example")
+            ("X" . "export")
+            ("q" . "quote")))
+    (setq org-fold-catch-invisible-edits 'show)
+    (setq org-return-follows-link nil)
+    (setq org-loop-over-headlines-in-active-region 'start-level)
+    (setq org-modules '(ol-info ol-eww))
+    (setq org-use-sub-superscripts '{})
+    (setq org-insert-heading-respect-content t)
+    (setq org-read-date-prefer-future 'time)
+    (setq org-highlight-latex-and-related nil) ; other options affect elisp regexp in src blocks
+    (setq org-fontify-quote-and-verse-blocks t)
+    (setq org-fontify-whole-block-delimiter-line t)
+    (setq org-track-ordered-property-with-tag t)
+    (setq org-highest-priority ?A)
+    (setq org-lowest-priority ?C)
+    (setq org-default-priority ?A)
+    (setq org-priority-faces nil))
+#+end_src
+
+*** The =unravel-org.el= Org to-do and refile settings
+:PROPERTIES:
+:CUSTOM_ID: h:024dd541-0061-4a10-b10b-b17dcd4794b9
+:END:
+
+#+begin_quote
+One of the many use-cases for Org is to maintain a plain text to-do
+list. A heading that starts with a to-do keyword, such as =TODO= is
+treated as a task and its state is considered not completed.
+
+We can switch between the task states with shift and the left or right
+arrow keys. Or we can select a keyword directly with =C-c C-t=, which
+calls ~org-todo~ by default. I personally prefer the latter approach,
+as it is more precise.
+
+Whenever a task state changes, we can log that event in a special
+=LOGBOOK= drawer. This is automatically placed right below the
+heading, before any paragraph text. Logging data is an opt-in feature,
+which I consider helpful ([[#h:0884658e-9eb5-47e3-9338-66e09004a1a0][The =unravel-org.el= Org time/state logging]]).
+
+Tasks can be associated with timestamps, typically a scheduled
+date+time or a deadline+time. This can be helpful when we are
+reviewing the source Org file, though it really shines in tandem with
+the agenda. Any heading that has a timestamp and which belongs to a
+file in the ~org-agenda-files~ will show up on the agenda in the given
+date ([[#h:7fe87b83-2815-4617-a5f9-d3417dd9d248][The =unravel-org.el= Org agenda settings]]).
+
+By default, the ~org-todo-keywords~ are =TODO= and =DONE=. We can
+write more keywords if we wish to implement a descriptive workflow.
+For example, we can have a =WAIT= keyword for something that is to be
+done but is not actionable yet. While the number of keywords is not
+limited, the binary model is the same: we have words that represent
+the incomplete state and those that count as the completion of the
+task. For instance, both =CANCEL= and =DONE= mean that the task is not
+actionable anymore and we move on to other things. As such, the extra
+keywords are a way for the user to make tasks more descriptive and
+easy to find. In the value of the ~org-todo-keywords~, we use the bar
+character to separate the incomplete state to the left from the
+completed one to the right.
+
+One of the agenda's headiline features is the ability to produce a
+view that lists headings with the given keyword. So having the right
+terms can make search and retrieval of data more easy. On the
+flip-side, too many keywords add cognitive load and require more
+explicit search terms to yield the desired results. I used to work
+with a more descriptive set of keywords, but ultimately decided to
+keep things simple.
+
+The refile mechanism is how we can reparent a heading, by moving it
+from one place to another. We do this with the command ~org-refile~,
+bound to =C-c C-w= by default. A common workflow where refiling is
+essential is to have an "inbox" file or heading, where unprocessed
+information is stored at, and periodically process its contents to
+move the data where it belongs. Though it can also work fine without
+any such inbox, in those cases where a heading should be stored
+someplace else. The ~org-refile-targets~ specifies the files that are
+available when we try to refile the current heading. With how I set it
+up, all the agenda files plus the current file's headings up to level
+2 are included as possible targets.
+
+In terms of workflow, I have not done a refile in a very long time,
+because my entries always stay in the same place as I had envisaged at
+the capture phase ([[#h:f8f06938-0dfe-45c3-b4cf-996d36cba82d][The =unravel-org.el= Org capture templates (~org-capture~)]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; refile, todo
+(use-package org
+  :ensure nil
+  :config
+  (setq org-refile-targets
+        '((org-agenda-files . (:maxlevel . 2))
+          (nil . (:maxlevel . 2))))
+  (setq org-refile-use-outline-path t)
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  (setq org-refile-use-cache t)
+  (setq org-reverse-note-order nil)
+  ;; ;; NOTE 2023-04-07: Leaving this here for demo purposes.
+  ;; (setq org-todo-keywords
+  ;;       '((sequence "TODO(t)" "MAYBE(m)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")
+  ;;         (sequence "COACH(k)" "|" "COACHED(K!)")))
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "|" "CANCEL(c@)" "DONE(d!)")
+          (sequence "COACH(k)" "|" "COACHED(K!)")))
+
+  (defface prot/org-bold-done
+    '((t :inherit (bold org-done)))
+    "Face for bold DONE-type Org keywords.")
+
+  (setq org-todo-keyword-faces
+        '(("CANCEL" . prot/org-bold-done)))
+  (setq org-use-fast-todo-selection 'expert)
+
+  (setq org-fontify-done-headline nil)
+  (setq org-fontify-todo-headline nil)
+  (setq org-fontify-whole-heading-line nil)
+  (setq org-enforce-todo-dependencies t)
+  (setq org-enforce-todo-checkbox-dependencies t))
+#+end_src
+
+*** The =unravel-org.el= Org heading tags
+:PROPERTIES:
+:CUSTOM_ID: h:81de4e32-a1af-4e1f-9e10-90eb0c90afa2
+:END:
+
+Each Org heading can have one or more tags associated with it, while
+all headings inherit any potential =#+FILETAGS=. We can add tags to a
+heading when the cursor is over it by typing the ever flexible =C-c C-c=.
+Though the more specific ~org-set-tags-command~ also gets the job
+done, plus it does not require that the cursor is positioned on the
+heading text.
+
+Tagging is useful for searching and retrieving the data we store. The
+Org agenda, in particular, provides commands to filter tasks by tag:
+
+- [[#h:024dd541-0061-4a10-b10b-b17dcd4794b9][The =unravel-org.el= Org to-do and refile settings]]
+- [[#h:7fe87b83-2815-4617-a5f9-d3417dd9d248][The =unravel-org.el= Org agenda settings]]
+
+The user option ~org-tag-alist~ lets us specify tags we always want to
+use, though we can write tags per file as well by using the =#+TAGS=
+keyword. I do the latter as a global list of tags is not useful in my
+case. For example, when I wan checking my =coach.org= file for the
+coaching sessions I provide, I do not need to see any of the tags that
+make sense in my general =tasks.org=.
+
+Note that in the settings below I disable the auto-alignment that Org
+does where it shifts tags to the right of the heading. I do not like
+it.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; tags
+(use-package org
+  :ensure nil
+  :config
+  (setq org-tag-alist nil)
+  (setq org-auto-align-tags nil)
+  (setq org-tags-column 0))
+#+end_src
+
+*** The =unravel-org.el= Org time/state logging
+:PROPERTIES:
+:CUSTOM_ID: h:0884658e-9eb5-47e3-9338-66e09004a1a0
+:END:
+
+Org can keep a record of state changes, such as when we set an entry
+marked with the =TODO= keyword as =DONE= or when we reschedule an
+appointment ([[#h:7fe87b83-2815-4617-a5f9-d3417dd9d248][The =unravel-org.el= Org agenda settings]]). This data
+is stored in a =LOGBOOK= drawer right below the heading. I choose to
+keep track of this information, as it is sometimes useful to capture
+mistakes or figure out intent in the absence of further clarification
+(though I do tend to write why something happened).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; log
+(use-package org
+  :ensure nil
+  :config
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  (setq org-log-note-clock-out nil)
+  (setq org-log-redeadline 'time)
+  (setq org-log-reschedule 'time))
+#+end_src
+
+*** The =unravel-org.el= Org link settings
+:PROPERTIES:
+:CUSTOM_ID: h:da8ce883-7f21-4a6e-a41f-d668ad762b41
+:END:
+
+One of the nice things about Org is its flexible linking mechanism. It
+can produce links to a variety of file types or buffers and even
+navigate to a section therein.
+
+At its simplest form, we have the =file= link type, which points to a
+file system path, with an optional extension for a match inside the
+file, as documented in the manual. Evaluate this inside of Emacs:
+
+#+begin_example emacs-lisp
+(info "(org) Search Options")
+#+end_example
+
+Links to buffers are also common and valuable. For example, we can
+have a link to a page produced by the ~man~ command, which gives us
+quick access to the documentation of some program. When Org follows
+that link, it opens the buffer in the appropriate major mode. For me,
+the most common scenario is a link to an email, which I typically
+associate with a task that shows up in my agenda:
+
+- [[#h:f8f06938-0dfe-45c3-b4cf-996d36cba82d][The =unravel-org.el= Org capture templates (~org-capture~)]]
+- [[#h:49890997-448e-408d-bebe-2003259bb125][The =unravel-notmuch.el= glue code for ~org-capture~ (=ol-notmuch.el=)]]
+
+Org supports lots of link types out-of-the-box, though more can be
+added by packages. My Denote does this: it defines a =denote= link
+type which behaves the same way as the =file= type except that it uses
+the identifier of the file instead of its full path (so eve if the
+file is renamed, the link will work for as long as the identifier
+remains the same).
+
+Links can be generated automatically as part of an ~org-capture~
+template. The command ~org-store-link~ produces one manually, storing
+it to a special data structure from which it can be retrieved later
+for insertion with the command ~org-insert-link~. The latter command
+can also create new links, simply by receiving data that is different
+from what was already stored.
+
+I bind ~org-store-link~ in main section of the Org configuration:
+[[#h:e03df1e0-b43e-49b5-978e-6a511165617c][The =unravel-org.el= section with basic Org settings]].
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; links
+(use-package org
+  :ensure nil
+  :config
+  (require 'prot-org) ; for the above commands
+
+  (setq org-link-context-for-files t)
+  (setq org-link-keep-stored-after-insertion nil)
+  (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id))
+#+end_src
+
+*** The =unravel-org.el= Org code block settings
+:PROPERTIES:
+:CUSTOM_ID: h:1f5a0d46-5202-48dd-8048-b48ce17f3df8
+:END:
+
+This document benefits from Org's ability to combine prose with code,
+by placing the latter inside of a block that is delimited by
+=#+BEGIN_SRC= and =#+END_SRC= lines.
+
+Code blocks can use the syntax highlighting ("fontification" in Emacs
+parlance) of a given major mode. They can also have optional
+parameters passed to their header, which expand the capabilities of
+the block. For instance, the following code block with my actual
+configuration uses the fontification of the ~emacs-lisp-mode~ and has
+a =:tangle= parameter with a value of a file system path. When I
+invoke the command ~org-babel-tangle~, the contents of this block will
+be added to that file, creating the file if necessary.
+
+More generally, Org is capable of evaluating code blocks and passing
+their return value to other code blocks. It is thus possible to write
+a fully fledged program as an Org document. This paradigm is known as
+"literate programming". In the case of an Emacs configuration, such as
+mine, it is called a "literate configuration" or variants thereof. I
+did a video about my setup: [[https://protesilaos.com/codelog/2023-12-18-emacs-org-advanced-literate-conf/][Advanced literate configuration with Org]] (2023-12-18).
+
+Org can evaluate code blocks in many languages. This is known as "Org
+Babel" and the files which implement support for a given language are
+typically named =ob-LANG.el= where =LANG= is the name of the language.
+We can load the requisite code for the languages we care about with
+something like the following:
+
+#+begin_example emacs-lisp
+(require 'ob-python)
+
+;; OR
+
+(use-package ob-python)
+
+;; OR for more control
+
+(use-package ob-python
+  :after org
+  :config
+  ;; Settings here
+  )
+#+end_example
+
+I seldom need to work with Org Babel, so I do not load any language
+automatically. Note that Emacs Lisp is loaded by default.
+
+To evaluate a code block, we type Org's omnipotent =C-c C-c=. The
+results will be produced below the code block. There is an optional
+parameter that controls how---or even if---the results are displayed.
+
+There are many other types of block apart from =SRC=. Those do
+different things, such as:
+
+- =#+BEGIN_QUOTE= :: Treat the contents as a block quote or equivalent.
+- =#+BEGIN_VERSE= :: Do not reflow any like breaks (for poetry and such).
+- =#+BEGIN_EXPORT= :: Evaluate the code for the given export target
+  (like =html= or =latex=), optionally replacing it with its results
+  or keeping both of them ([[#h:bd11d4d8-6e9f-4536-87a4-4018783bf8f5][The =unravel-org.el= Org export settings]]).
+
+This is a wonderful world of possibilities!
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; code blocks
+(use-package org
+  :ensure nil
+  :config
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-src-window-setup 'current-window)
+  (setq org-edit-src-persistent-message nil)
+  (setq org-src-fontify-natively t)
+  (setq org-src-preserve-indentation t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-edit-src-content-indentation 0))
+#+end_src
+
+*** The =unravel-org.el= Org export settings
+:PROPERTIES:
+:CUSTOM_ID: h:bd11d4d8-6e9f-4536-87a4-4018783bf8f5
+:END:
+
+Org is a capable authoring tool in no small part because it can be
+converted to other file formats. A typical example is to write a
+technical document in Org and then export it to a PDF. Another
+use-case is what I commonly do with the Emacs packages I maintain,
+which I export to an Info manual (texinfo format) and an HTML web
+page.
+
+The default set of export targets is specified in the value of the
+user option ~org-export-backends~. It is one of those rare cases where
+it has to be evaluated before the package is loaded. Other than that,
+we can load an export backend by finding the correspond =ox-FORMAT.el=
+file and either ~require~ it or load it with ~use-package~, like what
+I showed for Org Babel ([[#h:1f5a0d46-5202-48dd-8048-b48ce17f3df8][The =unravel-org.el= Org code block settings]]).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; export
+(use-package org
+  :ensure nil
+  :init
+  ;; NOTE 2023-05-20: Must be evaluated before Org is loaded,
+  ;; otherwise we have to use the Custom UI.  No thanks!
+  (setq org-export-backends '(html texinfo md))
+  :config
+  (setq org-export-with-toc t)
+  (setq org-export-headline-levels 8)
+  (setq org-export-dispatch-use-expert-ui nil)
+  (setq org-html-htmlize-output-type nil)
+  (setq org-html-head-include-default-style nil)
+  (setq org-html-head-include-scripts nil))
+#+end_src
+
+*** The =unravel-org.el= Org capture templates (~org-capture~)
+:PROPERTIES:
+:CUSTOM_ID: h:f8f06938-0dfe-45c3-b4cf-996d36cba82d
+:END:
+
+The ~org-capture~ command allows us to quickly store data in some
+structured way. This is done with the help of a templating system
+where we can, for example, record the date the entry was recorded,
+prompt for user input, automatically use the email's subject as the
+title of the task, and the like. The documentation string of
+~org-capture-templates~ covers the technicalities.
+
+I use two Org files for my tasks. The one is =tasks.org=, which
+contains the bulk of my entries. The other is =coach.org=, which is
+specific to my coaching work: https://protesilaos.com/coach.
+
+The =tasks.org= consists of several top-level headings. Each contains
+subheadings I need to review. You will notice how most of my
+entries in ~org-capture-templates~ involve this file. With Org, it is
+perfectly fine to work in a single file because we can fold headings
+or narrow to them with ~org-narrow-to-subtree~. Furthermore, we can
+navigate directly to a heading using minibuffer completion, such as
+with the general purpose command ~prot-search-outline~
+([[#h:b902e6a3-cdd2-420f-bc99-3d973c37cd20][The =unravel-search.el= extras provided by the =prot-search.el= library]]).
+
+Despite the fact that Org copes well with large files, I still choose
+to keep my coaching work in a separate file as a contingency plan.
+Because =coach.org= includes information about appointments, I need to
+be able to read it with ease from anywhere. This includes different
+types of hardware, but also any kind of generic text editor or
+terminal pager. I do not want to depend on features like folding,
+narrowing, and the like, in times when something has gone awry.
+Granted, this has never happened, though the idea makes sense.
+Besides, two files are not hard to manage in this case. The
+=coach.org= has a simple structure: each appointment is stored as a
+top-level heading.
+
+As for my workflow, here is an overview:
+
+- When I want to capture data that I am not yet sure about, I add it
+  to the =tasks.org= "Unprocessed" heading. I periodically review
+  those to decide if I want to do something with them or not. If I do
+  not want them, I delete them. Otherwise, I file them under another
+  heading in the same file using the ~org-refile~ command ([[#h:024dd541-0061-4a10-b10b-b17dcd4794b9][The =unravel-org.el= Org to-do and refile settings]]).
+  Not everything goes into the "Unprocessed" headings, as I often
+  known in advance what an item is about. This is just a fallback for
+  those cases when I need more information to decide on the
+  appropriate action.
+
+- Tasks that have an inherent time component are given a =SCHEDULED=
+  or =DEADLINE= timestamp (set those on demand with the commands
+  ~org-schedule~ and ~org-deadline~, respectively). These are the only
+  tasks I want to see on my daily agenda ([[#h:7fe87b83-2815-4617-a5f9-d3417dd9d248][The =unravel-org.el= Org agenda settings]]).
+  The difference between =SCHEDULED= and =DEADLINE= is that the former
+  has no strict start or end time and so is flexible, while the latter
+  is more rigid. For example, "visit the vet today" does not have a
+  strict time associated with it because the doctor often deals with
+  emergency situations and thus their agenda is fluid. While a
+  coaching session of mine like "work on Emacs with PERSON" has to
+  start at the agreed upon time.
+
+- I do not arbitrarily assign timestamps to tasks. If something does
+  not have a scheduled date or a deadline, then it does not belong on
+  the agenda. Otherwise, those arbitrarily defined "events" accumulate
+  in the agenda and crowd out the actual time-sensitive tasks. As a
+  result, the cognitive load is heavier and things will not be done.
+  So when I want to do something at some point, but have no specific
+  plan for it, I add is to the =tasks.org= "Wishlist". When I have
+  free time, I review my wishlist and pick something to work on from
+  there depending on my available time and mood. This keeps my
+  workflow both focused and stress-free.
+
+- Finally, my =coach.org= only has time-sensitive appointments with a
+  =DEADLINE= associated with them. I organise the rest of my
+  activities in the given day based on those.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; capture
+(use-package org-capture
+  :ensure nil
+  :bind ("C-c c" . org-capture)
+  :config
+  (require 'prot-org)
+
+  (setq org-capture-templates
+        `(("u" "Unprocessed" entry
+           (file+headline "tasks.org" "Unprocessed")
+           ,(concat "* %^{Title}\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%a\n%i%?")
+           :empty-lines-after 1)
+          ;; ("e" "Email note (unprocessed)" entry ; Also see `org-capture-templates-contexts'
+          ;;  (file+headline "tasks.org" "Unprocessed")
+          ;;  ,(concat "* TODO %:subject :mail:\n"
+          ;;           ":PROPERTIES:\n"
+          ;;           ":CAPTURED: %U\n"
+          ;;           ":END:\n\n"
+          ;;           "%a\n%i%?")
+          ;;  :empty-lines-after 1)
+          ("w" "Add to the wishlist (may do some day)" entry
+           (file+headline "tasks.org" "Wishlist")
+           ,(concat "* %^{Title}\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%a%?")
+           :empty-lines-after 1)
+          ("c" "Clock in and do immediately" entry
+           (file+headline "tasks.org" "Clocked tasks")
+           ,(concat "* TODO %^{Title}\n"
+                    ":PROPERTIES:\n"
+                    ":EFFORT: %^{Effort estimate in minutes|5|10|15|30|45|60|90|120}\n"
+                    ":END:\n\n"
+                    "%a\n")
+           :prepend t
+           :clock-in t
+           :clock-keep t
+           :immediate-finish t
+           :empty-lines-after 1)
+          ("t" "Time-sensitive task" entry
+           (file+headline "tasks.org" "Tasks with a date")
+           ,(concat "* TODO %^{Title} %^g\n"
+                    "%^{How time sensitive it is||SCHEDULED|DEADLINE}: %^t\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%a%?")
+           :empty-lines-after 1)
+          ("p" "Private lesson or service" entry
+           (file "coach.org")
+           #'prot-org-capture-coach
+           :prepend t
+           :empty-lines 1)
+          ("P" "Private service clocked" entry
+           (file+headline "coach.org" "Clocked services")
+           #'prot-org-capture-coach-clock
+           :prepend t
+           :clock-in t
+           :clock-keep t
+           :immediate-finish t
+           :empty-lines 1)))
+
+  ;; NOTE 2024-11-10: I realised that I was not using this enough, so
+  ;; I decided to simplify my setup.  Keeping it here, in case I need
+  ;; it again.
+
+  ;; (setq org-capture-templates-contexts
+  ;;       '(("e" ((in-mode . "notmuch-search-mode")
+  ;;               (in-mode . "notmuch-show-mode")
+  ;;               (in-mode . "notmuch-tree-mode")))))
+  )
+#+end_src
+
+*** The =unravel-org.el= Org agenda settings
+:PROPERTIES:
+:CUSTOM_ID: h:7fe87b83-2815-4617-a5f9-d3417dd9d248
+:END:
+
+[ Watch: [[https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/][Demo of my custom Org block agenda]] (2021-12-09). It has
+  changed a bit since then, but the idea is the same. ]
+
+With the Org agenda, we can visualise the tasks we have collected in
+our Org files or, more specifically, in the list of files specified in
+the user option ~org-agenda-files~. In my workflow, only the files in
+the ~org-directory~ can feed data into the agenda. Though Org provides
+commands to add/remove the current file on demand: ~org-remove-file~,
+and ~org-agenda-file-to-front~. If I ever need to write a task that is
+specific to a certain file or buffer, then I use Org's linking
+mechanism to point to the relevant context, but otherwise store my
+task in the usual place ([[#h:f8f06938-0dfe-45c3-b4cf-996d36cba82d][The =unravel-org.el= Org capture templates (~org-capture~)]]).
+
+By default, Org provides many so-called "views" for the agenda. One of
+the them is the daily/weekly agenda. Others show only the headings
+with =TODO= keywords, or some other kind of search criteria. I
+personally never use those views. I have my own custom agenda view,
+which consolidates in a single buffer the following blocks on data, in
+this order ([[#h:9974eac8-2167-45c4-90e0-12dd877403da][The =prot-org.el= library]]).:
+
+- Important tasks without a date :: When I add a top priority to
+  something, but there is no inherent deadline to it.
+
+- Pending scheduled tasks :: Tasks with a =SCHEDULED= date may
+  sometimes not be done when they ought to. So they need to be closer
+  to the top for me to do them as soon as I can.
+
+- Today's agenda :: What I am actually working on. Because I only
+  assign a timestamp to tasks that are indeed time-sensitive, this
+  always reflects the commitments I have for the day.
+
+- Next three days :: Like the above, but for the near future.
+
+- Upcoming deadlines (+14d) :: These are the deadlines I need to be
+  aware of for the 14 days after the next three days I am only
+  informed about.
+
+The Org agenda has lots of other extras, such as to filter the view.
+Though I never use them. My custom agenda does exactly what I need
+from it and thus keeps me focused.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+;;;; agenda
+(use-package org-agenda
+  :ensure nil
+  :bind
+  ;; I bind `org-agenda' to C-c A, so this one puts me straight into my
+  ;; custom block agenda.
+  ( :map global-map
+    ("C-c A" . org-agenda)
+    ("C-c a" . (lambda ()
+                 "Call Org agenda with `prot-org-custom-daily-agenda' configuration."
+                 (interactive)
+                 (org-agenda nil "A"))))
+  :config
+;;;;; Custom agenda blocks
+
+  (setq org-agenda-format-date #'prot-org-agenda-format-date-aligned)
+
+  ;; Check the variable `prot-org-custom-daily-agenda' in prot-org.el
+  (setq org-agenda-custom-commands
+        `(("A" "Daily agenda and top priority tasks"
+           ,prot-org-custom-daily-agenda
+           ((org-agenda-fontify-priorities nil)
+            (org-agenda-prefix-format "	 %t %s")
+            (org-agenda-dim-blocked-tasks nil)))
+          ("P" "Plain text daily agenda and top priorities"
+           ,prot-org-custom-daily-agenda
+           ((org-agenda-with-colors nil)
+            (org-agenda-prefix-format "%t %s")
+            (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
+            (org-agenda-fontify-priorities nil)
+            (org-agenda-remove-tags t))
+           ("agenda.txt"))))
+
+;;;;; Basic agenda setup
+  (setq org-default-notes-file (make-temp-file "emacs-org-notes-")) ; send it to oblivion
+  (setq org-agenda-files `(,org-directory))
+  (setq org-agenda-span 'week)
+  (setq org-agenda-start-on-weekday 1)  ; Monday
+  (setq org-agenda-confirm-kill t)
+  (setq org-agenda-show-all-dates t)
+  (setq org-agenda-show-outline-path nil)
+  (setq org-agenda-window-setup 'current-window)
+  (setq org-agenda-skip-comment-trees t)
+  (setq org-agenda-menu-show-matcher t)
+  (setq org-agenda-menu-two-columns nil)
+  (setq org-agenda-sticky nil)
+  (setq org-agenda-custom-commands-contexts nil)
+  (setq org-agenda-max-entries nil)
+  (setq org-agenda-max-todos nil)
+  (setq org-agenda-max-tags nil)
+  (setq org-agenda-max-effort nil)
+
+;;;;; General agenda view options
+  ;; NOTE 2021-12-07: Check further below my `org-agenda-custom-commands'
+  (setq org-agenda-prefix-format
+        '((agenda . " %i %-12:c%?-12t% s")
+          (todo . " %i %-12:c")
+          (tags . " %i %-12:c")
+          (search . " %i %-12:c")))
+  (setq org-agenda-sorting-strategy
+        '(((agenda habit-down time-up priority-down category-keep)
+           (todo priority-down category-keep)
+           (tags priority-down category-keep)
+           (search category-keep))))
+  (setq org-agenda-breadcrumbs-separator "->")
+  (setq org-agenda-todo-keyword-format "%-1s")
+  (setq org-agenda-fontify-priorities 'cookies)
+  (setq org-agenda-category-icon-alist nil)
+  (setq org-agenda-remove-times-when-in-prefix nil)
+  (setq org-agenda-remove-timeranges-from-blocks nil)
+  (setq org-agenda-compact-blocks nil)
+  (setq org-agenda-block-separator ?—)
+
+;;;;; Agenda marks
+  (setq org-agenda-bulk-mark-char "#")
+  (setq org-agenda-persistent-marks nil)
+
+;;;;; Agenda diary entries
+  (setq org-agenda-insert-diary-strategy 'date-tree)
+  (setq org-agenda-insert-diary-extract-time nil)
+  (setq org-agenda-include-diary nil)
+  ;; I do not want the diary, but there is no way to disable it
+  ;; altogether.  This creates a diary file in the /tmp directory.
+  (setq diary-file (make-temp-file "emacs-diary-"))
+  (setq org-agenda-diary-file 'diary-file) ; TODO 2023-05-20: review Org diary substitute
+
+;;;;; Agenda follow mode
+  (setq org-agenda-start-with-follow-mode nil)
+  (setq org-agenda-follow-indirect t)
+
+;;;;; Agenda multi-item tasks
+  (setq org-agenda-dim-blocked-tasks t)
+  (setq org-agenda-todo-list-sublevels t)
+
+;;;;; Agenda filters and restricted views
+  (setq org-agenda-persistent-filter nil)
+  (setq org-agenda-restriction-lock-highlight-subtree t)
+
+;;;;; Agenda items with deadline and scheduled timestamps
+  (setq org-agenda-include-deadlines t)
+  (setq org-deadline-warning-days 0)
+  (setq org-agenda-skip-scheduled-if-done nil)
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (setq org-agenda-skip-timestamp-if-deadline-is-shown t)
+  (setq org-agenda-skip-deadline-if-done nil)
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled 1)
+  (setq org-agenda-skip-scheduled-delay-if-deadline nil)
+  (setq org-agenda-skip-additional-timestamps-same-entry nil)
+  (setq org-agenda-skip-timestamp-if-done nil)
+  (setq org-agenda-search-headline-for-time nil)
+  (setq org-scheduled-past-days 365)
+  (setq org-deadline-past-days 365)
+  (setq org-agenda-move-date-from-past-immediately-to-today t)
+  (setq org-agenda-show-future-repeats t)
+  (setq org-agenda-prefer-last-repeat nil)
+  (setq org-agenda-timerange-leaders
+        '("" "(%d/%d): "))
+  (setq org-agenda-scheduled-leaders
+        '("Scheduled: " "Sched.%2dx: "))
+  (setq org-agenda-inactive-leader "[")
+  (setq org-agenda-deadline-leaders
+        '("Deadline:  " "In %3d d.: " "%2d d. ago: "))
+  ;; Time grid
+  (setq org-agenda-time-leading-zero t)
+  (setq org-agenda-timegrid-use-ampm nil)
+  (setq org-agenda-use-time-grid t)
+  (setq org-agenda-show-current-time-in-grid t)
+  (setq org-agenda-current-time-string (concat "Now " (make-string 70 ?.)))
+  (setq org-agenda-time-grid
+        '((daily today require-timed)
+          ( 0500 0600 0700 0800 0900 1000
+            1100 1200 1300 1400 1500 1600
+            1700 1800 1900 2000 2100 2200)
+          "" ""))
+  (setq org-agenda-default-appointment-duration nil)
+
+;;;;; Agenda global to-do list
+  (setq org-agenda-todo-ignore-with-date t)
+  (setq org-agenda-todo-ignore-timestamp t)
+  (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-todo-ignore-deadlines t)
+  (setq org-agenda-todo-ignore-time-comparison-use-seconds t)
+  (setq org-agenda-tags-todo-honor-ignore-options nil)
+
+;;;;; Agenda tagged items
+  (setq org-agenda-show-inherited-tags t)
+  (setq org-agenda-use-tag-inheritance
+        '(todo search agenda))
+  (setq org-agenda-hide-tags-regexp nil)
+  (setq org-agenda-remove-tags nil)
+  (setq org-agenda-tags-column -100)
+
+;;;;; Agenda entry
+  ;; NOTE: I do not use this right now.  Leaving everything to its
+  ;; default value.
+  (setq org-agenda-start-with-entry-text-mode nil)
+  (setq org-agenda-entry-text-maxlines 5)
+  (setq org-agenda-entry-text-exclude-regexps nil)
+  (setq org-agenda-entry-text-leaders "    > ")
+
+;;;;; Agenda logging and clocking
+  ;; NOTE: I do not use these yet, though I plan to.  Leaving everything
+  ;; to its default value for the time being.
+  (setq org-agenda-log-mode-items '(closed clock))
+  (setq org-agenda-clock-consistency-checks
+        '((:max-duration "10:00" :min-duration 0 :max-gap "0:05" :gap-ok-around
+                         ("4:00")
+                         :default-face ; This should definitely be reviewed
+                         ((:background "DarkRed")
+                          (:foreground "white"))
+                         :overlap-face nil :gap-face nil :no-end-time-face nil
+                         :long-face nil :short-face nil)))
+  (setq org-agenda-log-mode-add-notes t)
+  (setq org-agenda-start-with-log-mode nil)
+  (setq org-agenda-start-with-clockreport-mode nil)
+  (setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 2))
+  (setq org-agenda-search-view-always-boolean nil)
+  (setq org-agenda-search-view-force-full-words nil)
+  (setq org-agenda-search-view-max-outline-level 0)
+  (setq org-agenda-search-headline-for-time t)
+  (setq org-agenda-use-time-grid t)
+  (setq org-agenda-cmp-user-defined nil)
+  (setq org-agenda-sort-notime-is-late t) ; Org 9.4
+  (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
+
+;;;;; Agenda column view
+  ;; NOTE I do not use these, but may need them in the future.
+  (setq org-agenda-view-columns-initially nil)
+  (setq org-agenda-columns-show-summaries t)
+  (setq org-agenda-columns-compute-summary-properties t)
+  (setq org-agenda-columns-add-appointments-to-effort-sum nil)
+  (setq org-agenda-auto-exclude-function nil)
+  (setq org-agenda-bulk-custom-functions nil)
+
+  ;; ;;;;; Agenda habits
+  ;;   (require 'org-habit)
+  ;;   (setq org-habit-graph-column 50)
+  ;;   (setq org-habit-preceding-days 9)
+  ;;   ;; Always show the habit graph, even if there are no habits for
+  ;;   ;; today.
+  ;;   (setq org-habit-show-all-today t)
+  )
+#+end_src
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+(use-package prot-coach
+  :ensure nil
+  :commands (prot-coach-done-sessions-with-person))
+#+end_src
+
+*** The =unravel-org.el= call to ~provide~
+:PROPERTIES:
+:CUSTOM_ID: h:62eb7ca3-2f79-45a6-a018-38238b486e98
+:END:
+
+Finally, we ~provide~ the module. This is the mirror function of
+~require~ ([[#h:e6c4acf5-5b51-4b38-a86a-bf3f698ac872][The init.el final part to load the individual modules]]).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+(provide 'unravel-org)
+#+end_src
+
