@@ -158,7 +158,7 @@
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
                    ;; Set last preset or fall back to desired style from `fontaine-presets'.
-                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
+                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'large)))))
   :config
   ;; This is defined in Emacs C code: it belongs to font settings.
   (setq x-underline-at-descent-line nil)
