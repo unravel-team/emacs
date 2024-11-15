@@ -54,7 +54,7 @@
 
 (use-package magit
   :ensure t
-  :bind ("C-c g" . magit-status)
+  :bind ("C-x g" . magit-status)
   :init
   (setq magit-define-global-key-bindings nil)
   ;; (setq magit-section-visibility-indicator '("⮧"))
