@@ -7,3 +7,5 @@ savehist
 auto-save-list/
 eln-cache/
 transient/
+.org-id-locations
+ielm-history.eld
