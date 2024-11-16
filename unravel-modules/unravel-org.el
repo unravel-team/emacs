@@ -47,7 +47,8 @@
 (use-package org
   :ensure nil
   :init
-  (setq org-directory (expand-file-name "~/Documents/org/"))
+  (setq org-directory (expand-file-name "~/Tresors/Documents/diary"))
+  (setq org-default-notes-file (expand-file-name "brain/daily.org" org-directory))
   (setq org-imenu-depth 7)
 
   (add-to-list 'safe-local-variable-values '(org-hide-leading-stars . t))
@@ -129,8 +130,7 @@
   ;;       '((sequence "TODO(t)" "MAYBE(m)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")
   ;;         (sequence "COACH(k)" "|" "COACHED(K!)")))
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "|" "CANCEL(c@)" "DONE(d!)")
-          (sequence "COACH(k)" "|" "COACHED(K!)")))
+        '((sequence "TODO(t)" "|" "CANCEL(c@)" "DONE(d!)")))
 
   (defface prot/org-bold-done
     '((t :inherit (bold org-done)))

@@ -143,80 +143,177 @@
   ;; Denote DOES NOT define any key bindings.  This is for the user to
   ;; decide.  Here I only have a subset of what Denote offers.
   ( :map global-map
-    ("C-c n n" . denote)
-    ("C-c n N" . denote-type)
-    ("C-c n o" . denote-sort-dired) ; "order" mnemonic
+    ("C-c d n" . denote-create-note)
+    ("C-c d N" . denote-silo-extras-select-silo-then-command)
+    ("C-c d o" . denote-open-or-create)
+    ("C-c d O" . denote-silo-extras-open-or-create)
+    ("C-c d l" . denote-link-or-create)
+    ("C-c d L" . denote-link-after-creating-with-command)
     ;; Note that `denote-rename-file' can work from any context, not
     ;; just Dired buffers.  That is why we bind it here to the
     ;; `global-map'.
     ;;
     ;; Also see `denote-rename-file-using-front-matter' further below.
-    ("C-c n r" . denote-rename-file)
+    ("C-c d r" . denote-rename-file)
     ;; If you intend to use Denote with a variety of file types, it is
     ;; easier to bind the link-related commands to the `global-map', as
     ;; shown here.  Otherwise follow the same pattern for
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
+    ("C-c d j" . denote-journal-extras-new-entry)
+    ("C-c d s" . denote-sort-dired)
+    ;; Bindings to personal functions (defined below)
+    ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
+    ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry)
     :map text-mode-map
-    ("C-c n i" . denote-link) ; "insert" mnemonic
-    ("C-c n I" . denote-add-links)
-    ("C-c n b" . denote-backlinks)
+    ("C-c d B" . denote-backlinks)
+    ("C-c d b" . denote-find-backlink)
+    ("C-c d f" . denote-find-link)
     ;; Also see `denote-rename-file' further above.
-    ("C-c n R" . denote-rename-file-using-front-matter)
+    ("C-c d R" . denote-rename-file-using-front-matter)
+    ("C-c d k" . denote-rename-file-keywords)
     :map org-mode-map
-    ("C-c n d l" . denote-org-extras-dblock-insert-links)
-    ("C-c n d b" . denote-org-extras-dblock-insert-backlinks)
+    ("C-c d h" . denote-org-extras-link-to-heading)
+    ("C-c d d l" . denote-org-extras-dblock-insert-links)
+    ("C-c d d b" . denote-org-extras-dblock-insert-backlinks)
     ;; Key bindings specifically for Dired.
     :map dired-mode-map
     ("C-c C-d C-i" . denote-dired-link-marked-notes)
     ("C-c C-d C-r" . denote-dired-rename-marked-files)
     ("C-c C-d C-k" . denote-dired-rename-marked-files-with-keywords)
+    ("C-c C-d C-A" . denote-dired-rename-marked-files-add-keywords)
+    ("C-c C-d C-K" . denote-dired-rename-marked-files-remove-keywords)
     ("C-c C-d C-f" . denote-dired-rename-marked-files-using-front-matter))
   :config
-  ;; Remember to check the doc strings of those variables.
-  (setq denote-directory (expand-file-name "~/Documents/notes/"))
-  (setq denote-file-type 'text) ; Org is the default file type
+  (require 'denote-silo-extras)
+  (require 'denote-journal-extras)
+  (require 'denote-org-extras)
 
-  ;; If you want to have a "controlled vocabulary" of keywords,
-  ;; meaning that you only use a predefined set of them, then you want
-  ;; `denote-infer-keywords' to be nil and `denote-known-keywords' to
-  ;; have the keywords you need.
-  (setq denote-known-keywords '("emacs" "philosophy" "politics" "economics"))
+  ;; Remember to check the doc strings of those variables.
+  (setq denote-directory (expand-file-name "~/Tresors/Documents/diary/notes"))
+  (setq denote-file-type 'text) ; Org is the default file type
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
-
-  (setq denote-excluded-directories-regexp nil)
+  (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)
   (setq denote-date-format nil) ; read its doc string
+  (setq denote-date-prompt-use-org-read-date t)
+  (setq denote-prompts '(title keywords subdirectory signature))
+
   (setq denote-rename-confirmations nil) ; CAREFUL with this if you are not familiar with Denote!
-
-  (setq denote-backlinks-show-context nil)
-
-  (setq denote-rename-buffer-format "[D] %t%b")
-  (setq denote-buffer-has-backlinks-string " (<--->)")
-
+  (setq denote-save-buffers t)
+  (setq denote-rename-buffer-format "[D] %s %t%b")
   ;; Automatically rename Denote buffers when opening them so that
   ;; instead of their long file name they have a literal "[D]"
   ;; followed by the file's title.  Read the doc string of
   ;; `denote-rename-buffer-format' for how to modify this.
   (denote-rename-buffer-mode 1)
 
-  ;; ----- PERSONAL TWEAKS FOR EXPERIMENTS -----
-  (setq denote-text-front-matter "title: %s\n\n")
+  (setq denote-buffer-has-backlinks-string " (<--->)")
+  (setq denote-backlinks-show-context t)
+  (setq denote-org-store-link-to-heading t)
+  
+  ;; Journal settings
+  (setq denote-journal-extras-keyword "")
 
-  (defun prot/denote-add-text-front-matter-separator ()
-    "Add separator equal to the length of the title.
-Do this when the `denote-file-type' is `text'."
-    (when (and (eq denote-file-type 'text)
-              ;; Not `string=' because there may be a .gpg extension as well.
-              (string-match-p (file-name-extension buffer-file-name) "txt"))
-      (save-excursion
-        (goto-char (point-min))
-        (when (re-search-forward "title:" nil t)
-          (let ((text (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-            (if (re-search-forward "^$" nil t)
-                (insert (make-string (length text) ?-))
-              (error "Could not find an empty line after the front matter")))))))
+  ;; I use Yasnippet to expand these into a better template.
+  (add-to-list 'denote-templates '(reference-note . "reference"))
+  (add-to-list 'denote-templates '(morning . "morningpage"))
+  (add-to-list 'denote-templates '(emotion . "emotion"))
+  (add-to-list 'denote-templates '(insight . "insight"))
+  (add-to-list 'denote-templates '(weekly_intentions . "weekint"))
+  (add-to-list 'denote-templates '(weekly_report . "weekrpt"))
+  (add-to-list 'denote-templates '(checkin . "checkin"))
 
-  (add-hook 'denote-after-new-note-hook #'prot/denote-add-text-front-matter-separator))
+  ;; Front-matter for Org files
+  (setq denote-org-front-matter
+        ":PROPERTIES:
+:ID: %4$s
+:CREATED: %2$s
+:END:
+#+title:      %1$s
+#+filetags:   %3$s
+#+date:       %2$s
+#+identifier: %4$s
+\n")
+
+  (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
+    "Create a new microblog entry.
+Set the title of the new entry according to the value of the user option
+`denote-journal-extras-title-format'.
+
+With optional DATE as a prefix argument, prompt for a date.  If
+`denote-date-prompt-use-org-read-date' is non-nil, use the Org
+date selection module.
+
+When called from Lisp DATE is a string and has the same format as
+that covered in the documentation of the `denote' function.  It
+is internally processed by `denote-parse-date'."
+    (interactive (list (when current-prefix-arg (denote-date-prompt))))
+    (let ((internal-date (denote-parse-date date))
+          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+      (denote
+       (denote-journal-extras-daily--title-format internal-date)
+       '("draft" "microblog")
+       nil nil date
+       ;; See YASnippet
+       "microblog")))
+
+(defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
+  "Create a new blog entry.
+
+With optional DATE as a prefix argument, prompt for a date.  If
+`denote-date-prompt-use-org-read-date' is non-nil, use the Org
+date selection module.
+
+When called from Lisp DATE is a string and has the same format as
+that covered in the documentation of the `denote' function.  It
+is internally processed by `denote-parse-date'."
+  (interactive (list (when current-prefix-arg (denote-date-prompt))))
+  (let ((internal-date (denote-parse-date date))
+        (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+    (denote
+     (denote-title-prompt)
+     '("draft")
+     nil nil date
+     ;; See YASnippet
+     "fullblog")))
+
+(defun vedang/denote-link-ol-get-id ()
+  "Get the CUSTOM_ID of the current entry.
+If the entry already has a CUSTOM_ID, return it as-is, else
+create a new one."
+  (interactive)
+  (let* ((pos (point))
+         (id (org-entry-get pos "CUSTOM_ID")))
+    (if (and (stringp id) (string-match-p "\\S-" id))
+        id
+      (setq id (org-id-new "h"))
+      (org-entry-put pos "CUSTOM_ID" id)
+      id)))
+
+(defun vedang/denote--split-luhman-sig (signature)
+  "Split numbers and letters in Luhmann-style SIGNATURE string."
+  (replace-regexp-in-string
+   "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
+   (replace-regexp-in-string
+    "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
+    signature)))
+
+(defun vedang/denote--pad-sig (signature)
+  "Create a new signature with padded spaces for all components"
+  (combine-and-quote-strings
+   (mapcar
+    (lambda (x)
+      (string-pad x 5 32 t))
+    (split-string (vedang/denote--split-luhman-sig signature) "=" t))
+   "="))
+
+(defun vedang/denote-sort-for-signatures (sig1 sig2)
+  "Return non-nil if SIG1 is smaller that SIG2.
+Perform the comparison with `string<'."
+  (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
+
+(setq denote-sort-signature-comparison-function
+      #'vedang/denote-sort-for-signatures))
 
 (use-package consult-denote
   :ensure t
