@@ -322,4 +322,16 @@ Perform the comparison with `string<'."
   :config
   (consult-denote-mode 1))
 
+(use-package paredit
+  :ensure t
+  :bind ( :map paredit-mode-map
+          ("C-o" . paredit-open-round)
+          ("M-D" . paredit-splice-sexp)
+          ("C-A-d" . paredit-forward-down)
+          ("C-A-u" . paredit-backward-up)
+          ;; Unbind things that I don't need
+          ("M-s" . nil) ; used for search related keybindings
+          ("M-?" . nil)) ; `xref-find-references` uses it.
+  :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
+
 (provide 'unravel-langs)

@@ -3773,6 +3773,25 @@ Prot is the developer of this package.
     (consult-denote-mode 1))
 #+end_src
 
+** The =unravel-langs.el= settings for ~paredit~ (paren matching)
+:PROPERTIES:
+:CUSTOM_ID: h:885F9DED-E9C9-4B5B-9FE0-1A33CBD23126
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package paredit
+    :ensure t
+    :bind ( :map paredit-mode-map
+            ("C-o" . paredit-open-round)
+            ("M-D" . paredit-splice-sexp)
+            ("C-A-d" . paredit-forward-down)
+            ("C-A-u" . paredit-backward-up)
+            ;; Unbind things that I don't need
+            ("M-s" . nil) ; used for search related keybindings
+            ("M-?" . nil)) ; `xref-find-references` uses it.
+    :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
+#+end_src
+
 ** Finally, we provide the =unravel-langs.el= module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
