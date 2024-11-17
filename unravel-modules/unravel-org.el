@@ -37,9 +37,6 @@
   (with-eval-after-load 'org-agenda
     (appt-activate 1)
 
-    ;; NOTE 2021-12-07: In my `prot-org.el' (see further below), I add
-    ;; `org-agenda-to-appt' to various relevant hooks.
-    ;;
     ;; Create reminders for tasks with a due date when this file is read.
     (org-agenda-to-appt)))
 
@@ -71,14 +68,8 @@
     :map narrow-map
     ("b" . org-narrow-to-block)
     ("e" . org-narrow-to-element)
-    ("s" . org-narrow-to-subtree)
-    :map ctl-x-x-map
-    ("i" . prot-org-id-headlines)
-    ("h" . prot-org-ox-html))
+    ("s" . org-narrow-to-subtree))
   :config
-  ;; My custom extras, which I use for the agenda and a few other Org features.
-  (require 'prot-org)
-
 ;;;; general settings
   (setq org-ellipsis "⮧")
   (setq org-adapt-indentation nil)      ; No, non, nein, όχι!
@@ -126,10 +117,6 @@
   (setq org-refile-allow-creating-parent-nodes 'confirm)
   (setq org-refile-use-cache t)
   (setq org-reverse-note-order nil)
-  ;; ;; NOTE 2023-04-07: Leaving this here for demo purposes.
-  ;; (setq org-todo-keywords
-  ;;       '((sequence "TODO(t)" "MAYBE(m)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")
-  ;;         (sequence "COACH(k)" "|" "COACHED(K!)")))
   (setq org-todo-keywords
         '((sequence "TODO(t)" "|" "CANCEL(c@)" "DONE(d!)")))
 
@@ -169,8 +156,6 @@
 (use-package org
   :ensure nil
   :config
-  (require 'prot-org) ; for the above commands
-
   (setq org-link-context-for-files t)
   (setq org-link-keep-stored-after-insertion nil)
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id))
@@ -205,115 +190,16 @@
 ;;;; capture
 (use-package org-capture
   :ensure nil
-  :bind ("C-c c" . org-capture)
-  :config
-  (require 'prot-org)
-
-  (setq org-capture-templates
-        `(("u" "Unprocessed" entry
-           (file+headline "tasks.org" "Unprocessed")
-           ,(concat "* %^{Title}\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%a\n%i%?")
-           :empty-lines-after 1)
-          ;; ("e" "Email note (unprocessed)" entry ; Also see `org-capture-templates-contexts'
-          ;;  (file+headline "tasks.org" "Unprocessed")
-          ;;  ,(concat "* TODO %:subject :mail:\n"
-          ;;           ":PROPERTIES:\n"
-          ;;           ":CAPTURED: %U\n"
-          ;;           ":END:\n\n"
-          ;;           "%a\n%i%?")
-          ;;  :empty-lines-after 1)
-          ("w" "Add to the wishlist (may do some day)" entry
-           (file+headline "tasks.org" "Wishlist")
-           ,(concat "* %^{Title}\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%a%?")
-           :empty-lines-after 1)
-          ("c" "Clock in and do immediately" entry
-           (file+headline "tasks.org" "Clocked tasks")
-           ,(concat "* TODO %^{Title}\n"
-                    ":PROPERTIES:\n"
-                    ":EFFORT: %^{Effort estimate in minutes|5|10|15|30|45|60|90|120}\n"
-                    ":END:\n\n"
-                    "%a\n")
-           :prepend t
-           :clock-in t
-           :clock-keep t
-           :immediate-finish t
-           :empty-lines-after 1)
-          ("t" "Time-sensitive task" entry
-           (file+headline "tasks.org" "Tasks with a date")
-           ,(concat "* TODO %^{Title} %^g\n"
-                    "%^{How time sensitive it is||SCHEDULED|DEADLINE}: %^t\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%a%?")
-           :empty-lines-after 1)
-          ("p" "Private lesson or service" entry
-           (file "coach.org")
-           #'prot-org-capture-coach
-           :prepend t
-           :empty-lines 1)
-          ("P" "Private service clocked" entry
-           (file+headline "coach.org" "Clocked services")
-           #'prot-org-capture-coach-clock
-           :prepend t
-           :clock-in t
-           :clock-keep t
-           :immediate-finish t
-           :empty-lines 1)))
-
-  ;; NOTE 2024-11-10: I realised that I was not using this enough, so
-  ;; I decided to simplify my setup.  Keeping it here, in case I need
-  ;; it again.
-
-  ;; (setq org-capture-templates-contexts
-  ;;       '(("e" ((in-mode . "notmuch-search-mode")
-  ;;               (in-mode . "notmuch-show-mode")
-  ;;               (in-mode . "notmuch-tree-mode")))))
-  )
+  :bind ("C-c c" . org-capture))
 
 ;;;; agenda
 (use-package org-agenda
   :ensure nil
   :bind
-  ;; I bind `org-agenda' to C-c A, so this one puts me straight into my
-  ;; custom block agenda.
-  ( :map global-map
-    ("C-c A" . org-agenda)
-    ("C-c a" . (lambda ()
-                 "Call Org agenda with `prot-org-custom-daily-agenda' configuration."
-                 (interactive)
-                 (org-agenda nil "A"))))
+  ("C-c a" . org-agenda)
   :config
-;;;;; Custom agenda blocks
-
-  (setq org-agenda-format-date #'prot-org-agenda-format-date-aligned)
-
-  ;; Check the variable `prot-org-custom-daily-agenda' in prot-org.el
-  (setq org-agenda-custom-commands
-        `(("A" "Daily agenda and top priority tasks"
-           ,prot-org-custom-daily-agenda
-           ((org-agenda-fontify-priorities nil)
-            (org-agenda-prefix-format "	 %t %s")
-            (org-agenda-dim-blocked-tasks nil)))
-          ("P" "Plain text daily agenda and top priorities"
-           ,prot-org-custom-daily-agenda
-           ((org-agenda-with-colors nil)
-            (org-agenda-prefix-format "%t %s")
-            (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
-            (org-agenda-fontify-priorities nil)
-            (org-agenda-remove-tags t))
-           ("agenda.txt"))))
 
 ;;;;; Basic agenda setup
-  (setq org-default-notes-file (make-temp-file "emacs-org-notes-")) ; send it to oblivion
   (setq org-agenda-files `(,org-directory))
   (setq org-agenda-span 'week)
   (setq org-agenda-start-on-weekday 1)  ; Monday
@@ -481,9 +367,5 @@
   ;;   ;; today.
   ;;   (setq org-habit-show-all-today t)
   )
-
-(use-package prot-coach
-  :ensure nil
-  :commands (prot-coach-done-sessions-with-person))
 
 (provide 'unravel-org)
