@@ -11,21 +11,24 @@
   (("<f5>" . ef-themes-rotate)
    ("C-<f5>" . ef-themes-select))
   :config
-  (setq ef-themes-to-toggle '(ef-elea-light ef-elea-dark)
-        ef-themes-variable-pitch-ui t
-        ef-themes-mixed-fonts t
-        ef-themes-headings ; read the manual's entry of the doc string
+  (setq ef-themes-to-toggle '(ef-elea-light ef-elea-dark))
+  (setq ef-themes-variable-pitch-ui t)
+  (setq ef-themes-mixed-fonts t)
+  (setq ef-themes-rotate ef-themes-items)
+  (setq ef-themes-headings      ; read the manual's entry of the doc string
         '((0 . (variable-pitch light 1.9))
           (1 . (variable-pitch light 1.8))
           (2 . (variable-pitch regular 1.7))
           (3 . (variable-pitch regular 1.6))
           (4 . (variable-pitch regular 1.5))
-          (5 . (variable-pitch 1.4)) ; absence of weight means `bold'
+          (5 . (variable-pitch 1.4))  ; absence of weight means `bold'
           (6 . (variable-pitch 1.3))
           (7 . (variable-pitch 1.2))
           (agenda-date . (semilight 1.5))
           (agenda-structure . (variable-pitch light 1.9))
           (t . (variable-pitch 1.1))))
+  (setq ef-themes-disable-other-themes t)
+  (mapc #'disable-theme custom-enabled-themes)
 
   (ef-themes-select 'ef-elea-light))
 
@@ -158,7 +161,9 @@
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
                    ;; Set last preset or fall back to desired style from `fontaine-presets'.
-                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'large)))))
+                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))))
+   (enable-theme-functions . fontaine-apply-current-preset)
+   (ef-themes-post-load . fontaine-apply-current-preset))
   :config
   ;; This is defined in Emacs C code: it belongs to font settings.
   (setq x-underline-at-descent-line nil)
@@ -172,26 +177,23 @@
 
   (setq fontaine-presets
         '((small
-           :default-height 80)
-          (regular) ; like this it uses all the fallback values and is named `regular'
+           :default-family "Iosevka"
+           :default-height 130)
+          (regular
+           :default-height 150)
           (medium
            :default-weight semilight
-           :default-height 115
+           :default-height 170
            :bold-weight extrabold)
           (large
            :inherit medium
-           :default-height 150)
-          (live-stream
-           :default-family "Iosevka"
-           :default-height 150
-           :default-weight medium
-           :fixed-pitch-family "Iosevka"
-           :variable-pitch-family "Iosevka"
-           :bold-weight extrabold)
+           :default-height 190)
           (presentation
-           :default-height 180)
+           :inherit medium
+           :default-height 250)
           (jumbo
-           :default-height 260)
+           :inherit medium
+           :default-height 330)
           (t
            ;; I keep all properties for didactic purposes, but most can be
            ;; omitted.  See the fontaine manual for the technicalities:
@@ -200,15 +202,15 @@
            :default-weight regular
            :default-slant normal
            :default-width normal
-           :default-height 100
+           :default-height 150
 
-           :fixed-pitch-family "Iosevka Fixed"
-           :fixed-pitch-weight nil
+           :fixed-pitch-family nil ; falls back to :default-family
+           :fixed-pitch-weight nil ; falls back to :default-weight
            :fixed-pitch-slant nil
            :fixed-pitch-width nil
            :fixed-pitch-height 1.0
 
-           :fixed-pitch-serif-family "Iosevka"
+           :fixed-pitch-serif-family nil
            :fixed-pitch-serif-weight nil
            :fixed-pitch-serif-slant nil
            :fixed-pitch-serif-width nil
@@ -220,49 +222,49 @@
            :variable-pitch-width nil
            :variable-pitch-height 1.0
 
-           :mode-line-active-family "Iosevka Term"
+           :mode-line-active-family nil
            :mode-line-active-weight nil
            :mode-line-active-slant nil
            :mode-line-active-width nil
            :mode-line-active-height 1.0
 
-           :mode-line-inactive-family "Iosevka Term"
+           :mode-line-inactive-family nil
            :mode-line-inactive-weight nil
            :mode-line-inactive-slant nil
            :mode-line-inactive-width nil
            :mode-line-inactive-height 1.0
 
-           :header-line-family "Iosevka Term"
+           :header-line-family nil
            :header-line-weight nil
            :header-line-slant nil
            :header-line-width nil
            :header-line-height 1.0
 
-           :line-number-family "Iosevka Term"
+           :line-number-family nil
            :line-number-weight nil
            :line-number-slant nil
            :line-number-width nil
            :line-number-height 1.0
 
-           :tab-bar-family "Iosevka Term"
+           :tab-bar-family nil
            :tab-bar-weight nil
            :tab-bar-slant nil
            :tab-bar-width nil
            :tab-bar-height 1.0
 
-           :tab-line-family "Iosevka Term"
+           :tab-line-family nil
            :tab-line-weight nil
            :tab-line-slant nil
            :tab-line-width nil
            :tab-line-height 1.0
 
-           :bold-family "Iosevka"
+           :bold-family nil
            :bold-slant nil
            :bold-weight bold
            :bold-width nil
            :bold-height 1.0
 
-           :italic-family "Iosevka"
+           :italic-family nil
            :italic-weight nil
            :italic-slant italic
            :italic-width nil
