@@ -87,6 +87,19 @@
 (setq-default case-fold-search t)   ; For general regexp
 (setq read-file-name-completion-ignore-case t)
 
+(use-package mb-depth
+  :ensure nil
+  :hook (after-init . minibuffer-depth-indicate-mode)
+  :config
+  (setq read-minibuffer-restore-windows nil) ; Emacs 28
+  (setq enable-recursive-minibuffers t))
+
+(use-package minibuf-eldef
+  :ensure nil
+  :hook (after-init . minibuffer-electric-default-mode)
+  :config
+  (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
+
 (use-package rfn-eshadow
   :ensure nil
   :hook (minibuffer-setup . cursor-intangible-mode)
@@ -362,8 +375,7 @@
 
 (use-package vertico-suspend
   :after vertico
-  :init
-  (setq enable-recursive-minibuffers t)
+  ;; Note: `enable-recursive-minibuffers' must be t
   :bind ( :map global-map
           ("M-S" . vertico-suspend)
           ("C-x c b" . vertico-suspend)))

@@ -1449,6 +1449,36 @@ minibuffer. Let's have everything ignore casing by default.
   (setq read-minibuffer-restore-windows nil) ; Emacs 28
   (setq enable-recursive-minibuffers t))
 #+end_src
+
+** The =unravel-completion.el= settings for default values
+:PROPERTIES:
+:CUSTOM_ID: h:aebbdd4c-6e5b-4773-9f0a-c69f0d3c7158
+:END:
+
+#+begin_quote
+Minibuffer prompts often have a default value. This is used when the
+user types =RET= without inputting anything. The out-of-the-box
+behaviour of Emacs is to append informative text to the prompt like
+=(default some-default-value)=. With the tweak to ~minibuffer-default-prompt-format~
+we get a more compact style of =[some-default-value]=, which looks
+better to me.
+
+The ~minibuffer-electric-default-mode~ displays the default value next
+to the prompt only if =RET= will actually use the default in that
+situation. This means that while you start typing in the minibuffer,
+the =[some-default-value]= indicator disappears, since it is no longer
+applicable. Without this mode, the indicator stays there at all times,
+which can be confusing or distracting.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+(use-package minibuf-eldef
+  :ensure nil
+  :hook (after-init . minibuffer-electric-default-mode)
+  :config
+  (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
+#+end_src
+
 ** The =unravel-completion.el= settings for common interactions
 :PROPERTIES:
 :CUSTOM_ID: h:b640f032-ad11-413e-ad8f-63408671d500
