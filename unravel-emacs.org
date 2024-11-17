@@ -2062,6 +2062,936 @@ I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provi
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (provide 'unravel-completion)
 #+end_src
+* The =unravel-search.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:e0f9c30e-3a98-4479-b709-7008277749e4
+:END:
+
+[ Watch Prot's talk: [[https://protesilaos.com/codelog/2023-06-10-emacs-search-replace-basics/][Emacs: basics of search and replace]] (2023-06-10). ]
+
+#+begin_quote
+Emacs provides lots of useful facilities to search the contents of
+buffers or files. The most common scenario is to type =C-s=
+(~isearch-forward~) to perform a search forward from point or =C-r=
+(~isearch-backward~) to do so in reverse. These commands pack a ton of
+functionality and they integrate nicely with related facilities, such
+as those of (i) permanently highlighting the thing being searched,
+(ii) putting all results in a buffer that is useful for navigation
+purposes, among others, and (iii) replacing the given matching items
+with another term.
+
+Here I summarise the functionality, though do check the video I did on
+the basics of search and replace:
+
+- =C-s= (~isearch-forward~) :: Search forward from point (incremental
+  search); retype =C-s= to move forth.
+
+- =C-r= (~isearch-backward~) :: Search backward from point
+  (incremental); retype =C-r= to move back. While using either =C-s=
+  and =C-r= you can move in the opposite direction with either of
+  those keys when performing a repeat.
+
+- =C-M-s= (~isearch-forward-regexp~) :: Same as =C-s= but matches a
+  regular expression. The =C-s= and =C-r= motions are the same after
+  matches are found.
+
+- =C-M-r= (~isearch-backward-regexp~) :: The counterpart of the above
+  =C-M-s= for starting in reverse.
+
+- =C-s C-w= (~isearch-yank-word-or-char~) :: Search forward for
+  word-at-point. Again, =C-s= and =C-r= move forth and back,
+  respectively.
+
+- =C-r C-w= (~isearch-yank-word-or-char~) :: Same as above, but
+  backward.
+
+- =M-s o= (~occur~) :: Search for the given regular expression
+  throughout the buffer and collect the matches in an =*occur*=
+  buffer. Also check what I am doing with this in my custom
+  extensions: [[#h:b902e6a3-cdd2-420f-bc99-3d973c37cd20][The =unravel-search.el= extras provided by the =prot-search.el= library]].
+
+- =C-u 5 M-s o= (~occur~) :: Like the above, but give it N lines of
+  context when N is the prefix numeric argument  (5 in
+  this example).
+
+- =C-s SEARCH= followed by =M-s o=  (~isearch-forward~ --> ~occur~) ::
+  Like =C-s= but then put the matches in an *occur* buffer.
+
+- =C-s SEARCH= followed by =C-u 5 M-s o= (~isearch-forward~ -->
+  ~occur~) :: Same as above, but now with N lines of context (5 in
+  this example).
+
+- =M-%= (~query-replace~) :: Prompt for target to replace and then
+  prompt for its replacement (see explanation)
+
+- =C-M-%= (~query-replace-regexp~) :: Same as above, but for REGEXP
+
+- =C-s SEARCH= followed by =M-%= (~isearch-forward~ --> ~query-replace~) :: Search
+  with =C-s= and then perform a query-replace for the following
+  matches.
+
+- =C-M-s SEARCH M-%= (~isearch-forward-regexp~ -->
+  ~query-replace-regexp~) :: As above, but regexp-aware.
+
+- =C-s SEARCH C-M-%= (~isearch-forward~ --> ~query-replace-regexp~) :: Same
+  as above.
+
+- =M-s h r= (~highlight-regexp~) :: Prompt for a face (like
+  ~hi-yellow~) to highlight the given regular expression.
+
+- =M-s h u= (~unhighlight-regexp~) :: Prompt for an already
+  highlighted regular expression to unhighlight (do it after the
+  above).
+
+For starters, just learn:
+
+- =C-s=
+- =C-r=
+- =M-s o=
+- =M-%=
+
+Now on to the configurations.
+#+end_quote
+
+** The =unravel-search.el= on isearch lax space
+:PROPERTIES:
+:CUSTOM_ID: h:95947b37-2071-4ee7-a201-8e19bf3322e9
+:END:
+
+#+begin_quote
+The first thing I want to do for Isearch, is make it more convenient
+for me to match words that occur in sequence but are not necessarily
+following each other. By default, we can do that with something like
+=C-M-s= (~isearch-forward-regexp~) followed by =one.*two=. Though it
+is inconvenient to be a regexp-aware search mode when all we want is
+to just type =one two= and have the space be interpreted as
+"intermediate characters" rather than a literal space. The following
+do exactly this for regular =C-s= (~isearch-forward~) and =C-r=
+(~isearch-backward~).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el" :mkdirp yes
+  ;;; Isearch, occur, grep
+  (use-package isearch
+    :ensure nil
+    :demand t
+    :config
+    (setq search-whitespace-regexp ".*?" ; one `setq' here to make it obvious they are a bundle
+          isearch-lax-whitespace t
+          isearch-regexp-lax-whitespace nil))
+#+end_src
+
+** The =unravel-search.el= settings for isearch highlighting
+:PROPERTIES:
+:CUSTOM_ID: h:ed1307e7-f8a0-4b0a-8d91-2de9c1e2479c
+:END:
+
+#+begin_quote
+Here I am just tweaking the delay that affects when deferred
+highlights are applied. The current match is highlighted immediately.
+The rest are done after ~lazy-highlight-initial-delay~ unless they are
+longer in character count than ~lazy-highlight-no-delay-length~.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+(use-package isearch
+  :ensure nil
+  :demand t
+  :config
+  (setq search-highlight t)
+  (setq isearch-lazy-highlight t)
+  (setq lazy-highlight-initial-delay 0.5)
+  (setq lazy-highlight-no-delay-length 4))
+#+end_src
+
+** The =unravel-search.el= on isearch match counter
+:PROPERTIES:
+:CUSTOM_ID: h:acfdc17f-7ffb-48d3-90ff-49bd00463934
+:END:
+
+#+begin_quote
+I think the following options should be enabled by default. They
+produce a counter next to the isearch prompt that shows the position
+of the current match relative to the total count (like =5/20=). As we
+move to the next/previous match, the counter is updated accordingly.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+(use-package isearch
+  :ensure nil
+  :demand t
+  :config
+  (setq isearch-lazy-count t)
+  (setq lazy-count-prefix-format "(%s/%s) ")
+  (setq lazy-count-suffix-format nil))
+#+end_src
+
+** The =unravel-search.el= tweaks for the occur buffer
+:PROPERTIES:
+:CUSTOM_ID: h:85aca4da-b89b-4fbe-89e9-3ec536ad7b0d
+:END:
+
+#+begin_quote
+Here I am making some minor tweaks to =*occur*= buffer (remember to
+read the introduction to this section ([[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= module]])).
+I always want (i) the cursor to be at the top of the buffer, (ii) the
+current line to be highlighted, as it is easier for selection
+purposes ... 
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+(use-package isearch
+  :ensure nil
+  :demand t
+  :config
+  (setq list-matching-lines-jump-to-current-line nil) ; do not jump to current line in `*occur*' buffers
+  (add-hook 'occur-mode-hook #'hl-line-mode))
+#+end_src
+
+** The =unravel-search.el= modified isearch and occur key bindings
+:PROPERTIES:
+:CUSTOM_ID: h:5ce6216d-f318-4191-9d4f-9681c92f7582
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+(use-package isearch
+  :ensure nil
+  :demand t
+  :bind
+  ( :map minibuffer-local-isearch-map
+    ("M-/" . isearch-complete-edit)
+    :map occur-mode-map
+    ("t" . toggle-truncate-lines)
+    :map isearch-mode-map
+    ("C-g" . isearch-cancel) ; instead of `isearch-abort'
+    ("M-/" . isearch-complete)))
+#+end_src
+
+** The =unravel-search.el= tweaks to ~xref~, ~re-builder~ and ~grep~
+:PROPERTIES:
+:CUSTOM_ID: h:ceb286c5-a5f7-4cc8-b883-89d20a75ea02
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+;;; grep and xref
+(use-package re-builder
+  :ensure nil
+  :commands (re-builder regexp-builder)
+  :config
+  (setq reb-re-syntax 'read))
+
+(use-package xref
+  :ensure nil
+  :commands (xref-find-definitions xref-go-back)
+  :config
+  ;; All those have been changed for Emacs 28
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
+  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
+  (setq xref-file-name-display 'project-relative))
+
+(use-package grep
+  :ensure nil
+  :commands (grep lgrep rgrep)
+  :config
+  (setq grep-save-buffers nil)
+  (setq grep-use-headings t) ; Emacs 30
+
+  (let ((executable (or (executable-find "rg") "grep"))
+        (rgp (string-match-p "rg" grep-program)))
+    (setq grep-program executable)
+    (setq grep-template
+          (if rgp
+              "/usr/bin/rg -nH --null -e <R> <F>"
+            "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
+    (setq xref-search-program (if rgp 'ripgrep 'grep))))
+#+end_src
+
+** The =unravel-search.el= setup for editable grep buffers (~grep-edit-mode~ or ~wgrep~)
+:PROPERTIES:
+:CUSTOM_ID: h:9a3581df-ab18-4266-815e-2edd7f7e4852
+:END:
+
+#+begin_quote
+Starting with Emacs 31, buffers using ~grep-mode~ can now be edited
+directly. The idea is to collect the results of a search in one place
+and quickly apply a change across all or some of them. We have the
+same concept with occur (=M-x occur=) as well as with Dired buffers
+([[#h:1b53bc10-8b1b-4f68-bbec-165909761e43][The =unravel-dired.el= section about ~wdired~ (writable Dired)]]).
+
+For older versions of Emacs, we have the ~wgrep~ package by Masahiro
+Hayashi. I configure it to have key bindings like those of the ~occur~
+edit mode, which ~grep-edit-mode~ also uses.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+;;; wgrep (writable grep)
+;; See the `grep-edit-mode' for the new built-in feature.
+(unless (>= emacs-major-version 31)
+  (use-package wgrep
+    :ensure t
+    :after grep
+    :bind
+    ( :map grep-mode-map
+      ("e" . wgrep-change-to-wgrep-mode)
+      ("C-x C-q" . wgrep-change-to-wgrep-mode)
+      ("C-c C-c" . wgrep-finish-edit))
+    :config
+    (setq wgrep-auto-save-buffer t)
+    (setq wgrep-change-readonly-file t)))
+#+end_src
+
+** Finally, we provide the =unravel-search.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+(provide 'unravel-search)
+#+end_src
+
+* The =unravel-dired.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:f8b08a77-f3a8-42fa-b1a9-f940348889c3
+:END:
+
+[ Watch Prot's talk: <https://protesilaos.com/codelog/2023-06-26-emacs-file-dired-basics/> (2023-06-26) ]
+
+#+begin_quote
+Dired is probably my favourite Emacs tool. It exemplifies how I see
+Emacs as a whole: a layer of interactivity on top of Unix. The ~dired~
+interface wraps---and puts to synergy---standard commands like ~ls~,
+~cp~, ~mv~, ~rm~, ~mkdir~, ~chmod~, and related. All while granting
+access to many other conveniences, such as (i) marking files to
+operate on (individually, with a regexp, etc.), (ii) bulk renaming
+files by making the buffer writable and editing it like a regular
+file, (iii) showing only files you want, (iv) listing the contents of
+any subdirectory, such as to benefit from the bulk-renaming
+capability, (v) running a keyboard macro that edits file contents
+while using Dired to navigate the file listing, (vi) open files in an
+external application, and more.
+
+Dired lets us work with our files in a way that still feels close to
+the command-line, yet has more powerful interactive features than even
+fully fledged, graphical file managers.
+#+end_quote
+
+** The =unravel-dired.el= settings for common operations
+:PROPERTIES:
+:CUSTOM_ID: h:39fb0eab-54bb-4e5b-8e38-9443dbe5c5ee
+:END:
+
+#+begin_quote
+I add two settings which make all copy, rename/move, and delete
+operations more intuitive. I always want to perform those actions in a
+recursive manner, as this is the intent I have when I am targeting
+directories.
+
+The ~delete-by-moving-to-trash~ is a deviation from the behaviour of
+the ~rm~ program, as it sends the file into the virtual trash folder.
+Depending on the system, files in the trash are either removed
+automatically after a few days, or we still have to permanently delete
+them manually. I prefer this extra layer of safety. Plus, we have the
+~trashed~ package to navigate the trash folder in a Dired-like way
+([[#h:2e005bd1-d098-426d-91f9-2a31a6e55caa][The =unravel-dired.el= section about =trashed.el=]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el" :mkdirp yes
+;;; Dired file manager and prot-dired.el extras
+(use-package dired
+  :ensure nil
+  :commands (dired)
+  :config
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t))
+#+end_src
+
+** The =unravel-dired.el= switches for ~ls~ (how files are listed)
+:PROPERTIES:
+:CUSTOM_ID: h:679e4460-b306-450f-aa20-497243057e02
+:END:
+
+#+begin_quote
+As I already explained, Dired is a layer of interactivity on top of
+standard Unix tools ([[#h:f8b08a77-f3a8-42fa-b1a9-f940348889c3][The =unravel-dired.el= module]]). We can see
+this in how Dired produces the file listing and how we can affect it.
+The ~ls~ program accepts an =-l= flag for a "long", detailed list of
+files. This is what Dired uses. But we can pass more flags by setting
+the value of ~dired-listing-switches~. Do =M-x man= and then search
+for the ~ls~ manpage to learn about what I have here. In short:
+
+- =-A= :: Show hidden files ("dotfiles"), such as =.bashrc=, but omit
+  the implied =.= and =..= targets. The latter two refer to the
+  present and parent directory, respectively.
+
+- =-G= :: Do not show the group name in the long listing. Only show
+  the owner of the file.
+
+- =-F= :: Differentiate regular from special files by appending a
+  character to them. The =*= is for executables, the =/= is for
+  directories, the =|= is for a named pipe, the ~=~ is for a socket,
+  the =@= and the =>= are for stuff I have never seen.
+
+- =-h= :: Make file sizes easier to read, such as =555k= instead of
+  =568024= (the size of =unravel.org= as of this writing).
+
+- =-l= :: Produce a long, detailed listing. Dired requires this.
+
+- =-v= :: Sort files by version numbers, such that =file1=, =file2=,
+  and =file10= appear in this order instead of 1, 10, 2. The latter is
+  called "lexicograhic" and I have not found a single case where it is
+  useful to me.
+
+- =--group-directories-first= :: Does what it says to place all
+  directories before files in the listing. I prefer this over a strict
+  sorting that does not differentiate between files and directories.
+
+- =--time-style=long-iso= :: Uses the international standard for time
+  representation in the file listing. So we have something like
+  =2023-12-30 06:38= to show the last modified time.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+  (use-package dired
+    :ensure nil
+    :commands (dired)
+    :config
+    (setq dired-listing-switches
+          "-AGFhlv --group-directories-first --time-style=long-iso"))
+#+end_src
+
+** The =unravel-dired.el= setting for dual-pane Dired
+:PROPERTIES:
+:CUSTOM_ID: h:8225364c-3856-48bc-bf64-60d40ddd3320
+:END:
+
+#+begin_quote
+I often have two Dired buffers open side-by-side and want to move
+files between them. By setting ~dired-dwim-target~ to a ~t~ value,
+we get the other buffer as the default target of the current rename or
+copy operation. This is exactly what I want.
+
+If there are more than two windows showing Dired buffers, the default
+target is the previously visited window.
+
+Note that this only affects how quickly we can access the default
+value, as we can always type =M-p= (~previous-history-element~) and
+=M-n= (~next-history-element~) to cycle through the minibuffer
+history ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][The =unravel-completion.el= settings for saving the history (~savehist-mode~)]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+(use-package dired
+  :ensure nil
+  :commands (dired)
+  :config
+  (setq dired-dwim-target t))
+#+end_src
+
+** The =unravel-dired.el= miscellaneous tweaks
+:PROPERTIES:
+:CUSTOM_ID: h:6327e6ba-a468-416f-ad26-b530c32fe235
+:END:
+
+#+begin_quote
+These are some minor tweaks that I do not really care about. The only
+one which is really nice in my opinion is the hook that involves the
+~dired-hide-details-mode~. This is the command that hides the noisy
+output of the ~ls~ =-l= flag, leaving only the file names in the list
+([[#h:679e4460-b306-450f-aa20-497243057e02][The =unravel-dired.el= switches for ~ls~ (how files are listed)]]).
+We can toggle this effect at any time with the =(= key, by default.
+
+I disable the repetition of the =j= key as I do use ~repeat-mode~
+([[#h:fbe6f9da-25ee-46a3-bb03-8fa7c1d48dab][The =unravel-essentials.el= settings for ~repeat-mode~]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+(use-package dired
+  :ensure nil
+  :commands (dired)
+  :config
+  (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
+  (setq dired-make-directory-clickable t) ; Emacs 29.1
+  (setq dired-free-space nil) ; Emacs 29.1
+  (setq dired-mouse-drag-files t) ; Emacs 29.1
+
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  (add-hook 'dired-mode-hook #'hl-line-mode)
+
+  ;; In Emacs 29 there is a binding for `repeat-mode' which lets you
+  ;; repeat C-x C-j just by following it up with j.  For me, this is a
+  ;; problem as j calls `dired-goto-file', which I often use.
+  (define-key dired-jump-map (kbd "j") nil))
+#+end_src
+
+** The =unravel-dired.el= section about various conveniences
+:PROPERTIES:
+:CUSTOM_ID: h:6758bf16-e47e-452e-b39d-9d67c2b9aa4b
+:END:
+
+#+begin_quote
+The =dired-aux.el= and =dired-x.el= are two built-in libraries that
+provide useful extras for Dired. The highlights from what I have here
+are:
+
+- the user option ~dired-create-destination-dirs~ and
+  ~dired-create-destination-dirs-on-trailing-dirsep~, which offer to
+  create the specified directory path if it is missing.
+
+- the user options ~dired-clean-up-buffers-too~ and
+  ~dired-clean-confirm-killing-deleted-buffers~ which cover the
+  deletion of buffers related to files that we delete from Dired.
+
+- the key binding for ~dired-do-open~, which opens the file or
+  directory externally ([[#h:d7d5e619-3d50-4d9e-a951-7262462a60c9][The =unravel-dired.el= settings to open files externally]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+(use-package dired-aux
+  :ensure nil
+  :after dired
+  :bind
+  ( :map dired-mode-map
+    ("C-+" . dired-create-empty-file)
+    ("M-s f" . nil)
+    ("C-<return>" . dired-do-open) ; Emacs 30
+    ("C-x v v" . dired-vc-next-action)) ; Emacs 28
+  :config
+  (setq dired-isearch-filenames 'dwim)
+  (setq dired-create-destination-dirs 'ask) ; Emacs 27
+  (setq dired-vc-rename-file t)             ; Emacs 27
+  (setq dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir)))) ; Emacs 28
+  (setq dired-create-destination-dirs-on-trailing-dirsep t)) ; Emacs 29
+
+(use-package dired-x
+  :ensure nil
+  :after dired
+  :bind
+  ( :map dired-mode-map
+    ("I" . dired-info))
+  :config
+  (setq dired-clean-up-buffers-too t)
+  (setq dired-clean-confirm-killing-deleted-buffers t)
+  (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
+  (setq dired-bind-man nil)
+  (setq dired-bind-info nil))
+#+end_src
+
+** The =unravel-dired.el= section about ~dired-subtree~
+:PROPERTIES:
+:CUSTOM_ID: h:3a4a29bc-3491-4d01-9d64-1cef63b3116a
+:END:
+
+#+begin_quote
+The ~dired-subtree~ package by Matúš Goljer provides the convenience
+of quickly revealing the contents of the directory at point. We do not
+have to insert its contents below the current listing, as we would
+normally do in Dired, nor do we have to open it in another buffer just
+to check if we need to go further.
+
+I do not use this feature frequently, though I appreciate it when I do
+need it.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+(use-package dired-subtree
+  :ensure t
+  :after dired
+  :bind
+  ( :map dired-mode-map
+    ("<tab>" . dired-subtree-toggle)
+    ("TAB" . dired-subtree-toggle)
+    ("<backtab>" . dired-subtree-remove)
+    ("S-TAB" . dired-subtree-remove))
+  :config
+  (setq dired-subtree-use-backgrounds nil))
+#+end_src
+
+** The =unravel-dired.el= section about ~wdired~ (writable Dired)
+:PROPERTIES:
+:CUSTOM_ID: h:1b53bc10-8b1b-4f68-bbec-165909761e43
+:END:
+
+#+begin_quote
+As noted in the introduction, Dired can be made writable
+([[#h:f8b08a77-f3a8-42fa-b1a9-f940348889c3][The =unravel-dired.el= module]]). This way, we can quickly rename
+multiple files using Emacs' panoply of editing capabilities.
+
+Both of the variables I configure here have situational usage. I
+cannot remember the last time I benefited from them.
+
+Note that we have a variant of ~wdired~ for ~grep~ buffers
+([[#h:9a3581df-ab18-4266-815e-2edd7f7e4852][The =unravel-search.el= setup for editable grep buffers (~wgrep~)]]).
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+(use-package wdired
+  :ensure nil
+  :commands (wdired-change-to-wdired-mode)
+  :config
+  (setq wdired-allow-to-change-permissions t)
+  (setq wdired-create-parent-directories t))
+#+end_src
+
+** The =unravel-dired.el= section about ~trashed~
+:PROPERTIES:
+:CUSTOM_ID: h:2e005bd1-d098-426d-91f9-2a31a6e55caa
+:END:
+
+The ~trashed~ package by Shingo Tanaka provides a Dired-like interface
+to the system's virtual trash directory. The few times I need to
+restore a file, I do =M-x trashed=, then type =r= to mark the file to be
+restored (=M-x trashed-flag-restore=), and then type =x= (=M-x trashed-do-execute=)
+to apply the effect.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+;;; dired-like mode for the trash (trashed.el)
+(use-package trashed
+  :ensure t
+  :commands (trashed)
+  :config
+  (setq trashed-action-confirmer 'y-or-n-p)
+  (setq trashed-use-header-line t)
+  (setq trashed-sort-key '("Date deleted" . t))
+  (setq trashed-date-format "%Y-%m-%d %H:%M:%S"))
+#+end_src
+
+** Finally, we provide the =unravel-dired.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+(provide 'unravel-dired)
+#+end_src
+
+* The =unravel-window.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:b5fa481d-8549-4424-869e-91091cdf730b
+:END:
+
+#+begin_quote
+This module is all about buffers and windows. How they are managed and
+displayed.
+#+end_quote
+
+** The =unravel-window.el= section about uniquifying buffer names
+:PROPERTIES:
+:CUSTOM_ID: h:cfbea29c-3290-4fd1-a02a-d7e887c15674
+:END:
+
+#+begin_quote
+When a buffer name is reserved, Emacs tries to produce the new buffer
+by finding a suitable variant of the original name. The doc string of
+the variable ~uniquify-buffer-name-style~ does a good job at
+explaining the various patterns:
+
+#+begin_example
+For example, the files ‘/foo/bar/mumble/name’ and ‘/baz/quux/mumble/name’
+would have the following buffer names in the various styles:
+
+  forward                       bar/mumble/name    quux/mumble/name
+  reverse                       name\mumble\bar    name\mumble\quux
+  post-forward                  name|bar/mumble    name|quux/mumble
+  post-forward-angle-brackets   name<bar/mumble>   name<quux/mumble>
+  nil                           name               name<2>
+#+end_example
+
+I use the =forward= style, which is the closest to the actual file
+name.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+;;; General window and buffer configurations
+(use-package uniquify
+  :ensure nil
+  :config
+;;;; `uniquify' (unique names for buffers)
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-strip-common-suffix t)
+  (setq uniquify-after-kill-buffer-p t))
+#+end_src
+
+** The =unravel-window.el= rules for displaying buffers (~display-buffer-alist~)
+:PROPERTIES:
+:CUSTOM_ID: h:50f8b1e4-b14e-453f-a37e-1c0e495ab80f
+:END:
+
+[ Watch Prot's talk: [[https://protesilaos.com/codelog/2024-02-08-emacs-window-rules-display-buffer-alist/][control where buffers are displayed (the ~display-buffer-alist~)]] (2024-02-08). ]
+
+#+begin_quote
+The ~display-buffer-alist~ is a powerful user option and somewhat hard
+to get started with. The reason for its difficulty comes from the
+knowledge required to understand the underlying ~display-buffer~
+mechanism.
+
+Here is the gist of what we do with it:
+
+- The alist is a list of lists.
+- Each element of the alist (i.e. one of the lists) is of the
+  following form:
+
+  #+begin_example
+  (BUFFER-MATCHER
+   FUNCTIONS-TO-DISPLAY-BUFFER
+   OTHER-PARAMETERS)
+  #+end_example
+
+- The =BUFFER-MATCHER= is either a regular expression to match the
+  buffer by its name or a method to get the buffer whose major mode is
+  the one specified. In the latter case, you will see the use of cons
+  cells (like =(one . two)=) involving the ~derived-mode~ symbol
+  (remember that I build Emacs from source, so ~derived-mode~ may not
+  exist in your version of Emacs).
+
+- The =FUNCTIONS-TO-DISPLAY-BUFFER= is a list of ~display-buffer~
+  functions that are tried in the order they appear in until one
+  works. The list can be of one element, as you will notice with some
+  of my entries.
+
+- The =OTHER-PARAMETERS= are enumerated in the Emacs Lisp Reference
+  Manual. Evaluate:
+
+  #+begin_src emacs-lisp
+  (info "(elisp) Buffer Display Action Alists")
+  #+end_src
+
+In my =prot-window.el= library, I define functions that determine how
+a buffer should be displayed, given size considerations ([[#h:35b8a0a5-c447-4301-a404-bc274596238d][The =prot-window.el= library]]).
+You will find the functions ~prot-window-shell-or-term-p~ to determine
+what a shell or terminal is, ~prot-window-display-buffer-below-or-pop~
+to display the buffer below the current one or to its side depending
+on how much width is available, and ~prot-window-select-fit-size~ to
+perform the two-fold task of selecting a window and making it fit up
+to a certain height.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+  ;;;; `window', `display-buffer-alist', and related
+  (use-package prot-window
+    :ensure nil
+    :demand t
+    :config
+    ;; NOTE 2023-03-17: Remember that I am using development versions of
+    ;; Emacs.  Some of my `display-buffer-alist' contents are for Emacs
+    ;; 29+.
+    (setq display-buffer-alist
+          `(;; no window
+            ("\\`\\*Async Shell Command\\*\\'"
+             (display-buffer-no-window))
+            ("\\`\\*\\(Warnings\\|Compile-Log\\|Org Links\\)\\*\\'"
+             (display-buffer-no-window)
+             (allow-no-window . t))
+            ;; bottom side window
+            ("\\*Org \\(Select\\|Note\\)\\*" ; the `org-capture' key selection and `org-add-log-note'
+             (display-buffer-in-side-window)
+             (dedicated . t)
+             (side . bottom)
+             (slot . 0)
+             (window-parameters . ((mode-line-format . none))))
+            ;; bottom buffer (NOT side window)
+            ((or . ((derived-mode . flymake-diagnostics-buffer-mode)
+                    (derived-mode . flymake-project-diagnostics-mode)
+                    (derived-mode . messages-buffer-mode)
+                    (derived-mode . backtrace-mode)))
+             (display-buffer-reuse-mode-window display-buffer-at-bottom)
+             (window-height . 0.3)
+             (dedicated . t)
+             (preserve-size . (t . t)))
+            ("\\*Embark Actions\\*"
+             (display-buffer-reuse-mode-window display-buffer-below-selected)
+             (window-height . fit-window-to-buffer)
+             (window-parameters . ((no-other-window . t)
+                                   (mode-line-format . none))))
+            ("\\*\\(Output\\|Register Preview\\).*"
+             (display-buffer-reuse-mode-window display-buffer-at-bottom))
+            ;; below current window
+            ("\\(\\*Capture\\*\\|CAPTURE-.*\\)"
+             (display-buffer-reuse-mode-window display-buffer-below-selected))
+            ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
+             (display-buffer-reuse-mode-window display-buffer-below-selected)
+             (window-height . 0.1)
+             (dedicated . t)
+             (preserve-size . (t . t)))
+            ((derived-mode . reb-mode) ; M-x re-builder
+             (display-buffer-reuse-mode-window display-buffer-below-selected)
+             (window-height . 4) ; note this is literal lines, not relative
+             (dedicated . t)
+             (preserve-size . (t . t)))
+            ((or . ((derived-mode . occur-mode)
+                    (derived-mode . grep-mode)
+                    (derived-mode . Buffer-menu-mode)
+                    (derived-mode . log-view-mode)
+                    (derived-mode . help-mode) ; See the hooks for `visual-line-mode'
+                    "\\*\\(|Buffer List\\|Occur\\|vc-change-log\\|eldoc.*\\).*"
+                    prot-window-shell-or-term-p
+                    ;; ,world-clock-buffer-name
+                    ))
+             (prot-window-display-buffer-below-or-pop)
+             (body-function . prot-window-select-fit-size))
+            ("\\*\\(Calendar\\|Bookmark Annotation\\|ert\\).*"
+             (display-buffer-reuse-mode-window display-buffer-below-selected)
+             (dedicated . t)
+             (window-height . fit-window-to-buffer))
+            ;; same window
+            ;; NOTE 2023-02-17: `man' does not fully obey the
+            ;; `display-buffer-alist'.  It works for new frames and for
+            ;; `display-buffer-below-selected', but otherwise is
+            ;; unpredictable.  See `Man-notify-method'.
+            ((or . ((derived-mode . Man-mode)
+                    (derived-mode . woman-mode)
+                    "\\*\\(Man\\|woman\\).*"))
+             (display-buffer-same-window)))))
+#+end_src
+
+#+begin_quote
+The following settings are relevant for the ~display-buffer-alist~ we
+saw right above. Notice, in particular, the ~split-height-threshold~
+and ~split-width-threshold~ which determine when to split the frame by
+height or width. These are relevant for ~prot-window-display-buffer-below-or-pop~
+and the other more basic functions I have defined for this purpose.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+(use-package prot-window
+  :ensure nil
+  :demand t
+  :config
+  (setq window-combination-resize t)
+  (setq even-window-sizes 'height-only)
+  (setq window-sides-vertical nil)
+  (setq switch-to-buffer-in-dedicated-window 'pop)
+  (setq split-height-threshold 80)
+  (setq split-width-threshold 125)
+  (setq window-min-height 3)
+  (setq window-min-width 30))
+#+end_src
+
+** The =unravel-window.el= section about ~beframe~
+:PROPERTIES:
+:CUSTOM_ID: h:77e4f174-0c86-460d-8a54-47545f922ae9
+:END:
+
+[ Also see: [[#h:7dcbcadf-8af6-487d-b864-e4ce56d69530][The =unravel-git.el= section about =project.el=]]. ]
+
+#+begin_quote
+My ~beframe~ package enables a frame-oriented Emacs workflow where
+each frame has access to the list of buffers visited therein. In the
+interest of brevity, we call buffers that belong to frames "beframed".
+Check the video demo I did and note that I consider this one of the
+best changes I ever did to boost my productivity:
+<https://protesilaos.com/codelog/2023-02-28-emacs-beframe-demo/>.
+#+end_quote
+
++ Package name (GNU ELPA): ~beframe~
++ Official manual: <https://protesilaos.com/emacs/beframe>
++ Change log: <https://protesilaos.com/emacs/beframe-changelog>
++ Git repositories:
+  - GitHub: <https://github.com/protesilaos/beframe>
+  - GitLab: <https://gitlab.com/protesilaos/beframe>
++ Backronym: Buffers Encapsulated in Frames Realise Advanced
+  Management of Emacs.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+  ;;; Frame-isolated buffers
+  ;; Another package of mine.  Read the manual:
+  ;; <https://protesilaos.com/emacs/beframe>.
+  (use-package beframe
+    :ensure t
+    :hook (after-init . beframe-mode)
+    :bind
+    ("C-x f" . other-frame-prefix)
+    ("C-c b" . beframe-prefix-map)
+    ;; Replace the generic `buffer-menu'.  With a prefix argument, this
+    ;; commands prompts for a frame.  Call the `buffer-menu' via M-x if
+    ;; you absolutely need the global list of buffers.
+    ("C-x C-b" . beframe-buffer-menu)
+    ("C-x B" . select-frame-by-name)
+    :config
+    (setq beframe-functions-in-frames '(project-prompt-project-dir)))
+#+end_src
+
+** The =unravel-window.el= configuration of ~undelete-frame-mode~ and ~winner-mode~
+:PROPERTIES:
+:CUSTOM_ID: h:2df15080-77f9-45f8-a3b5-1adddc70a512
+:END:
+
+#+begin_quote
+Since I am using my ~beframe~ package to isolate buffers per frame
+([[#h:77e4f174-0c86-460d-8a54-47545f922ae9][The =unravel-window.el= section about ~beframe~]]), I appreciate the
+feature of Emacs 29 to undo the deletion of frames. Note the key
+binding I use for this purpose. It overrides one of the alternatives
+for the standard ~undo~ command, though I personally only ever use
+=C-/=: everything else is free to use as I see fit.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+;;; Frame history (undelete-frame-mode)
+(use-package frame
+  :ensure nil
+  :bind ("C-x u" . undelete-frame) ; I use only C-/ for `undo'
+  :hook (after-init . undelete-frame-mode))
+#+end_src
+
+#+begin_quote
+The ~winner-mode~ is basically the same idea as ~undelete-frame-mode~
+but for window layouts. Or maybe I should phrase this the other way
+round, given that ~winner~ is the older package. But the point is that
+we can quickly go back to an earlier arrangement of windows in a
+frame.
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+;;; Window history (winner-mode)
+(use-package winner
+  :ensure nil
+  :hook (after-init . winner-mode)
+  :bind
+  (("C-x <right>" . winner-redo)
+   ("C-x <left>" . winner-undo)))
+#+end_src
+
+** The =unravel-window.el= use of contextual header line (~breadcrumb~)
+:PROPERTIES:
+:CUSTOM_ID: h:29ced61b-4b5a-4f63-af00-fe311468d1cd
+:END:
+
+#+begin_quote
+The ~breadcrumb~ package by João Távora lets us display contextual
+information about the current heading or code definition in the header
+line. The header line is displayed above the contents of each buffer
+in the given window. When we are editing an Org file, for example, we
+see the path to the file, followed by a reference to the tree that
+leads to the current heading. Same idea for programming modes. Neat!
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+;;; Header line context of symbol/heading (breadcrumb.el)
+(use-package breadcrumb
+  :ensure t
+  :functions (prot/breadcrumb-local-mode)
+  :hook ((text-mode prog-mode) . prot/breadcrumb-local-mode)
+  :config
+  (setq breadcrumb-project-max-length 0.5)
+  (setq breadcrumb-project-crumb-separator "/")
+  (setq breadcrumb-imenu-max-length 1.0)
+  (setq breadcrumb-imenu-crumb-separator " > ")
+
+  (defun prot/breadcrumb-local-mode ()
+    "Enable `breadcrumb-local-mode' if the buffer is visiting a file."
+    (when buffer-file-name
+      (breadcrumb-local-mode 1))))
+#+end_src
+
+** Finally, we provide the =unravel-window.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:2124c200-734d-49c4-aeb1-513caaf957ae
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+(provide 'unravel-window)
+#+end_src
+
 * The =unravel-git.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:65e3eff5-0bff-4e1f-b6c5-0d3aa1a0d232
@@ -2292,12 +3222,15 @@ Finally, we ~provide~ the module.
 :CUSTOM_ID: h:d799c3c0-bd6a-40bb-bd1a-ba4ea5367840
 :END:
 
+Watch these talks that I've given about Org:
+
 Watch these talks by Prot:
 
 - [[https://protesilaos.com/codelog/2023-12-18-emacs-org-advanced-literate-conf/][Advanced literate configuration with Org]] (2023-12-18)
 - [[https://protesilaos.com/codelog/2023-05-23-emacs-org-basics/][Basics of Org mode]] (2023-05-23)
 - [[https://protesilaos.com/codelog/2021-12-09-emacs-org-block-agenda/][Demo of my custom Org block agenda]] (2021-12-09)
 - [[https://protesilaos.com/codelog/2020-02-04-emacs-org-capture-intro/][Primer on "org-capture"]] (2020-02-04)
+
 
 #+begin_quote
 At its core, Org is a plain text markup language. By "markup
@@ -3880,6 +4813,436 @@ Prot is the developer of this package.
 #+end_src
 
 * Custom libraries
+** The =prot-common.el= library
+:PROPERTIES:
+:CUSTOM_ID: h:3fccfadf-22e9-457f-b9fd-ed1b48600d23
+:END:
+
+#+begin_src emacs-lisp :tangle "custom-lisp/prot-common.el" :mkdirp yes
+  ;;; prot-common.el --- Common functions for my dotemacs -*- lexical-binding: t -*-
+
+  ;; Copyright (C) 2020-2024  Protesilaos Stavrou
+
+  ;; Author: Protesilaos Stavrou <info@protesilaos.com>
+  ;; URL: https://protesilaos.com/emacs/dotemacs
+  ;; Version: 0.1.0
+  ;; Package-Requires: ((emacs "30.1"))
+
+  ;; This file is NOT part of GNU Emacs.
+
+  ;; This program is free software; you can redistribute it and/or modify
+  ;; it under the terms of the GNU General Public License as published by
+  ;; the Free Software Foundation, either version 3 of the License, or (at
+  ;; your option) any later version.
+  ;;
+  ;; This program is distributed in the hope that it will be useful,
+  ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ;; GNU General Public License for more details.
+  ;;
+  ;; You should have received a copy of the GNU General Public License
+  ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+  ;;; Commentary:
+  ;;
+  ;; Common functions for my Emacs: <https://protesilaos.com/emacs/dotemacs/>.
+  ;;
+  ;; Remember that every piece of Elisp that I write is for my own
+  ;; educational and recreational purposes.  I am not a programmer and I
+  ;; do not recommend that you copy any of this if you are not certain of
+  ;; what it does.
+
+  ;;; Code:
+
+  (eval-when-compile
+    (require 'subr-x)
+    (require 'cl-lib))
+
+  (defgroup prot-common ()
+    "Auxiliary functions for my dotemacs."
+    :group 'editing)
+
+  ;;;###autoload
+  (defun prot-common-number-even-p (n)
+    "Test if N is an even number."
+    (if (numberp n)
+        (= (% n 2) 0)
+      (error "%s is not a number" n)))
+
+  ;;;###autoload
+  (defun prot-common-number-integer-p (n)
+    "Test if N is an integer."
+    (if (integerp n)
+        n
+      (error "%s is not an integer" n)))
+
+  ;;;###autoload
+  (defun prot-common-number-integer-positive-p (n)
+    "Test if N is a positive integer."
+    (if (prot-common-number-integer-p n)
+        (> n 0)
+      (error "%s is not a positive integer" n)))
+
+  ;; Thanks to Gabriel for providing a cleaner version of
+  ;; `prot-common-number-negative': <https://github.com/gabriel376>.
+  ;;;###autoload
+  (defun prot-common-number-negative (n)
+    "Make N negative."
+    (if (and (numberp n) (> n 0))
+        (* -1 n)
+      (error "%s is not a valid positive number" n)))
+
+  ;;;###autoload
+  (defun prot-common-reverse-percentage (number percent change-p)
+    "Determine the original value of NUMBER given PERCENT.
+
+  CHANGE-P should specify the increase or decrease.  For simplicity,
+  nil means decrease while non-nil stands for an increase.
+
+  NUMBER must satisfy `numberp', while PERCENT must be `natnump'."
+    (unless (numberp number)
+      (user-error "NUMBER must satisfy numberp"))
+    (unless (natnump percent)
+      (user-error "PERCENT must satisfy natnump"))
+    (let* ((pc (/ (float percent) 100))
+           (pc-change (if change-p (+ 1 pc) pc))
+           (n (if change-p pc-change (float (- 1 pc-change)))))
+      ;; FIXME 2021-12-21: If float, round to 4 decimal points.
+      (/ number n)))
+
+  ;;;###autoload
+  (defun prot-common-percentage-change (n-original n-final)
+    "Find percentage change between N-ORIGINAL and N-FINAL numbers.
+
+  When the percentage is not an integer, it is rounded to 4
+  floating points: 16.666666666666664 => 16.667."
+    (unless (numberp n-original)
+      (user-error "N-ORIGINAL must satisfy numberp"))
+    (unless (numberp n-final)
+      (user-error "N-FINAL must satisfy numberp"))
+    (let* ((difference (float (abs (- n-original n-final))))
+           (n (* (/ difference n-original) 100))
+           (round (floor n)))
+      ;; FIXME 2021-12-21: Any way to avoid the `string-to-number'?
+      (if (> n round) (string-to-number (format "%0.4f" n)) round)))
+
+  ;; REVIEW 2023-04-07 07:43 +0300: I just wrote the conversions from
+  ;; seconds.  Hopefully they are correct, but I need to double check.
+  (defun prot-common-seconds-to-minutes (seconds)
+    "Convert a number representing SECONDS to MM:SS notation."
+    (let ((minutes (/ seconds 60))
+          (seconds (% seconds 60)))
+      (format "%.2d:%.2d" minutes seconds)))
+
+  (defun prot-common-seconds-to-hours (seconds)
+    "Convert a number representing SECONDS to HH:MM:SS notation."
+    (let* ((hours (/ seconds 3600))
+           (minutes (/ (% seconds 3600) 60))
+           (seconds (% seconds 60)))
+      (format "%.2d:%.2d:%.2d" hours minutes seconds)))
+
+  ;;;###autoload
+  (defun prot-common-seconds-to-minutes-or-hours (seconds)
+    "Convert SECONDS to either minutes or hours, depending on the value."
+    (if (> seconds 3599)
+        (prot-common-seconds-to-hours seconds)
+      (prot-common-seconds-to-minutes seconds)))
+
+  ;;;###autoload
+  (defun prot-common-rotate-list-of-symbol (symbol)
+    "Rotate list value of SYMBOL by moving its car to the end.
+  Return the first element before performing the rotation.
+
+  This means that if `sample-list' has an initial value of `(one
+  two three)', this function will first return `one' and update the
+  value of `sample-list' to `(two three one)'.  Subsequent calls
+  will continue rotating accordingly."
+    (unless (symbolp symbol)
+      (user-error "%s is not a symbol" symbol))
+    (when-let* ((value (symbol-value symbol))
+                (list (and (listp value) value))
+                (first (car list)))
+      (set symbol (append (cdr list) (list first)))
+      first))
+
+  ;;;###autoload
+  (defun prot-common-empty-buffer-p ()
+    "Test whether the buffer is empty."
+    (or (= (point-min) (point-max))
+        (save-excursion
+          (goto-char (point-min))
+          (while (and (looking-at "^\\([a-zA-Z]+: ?\\)?$")
+                      (zerop (forward-line 1))))
+          (eobp))))
+
+  ;;;###autoload
+  (defun prot-common-minor-modes-active ()
+    "Return list of active minor modes for the current buffer."
+    (let ((active-modes))
+      (mapc (lambda (m)
+              (when (and (boundp m) (symbol-value m))
+                (push m active-modes)))
+            minor-mode-list)
+      active-modes))
+
+  ;;;###autoload
+  (defun prot-common-truncate-lines-silently ()
+    "Toggle line truncation without printing messages."
+    (let ((inhibit-message t))
+      (toggle-truncate-lines t)))
+
+  ;; NOTE 2023-08-12: I tried the `clear-message-function', but it did
+  ;; not work.  What I need is very simple and this gets the job done.
+  ;;;###autoload
+  (defun prot-common-clear-minibuffer-message (&rest _)
+    "Print an empty message to clear the echo area.
+  Use this as advice :after a noisy function."
+    (message ""))
+
+  ;;;###autoload
+  (defun prot-common-disable-hl-line ()
+    "Disable Hl-Line-Mode (for hooks)."
+    (hl-line-mode -1))
+
+  ;;;###autoload
+  (defun prot-common-window-bounds ()
+    "Return start and end points in the window as a cons cell."
+    (cons (window-start) (window-end)))
+
+  ;;;###autoload
+  (defun prot-common-page-p ()
+    "Return non-nil if there is a `page-delimiter' in the buffer."
+    (or (save-excursion (re-search-forward page-delimiter nil t))
+        (save-excursion (re-search-backward page-delimiter nil t))))
+
+  ;;;###autoload
+  (defun prot-common-window-small-p ()
+    "Return non-nil if window is small.
+  Check if the `window-width' or `window-height' is less than
+  `split-width-threshold' and `split-height-threshold',
+  respectively."
+    (or (and (numberp split-width-threshold)
+             (< (window-total-width) split-width-threshold))
+        (and (numberp split-height-threshold)
+             (> (window-total-height) split-height-threshold))))
+
+  (defun prot-common-window-narrow-p ()
+    "Return non-nil if window is narrow.
+  Check if the `window-width' is less than `split-width-threshold'."
+    (and (numberp split-width-threshold)
+         (< (window-total-width) split-width-threshold)))
+
+  ;;;###autoload
+  (defun prot-common-three-or-more-windows-p (&optional frame)
+    "Return non-nil if three or more windows occupy FRAME.
+  If FRAME is non-nil, inspect the current frame."
+    (>= (length (window-list frame :no-minibuffer)) 3))
+
+  ;;;###autoload
+  (defun prot-common-read-data (file)
+    "Read Elisp data from FILE."
+    (with-temp-buffer
+      (insert-file-contents file)
+      (read (current-buffer))))
+
+  ;;;###autoload
+  (defun prot-common-completion-category ()
+    "Return completion category."
+    (when-let* ((window (active-minibuffer-window)))
+      (with-current-buffer (window-buffer window)
+        (completion-metadata-get
+         (completion-metadata (buffer-substring-no-properties
+                               (minibuffer-prompt-end)
+                               (max (minibuffer-prompt-end) (point)))
+                              minibuffer-completion-table
+                              minibuffer-completion-predicate)
+         'category))))
+
+  ;; Thanks to Omar Antolín Camarena for providing this snippet!
+  ;;;###autoload
+  (defun prot-common-completion-table (category candidates)
+    "Pass appropriate metadata CATEGORY to completion CANDIDATES.
+
+  This is intended for bespoke functions that need to pass
+  completion metadata that can then be parsed by other
+  tools (e.g. `embark')."
+    (lambda (string pred action)
+      (if (eq action 'metadata)
+          `(metadata (category . ,category))
+        (complete-with-action action candidates string pred))))
+
+  ;;;###autoload
+  (defun prot-common-completion-table-no-sort (category candidates)
+    "Pass appropriate metadata CATEGORY to completion CANDIDATES.
+  Like `prot-common-completion-table' but also disable sorting."
+    (lambda (string pred action)
+      (if (eq action 'metadata)
+          `(metadata (category . ,category)
+                     (display-sort-function . ,#'identity))
+        (complete-with-action action candidates string pred))))
+
+  ;; Thanks to Igor Lima for the `prot-common-crm-exclude-selected-p':
+  ;; <https://github.com/0x462e41>.
+  ;; This is used as a filter predicate in the relevant prompts.
+  (defvar crm-separator)
+
+  ;;;###autoload
+  (defun prot-common-crm-exclude-selected-p (input)
+    "Filter out INPUT from `completing-read-multiple'.
+  Hide non-destructively the selected entries from the completion
+  table, thus avoiding the risk of inputting the same match twice.
+
+  To be used as the PREDICATE of `completing-read-multiple'."
+    (if-let* ((pos (string-match-p crm-separator input))
+              (rev-input (reverse input))
+              (element (reverse
+                        (substring rev-input 0
+                                   (string-match-p crm-separator rev-input))))
+              (flag t))
+        (progn
+          (while pos
+            (if (string= (substring input 0 pos) element)
+                (setq pos nil)
+              (setq input (substring input (1+ pos))
+                    pos (string-match-p crm-separator input)
+                    flag (when pos t))))
+          (not flag))
+      t))
+
+  ;; The `prot-common-line-regexp-p' and `prot-common--line-regexp-alist'
+  ;; are contributed by Gabriel: <https://github.com/gabriel376>.  They
+  ;; provide a more elegant approach to using a macro, as shown further
+  ;; below.
+  (defvar prot-common--line-regexp-alist
+    '((empty . "[\s\t]*$")
+      (indent . "^[\s\t]+")
+      (non-empty . "^.+$")
+      (list . "^\\([\s\t#*+]+\\|[0-9]+[^\s]?[).]+\\)")
+      (heading . "^[=-]+"))
+    "Alist of regexp types used by `prot-common-line-regexp-p'.")
+
+  (defun prot-common-line-regexp-p (type &optional n)
+    "Test for TYPE on line.
+  TYPE is the car of a cons cell in
+  `prot-common--line-regexp-alist'.  It matches a regular
+  expression.
+
+  With optional N, search in the Nth line from point."
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (and (not (bobp))
+           (or (beginning-of-line n) t)
+           (save-match-data
+             (looking-at
+              (alist-get type prot-common--line-regexp-alist))))))
+
+  ;; The `prot-common-shell-command-with-exit-code-and-output' function is
+  ;; courtesy of Harold Carr, who also sent a patch that improved
+  ;; `prot-eww-download-html' (from the `prot-eww.el' library).
+  ;;
+  ;; More about Harold: <http://haroldcarr.com/about/>.
+  (defun prot-common-shell-command-with-exit-code-and-output (command &rest args)
+    "Run COMMAND with ARGS.
+  Return the exit code and output in a list."
+    (with-temp-buffer
+      (list (apply 'call-process command nil (current-buffer) nil args)
+            (buffer-string))))
+
+  (defvar prot-common-url-regexp
+    (concat
+     "~?\\<\\([-a-zA-Z0-9+&@#/%?=~_|!:,.;]*\\)"
+     "[.@]"
+     "\\([-a-zA-Z0-9+&@#/%?=~_|!:,.;]+\\)\\>/?")
+    "Regular expression to match (most?) URLs or email addresses.")
+
+  (autoload 'auth-source-search "auth-source")
+
+  ;;;###autoload
+  (defun prot-common-auth-get-field (host prop)
+    "Find PROP in `auth-sources' for HOST entry."
+    (when-let* ((source (auth-source-search :host host)))
+      (if (eq prop :secret)
+          (funcall (plist-get (car source) prop))
+        (plist-get (flatten-list source) prop))))
+
+  ;;;###autoload
+  (defun prot-common-parse-file-as-list (file)
+    "Return the contents of FILE as a list of strings.
+  Strings are split at newline characters and are then trimmed for
+  negative space.
+
+  Use this function to provide a list of candidates for
+  completion (per `completing-read')."
+    (split-string
+     (with-temp-buffer
+       (insert-file-contents file)
+       (buffer-substring-no-properties (point-min) (point-max)))
+     "\n" :omit-nulls "[\s\f\t\n\r\v]+"))
+
+  (defun prot-common-ignore (&rest _)
+    "Use this as override advice to make a function do nothing."
+    nil)
+
+  ;; NOTE 2023-06-02: The `prot-common-wcag-formula' and
+  ;; `prot-common-contrast' are taken verbatim from my `modus-themes'
+  ;; and renamed to have the prefix `prot-common-' instead of
+  ;; `modus-themes-'.  This is all my code, of course, but I do it this
+  ;; way to ensure that this file is self-contained in case someone
+  ;; copies it.
+
+  ;; This is the WCAG formula: <https://www.w3.org/TR/WCAG20-TECHS/G18.html>.
+  (defun prot-common-wcag-formula (hex)
+    "Get WCAG value of color value HEX.
+  The value is defined in hexadecimal RGB notation, such #123456."
+    (cl-loop for k in '(0.2126 0.7152 0.0722)
+             for x in (color-name-to-rgb hex)
+             sum (* k (if (<= x 0.03928)
+                          (/ x 12.92)
+                        (expt (/ (+ x 0.055) 1.055) 2.4)))))
+
+  ;;;###autoload
+  (defun prot-common-contrast (c1 c2)
+    "Measure WCAG contrast ratio between C1 and C2.
+  C1 and C2 are color values written in hexadecimal RGB."
+    (let ((ct (/ (+ (prot-common-wcag-formula c1) 0.05)
+                 (+ (prot-common-wcag-formula c2) 0.05))))
+      (max ct (/ ct))))
+
+  ;;;; EXPERIMENTAL macros (not meant to be used anywhere)
+
+  ;; TODO 2023-09-30: Try the same with `cl-defmacro' and &key
+  (defmacro prot-common-if (condition &rest consequences)
+    "Separate the CONSEQUENCES of CONDITION semantically.
+  Like `if', `when', `unless' but done by using `:then' and `:else'
+  keywords.  The forms under each keyword of `:then' and `:else'
+  belong to the given subset of CONSEQUENCES.
+
+  - The absence of `:else' means: (if CONDITION (progn CONSEQUENCES)).
+  - The absence of `:then' means: (if CONDITION nil CONSEQUENCES).
+  - Otherwise: (if CONDITION (progn then-CONSEQUENCES) else-CONSEQUENCES)."
+    (declare (indent 1))
+    (let (then-consequences else-consequences last-kw)
+      (dolist (elt consequences)
+        (let ((is-keyword (keywordp elt)))
+          (cond
+           ((and (not is-keyword) (eq last-kw :then))
+            (push elt then-consequences))
+           ((and (not is-keyword) (eq last-kw :else))
+            (push elt else-consequences))
+           ((and is-keyword (eq elt :then))
+            (setq last-kw :then))
+           ((and is-keyword (eq elt :else))
+            (setq last-kw :else)))))
+      `(if ,condition
+           ,(if then-consequences
+                `(progn ,@(nreverse then-consequences))
+              nil)
+         ,@(nreverse else-consequences))))
+
+  (provide 'prot-common)
+  ;;; prot-common.el ends here
+#+end_src
+
 ** The =prot-embark.el= library
 :PROPERTIES:
 :CUSTOM_ID: h:fb034be5-c316-4c4f-a46f-cebcab332a47
@@ -4024,5 +5387,249 @@ Prot is the developer of this package.
 
 (provide 'prot-embark)
 ;;; prot-embark.el ends here
+#+end_src
+
+** The =prot-window.el= library
+:PROPERTIES:
+:CUSTOM_ID: h:35b8a0a5-c447-4301-a404-bc274596238d
+:END:
+
+#+begin_src emacs-lisp :tangle "custom-lisp/prot-window.el" :mkdirp yes
+;;; prot-window.el --- Display-buffer and window-related extensions for my dotemacs -*- lexical-binding: t -*-
+
+;; Copyright (C) 2023-2024  Protesilaos Stavrou
+
+;; Author: Protesilaos Stavrou <info@protesilaos.com>
+;; URL: https://protesilaos.com/emacs/dotemacs
+;; Version: 0.1.0
+;; Package-Requires: ((emacs "30.1"))
+
+;; This file is NOT part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;;
+;; This covers my window and display-buffer extensions, for use in my
+;; Emacs setup: https://protesilaos.com/emacs/dotemacs.
+;;
+;; Remember that every piece of Elisp that I write is for my own
+;; educational and recreational purposes.  I am not a programmer and I
+;; do not recommend that you copy any of this if you are not certain of
+;; what it does.
+
+;;; Code:
+
+(require 'prot-common)
+
+(defvar prot-window-window-sizes
+  '( :max-height (lambda () (floor (frame-height) 3))
+     :min-height 10
+     :max-width (lambda () (floor (frame-width) 4))
+     :min-width 20)
+  "Property list of maximum and minimum window sizes.
+The property keys are `:max-height', `:min-height', `:max-width',
+and `:min-width'.  They all accept a value of either a
+number (integer or floating point) or a function.")
+
+(defun prot-window--get-window-size (key)
+  "Extract the value of KEY from `prot-window-window-sizes'."
+  (when-let* ((value (plist-get prot-window-window-sizes key)))
+    (cond
+     ((functionp value)
+      (funcall value))
+     ((numberp value)
+      value)
+     (t
+      (error "The value of `%s' is neither a number nor a function" key)))))
+
+(defun prot-window-select-fit-size (window)
+  "Select WINDOW and resize it.
+The resize pertains to the maximum and minimum values for height
+and width, per `prot-window-window-sizes'.
+
+Use this as the `body-function' in a `display-buffer-alist' entry."
+  (select-window window)
+  (fit-window-to-buffer
+   window
+   (prot-window--get-window-size :max-height)
+   (prot-window--get-window-size :min-height)
+   (prot-window--get-window-size :max-width)
+   (prot-window--get-window-size :min-width))
+  ;; If we did not use `display-buffer-below-selected', then we must
+  ;; be in a lateral window, which has more space.  Then we do not
+  ;; want to dedicate the window to this buffer, because we will be
+  ;; running out of space.
+  (when (or (window-in-direction 'above) (window-in-direction 'below))
+    (set-window-dedicated-p window t)))
+
+(defun prot-window--get-display-buffer-below-or-pop ()
+  "Return list of functions for `prot-window-display-buffer-below-or-pop'."
+  (list
+   #'display-buffer-reuse-mode-window
+   (if (or (prot-common-window-small-p)
+           (prot-common-three-or-more-windows-p))
+       #'display-buffer-below-selected
+     #'display-buffer-pop-up-window)))
+
+(defun prot-window-display-buffer-below-or-pop (&rest args)
+  "Display buffer below current window or pop a new window.
+The criterion for choosing to display the buffer below the
+current one is a non-nil return value for
+`prot-common-window-small-p'.
+
+Apply ARGS expected by the underlying `display-buffer' functions.
+
+This as the action function in a `display-buffer-alist' entry."
+  (let ((functions (prot-window--get-display-buffer-below-or-pop)))
+    (catch 'success
+      (dolist (fn functions)
+        (when (apply fn args)
+          (throw 'success fn))))))
+
+(defun prot-window-shell-or-term-p (buffer &rest _)
+  "Check if BUFFER is a shell or terminal.
+This is a predicate function for `buffer-match-p', intended for
+use in `display-buffer-alist'."
+  (when (string-match-p "\\*.*\\(e?shell\\|v?term\\).*" (buffer-name (get-buffer buffer)))
+    (with-current-buffer buffer
+      ;; REVIEW 2022-07-14: Is this robust?
+      (and (not (derived-mode-p 'message-mode 'text-mode))
+           (derived-mode-p 'eshell-mode 'shell-mode 'comint-mode 'fundamental-mode)))))
+
+(defun prot-window-remove-dedicated (&rest _)
+  "Remove dedicated window parameter.
+Use this as :after advice to `delete-other-windows' and
+`delete-window'."
+  (when (one-window-p :no-mini)
+    (set-window-dedicated-p nil nil)))
+
+(mapc
+ (lambda (fn)
+   (advice-add fn :after #'prot-window-remove-dedicated))
+ '(delete-other-windows delete-window))
+
+(defmacro prot-window-define-full-frame (name &rest args)
+  "Define command to call ARGS in new frame with `display-buffer-full-frame' bound.
+Name the function prot-window- followed by NAME.  If ARGS is nil,
+call NAME as a function."
+  (declare (indent 1))
+  `(defun ,(intern (format "prot-window-%s" name)) ()
+     ,(format "Call `prot-window-%s' in accordance with `prot-window-define-full-frame'." name)
+     (interactive)
+     (let ((display-buffer-alist '((".*" (display-buffer-full-frame)))))
+       (with-selected-frame (make-frame)
+         ,(if args
+              `(progn ,@args)
+            `(funcall ',name))
+         (modify-frame-parameters nil '((buffer-list . nil)))))))
+
+(defun prot-window--get-shell-buffers ()
+  "Return list of `shell' buffers."
+  (seq-filter
+   (lambda (buffer)
+     (with-current-buffer buffer
+       (derived-mode-p 'shell-mode)))
+   (buffer-list)))
+
+(defun prot-window--get-new-shell-buffer ()
+  "Return buffer name for `shell' buffers."
+  (if-let* ((buffers (prot-window--get-shell-buffers))
+            (buffers-length (length buffers))
+            ((>= buffers-length 1)))
+      (format "*shell*<%s>" (1+ buffers-length))
+    "*shell*"))
+
+;;;###autoload (autoload 'prot-window-shell "prot-window")
+(prot-window-define-full-frame shell
+  (let ((name (prot-window--get-new-shell-buffer)))
+    (shell name)
+    (set-frame-name name)
+    (when-let* ((buffer (get-buffer name)))
+      (with-current-buffer buffer
+        (add-hook
+         'delete-frame-functions
+         (lambda (_)
+           ;; FIXME 2023-09-09: Works for multiple frames (per
+           ;; `make-frame-command'), but not if the buffer is in two
+           ;; windows in the same frame.
+           (unless (> (safe-length (get-buffer-window-list buffer nil t)) 1)
+             (let ((kill-buffer-query-functions nil))
+               (kill-buffer buffer))))
+         nil
+         :local)))))
+
+;;;###autoload (autoload 'prot-window-coach "prot-window")
+(prot-window-define-full-frame coach
+  (let ((buffer (get-buffer-create "*scratch for coach*")))
+    (with-current-buffer buffer
+      (funcall initial-major-mode))
+    (display-buffer buffer)
+    (set-frame-name "Coach")))
+
+;; REVIEW 2023-06-25: Does this merit a user option?  I don't think I
+;; will ever set it to the left.  It feels awkward there.
+(defun prot-window-scroll-bar-placement ()
+  "Control the placement of scroll bars."
+  (when scroll-bar-mode
+    (setq default-frame-scroll-bars 'right)
+    (set-scroll-bar-mode 'right)))
+
+(add-hook 'scroll-bar-mode-hook #'prot-window-scroll-bar-placement)
+
+(defun prot-window-no-minibuffer-scroll-bar (frame)
+  "Remove the minibuffer scroll bars from FRAME."
+  (set-window-scroll-bars (minibuffer-window frame) nil nil nil nil :persistent))
+
+(add-hook 'after-make-frame-functions 'prot-window-no-minibuffer-scroll-bar)
+
+;;;; Run commands in a popup frame (via emacsclient)
+
+(defun prot-window-delete-popup-frame (&rest _)
+  "Kill selected selected frame if it has parameter `prot-window-popup-frame'.
+Use this function via a hook."
+  (when (frame-parameter nil 'prot-window-popup-frame)
+    (delete-frame)))
+
+(defmacro prot-window-define-with-popup-frame (command)
+  "Define function which calls COMMAND in a new frame.
+Make the new frame have the `prot-window-popup-frame' parameter."
+  `(defun ,(intern (format "prot-window-popup-%s" command)) ()
+     ,(format "Run `%s' in a popup frame with `prot-window-popup-frame' parameter.
+Also see `prot-window-delete-popup-frame'." command)
+     (interactive)
+     (let ((frame (make-frame '((prot-window-popup-frame . t)))))
+       (select-frame frame)
+       (switch-to-buffer " prot-window-hidden-buffer-for-popup-frame")
+       (condition-case nil
+           (call-interactively ',command)
+         ((quit error user-error)
+          (delete-frame frame))))))
+
+(declare-function org-capture "org-capture" (&optional goto keys))
+(defvar org-capture-after-finalize-hook)
+
+;;;###autoload (autoload 'prot-window-popup-org-capture "prot-window")
+(prot-window-define-with-popup-frame org-capture)
+
+(declare-function tmr "tmr" (time &optional description acknowledgep))
+(defvar tmr-timer-created-functions)
+
+;;;###autoload (autoload 'prot-window-popup-tmr "prot-window")
+(prot-window-define-with-popup-frame tmr)
+
+(provide 'prot-window)
+;;; prot-window.el ends here
 #+end_src
 
