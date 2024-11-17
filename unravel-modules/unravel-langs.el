@@ -167,7 +167,6 @@
     :map text-mode-map
     ("C-c d B" . denote-backlinks)
     ("C-c d b" . denote-find-backlink)
-    ("C-c d f" . denote-find-link)
     ;; Also see `denote-rename-file' further above.
     ("C-c d R" . denote-rename-file-using-front-matter)
     ("C-c d k" . denote-rename-file-keywords)
@@ -175,6 +174,7 @@
     ("C-c d h" . denote-org-extras-link-to-heading)
     ("C-c d d l" . denote-org-extras-dblock-insert-links)
     ("C-c d d b" . denote-org-extras-dblock-insert-backlinks)
+    ("C-c d d m" . denote-org-extras-dblock-insert-missing-links)
     ;; Key bindings specifically for Dired.
     :map dired-mode-map
     ("C-c C-d C-i" . denote-dired-link-marked-notes)
@@ -318,8 +318,8 @@ Perform the comparison with `string<'."
 (use-package consult-denote
   :ensure t
   :bind
-  (("C-c n f" . consult-denote-find)
-   ("C-c n g" . consult-denote-grep))
+  (("C-c d f" . consult-denote-find)
+   ("C-c d g" . consult-denote-grep))
   :config
   (consult-denote-mode 1))
 
