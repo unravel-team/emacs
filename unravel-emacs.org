@@ -1098,6 +1098,20 @@ process.
     (server-start)))
 #+end_src
 
+** The =unravel-essentials.el= section about ~easy-kill~
+:PROPERTIES:
+:CUSTOM_ID: h:891BA3F6-6229-45B5-B5E8-80FA4837662B
+:END:
+
+~easy-kill~ is a drop-in replacement for ~kill-ring-save~, letting me easily and quickly copy / kill anything I want.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  (use-package easy-kill
+    :ensure t
+    :bind
+    ("M-w" . easy-kill)) ; re-map kill-ring-save
+#+end_src
+
 ** The =unravel-essentials.el= section about ~expreg~ (tree-sitter mark syntactically)
 :PROPERTIES:
 :CUSTOM_ID: h:ceb193bf-0de3-4c43-8ab7-6daa50817754
@@ -1113,6 +1127,8 @@ designed for tree-sitter (Lisp seems to work regardless).
 
 The package offers the ~expreg-expand~ and ~expreg-contract~ commands.
 #+end_quote
+
+I expect ~expreg~ to eventually completely replace ~easy-kill~ ()
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)

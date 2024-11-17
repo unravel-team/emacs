@@ -89,6 +89,11 @@
   (unless (server-running-p)
     (server-start)))
 
+(use-package easy-kill
+  :ensure t
+  :bind
+  ("M-w" . easy-kill)) ; re-map kill-ring-save
+
 ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)
 (when (treesit-available-p)
   (use-package expreg
