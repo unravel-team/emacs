@@ -1436,6 +1436,19 @@ minibuffer. Let's have everything ignore casing by default.
 (setq read-file-name-completion-ignore-case t)
 #+end_src
 
+** The =unravel-completion.el= settings for recursive minibuffers
+:PROPERTIES:
+:CUSTOM_ID: h:4299825a-db51-49fe-b415-fb1749eed289
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+(use-package mb-depth
+  :ensure nil
+  :hook (after-init . minibuffer-depth-indicate-mode)
+  :config
+  (setq read-minibuffer-restore-windows nil) ; Emacs 28
+  (setq enable-recursive-minibuffers t))
+#+end_src
 ** The =unravel-completion.el= settings for common interactions
 :PROPERTIES:
 :CUSTOM_ID: h:b640f032-ad11-413e-ad8f-63408671d500
@@ -2004,8 +2017,7 @@ I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provi
 
   (use-package vertico-suspend
     :after vertico
-    :init
-    (setq enable-recursive-minibuffers t)
+    ;; Note: `enable-recursive-minibuffers' must be t
     :bind ( :map global-map
             ("M-S" . vertico-suspend)
             ("C-x c b" . vertico-suspend)))
