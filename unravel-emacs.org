@@ -2953,10 +2953,12 @@ frame.
    ("C-x <left>" . winner-undo)))
 #+end_src
 
-** The =unravel-window.el= use of contextual header line (~breadcrumb~)
+** COMMENT The =unravel-window.el= use of contextual header line (~breadcrumb~)
 :PROPERTIES:
 :CUSTOM_ID: h:29ced61b-4b5a-4f63-af00-fe311468d1cd
 :END:
+
+~breadcrumb~ is an interesting package when demo'ing something, but not useful to me in day-to-day use. Commenting it out until I need it.
 
 #+begin_quote
 The ~breadcrumb~ package by João Távora lets us display contextual

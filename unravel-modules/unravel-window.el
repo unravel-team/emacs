@@ -127,20 +127,4 @@
   (("C-x <right>" . winner-redo)
    ("C-x <left>" . winner-undo)))
 
-;;; Header line context of symbol/heading (breadcrumb.el)
-(use-package breadcrumb
-  :ensure t
-  :functions (prot/breadcrumb-local-mode)
-  :hook ((text-mode prog-mode) . prot/breadcrumb-local-mode)
-  :config
-  (setq breadcrumb-project-max-length 0.5)
-  (setq breadcrumb-project-crumb-separator "/")
-  (setq breadcrumb-imenu-max-length 1.0)
-  (setq breadcrumb-imenu-crumb-separator " > ")
-
-  (defun prot/breadcrumb-local-mode ()
-    "Enable `breadcrumb-local-mode' if the buffer is visiting a file."
-    (when buffer-file-name
-      (breadcrumb-local-mode 1))))
-
 (provide 'unravel-window)
