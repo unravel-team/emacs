@@ -6,6 +6,8 @@
 
 This configuration is inspired from the work of [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][my hero Prot]]. I've copied straight from his config file, because I think the explanations he has created are worthwhile and should be read by everyone. Prot's files are all prefixed with =prot-emacs-*=. I have changed this to =unravel-*=. The reason for this is that I have picked up only what I need and changed it where needed. As such, any issues you face with this configuration are likely introduced by me.
 
+I use emacs on Mac OSX as my primary development environment. I install the latest available pre-compiled Emacs (with native compilation), as provided by Jimeh here: [[https://github.com/jimeh/emacs-builds?tab=readme-ov-file][jimeh/emacs-builds]].
+
 Any quote without attribution is directly taken from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][Prot's org file]]. You should read through it if you want detailed explanations of things you find here.
 
 #+begin_quote
