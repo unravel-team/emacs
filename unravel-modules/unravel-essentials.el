@@ -152,4 +152,25 @@ word.  Fall back to regular `expreg-expand'."
     (setq source-directory (expand-file-name "~/src/emacs/src/"))
     (setq find-function-C-source-directory (expand-file-name "~/src/emacs/src/"))))
 
+(defun vedang/backward-kill-word-or-kill-region (&optional arg)
+  "Rebind `C-w' to work differently based on whether a region is active.
+
+If the region is selected, retain the original behaviour, otherwise call
+`backward-kill-word' instead.  ARG is passed to `backward-kill-word'."
+  (interactive "p")
+  (if (region-active-p)
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word arg)))
+
+(use-package simple
+  :ensure nil
+  :after vertico ; so that we can bind to vertico-map
+  :bind
+  ;; Rebind `C-w' to work differently based on whether a region is
+  ;; active.
+  ( :map global-map
+    ("C-w" . vedang/backward-kill-word-or-kill-region)
+    :map vertico-map
+    ("C-l" . vedang/backward-kill-word-or-kill-region)))
+
 (provide 'unravel-essentials)
