@@ -17,6 +17,11 @@
   (setq echo-keystrokes-help t) ; Emacs 30
   (setq epa-keys-select-method 'minibuffer)) ; Emacs 30
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
 (use-package recentf
   :ensure nil
   :hook (after-init . recentf-mode)

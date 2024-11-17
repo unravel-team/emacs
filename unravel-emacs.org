@@ -933,6 +933,18 @@ in the function ~prot/enable-variable-pitch~.
     (setq epa-keys-select-method 'minibuffer)) ; Emacs 30
 #+end_src
 
+** The =unravel-essentials.el= section for fixing PATH on OSX (~exec-path-from-shell~)
+:PROPERTIES:
+:CUSTOM_ID: h:D4517B67-0D90-417E-97D7-60A08EABB3DA
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+
 ** The =unravel-essentials.el= configuration to track recently visited files (~recentf~)
 :PROPERTIES:
 :CUSTOM_ID: h:f9aa7523-d88a-4080-add6-073f36cb8b9a
