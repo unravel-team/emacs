@@ -1825,6 +1825,13 @@ Karthik Chikmagalur has an excellently written and presented essay on
 user, this will help you.
 #+end_quote
 
+Here are the main keybindings you should be aware of:
+
+- ~C-.~ to enter embark with ~prot-embark-act-quit~
+- ~E~ to ~embark-export~ (eg: when you want to see grep results in the ~grep-mode~ window
+- ~S~ to ~embark-collect~ (eg: when you just want to save the consult results for inspection)
+- ~A~ to ~embark-act~ (eg: to choose a new action in the middle of an existing action)
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Extended minibuffer actions and more (embark.el and prot-embark.el)
   (use-package embark
