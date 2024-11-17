@@ -71,7 +71,7 @@
     ("s" . org-narrow-to-subtree))
   :config
 ;;;; general settings
-  (setq org-ellipsis "⮧")
+  (setq org-ellipsis "...")
   (setq org-adapt-indentation nil)      ; No, non, nein, όχι!
   (setq org-special-ctrl-a/e nil)
   (setq org-special-ctrl-k nil)

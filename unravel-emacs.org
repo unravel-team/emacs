@@ -363,11 +363,10 @@ Now we are ready to load our per-module configuration files:
 #+begin_src emacs-lisp :tangle "init.el"
   (require 'unravel-theme)
   (require 'unravel-essentials)
-  ;; (require 'unravel-modeline)
   (require 'unravel-completion)
-  ;; (require 'unravel-search)
-  ;; (require 'unravel-dired)
-  ;; (require 'unravel-window)
+  (require 'unravel-search)
+  (require 'unravel-dired)
+  (require 'unravel-window)
   (require 'unravel-git)
   (require 'unravel-org)
   (require 'unravel-langs)
@@ -3433,7 +3432,7 @@ on how I use Org.
       ("s" . org-narrow-to-subtree))
     :config
   ;;;; general settings
-    (setq org-ellipsis "⮧")
+    (setq org-ellipsis "...")
     (setq org-adapt-indentation nil)      ; No, non, nein, όχι!
     (setq org-special-ctrl-a/e nil)
     (setq org-special-ctrl-k nil)
