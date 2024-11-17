@@ -2647,15 +2647,15 @@ restored (=M-x trashed-flag-restore=), and then type =x= (=M-x trashed-do-execut
 to apply the effect.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
-;;; dired-like mode for the trash (trashed.el)
-(use-package trashed
-  :ensure t
-  :commands (trashed)
-  :config
-  (setq trashed-action-confirmer 'y-or-n-p)
-  (setq trashed-use-header-line t)
-  (setq trashed-sort-key '("Date deleted" . t))
-  (setq trashed-date-format "%Y-%m-%d %H:%M:%S"))
+  ;;; dired-like mode for the trash (trashed.el)
+  (use-package trashed
+    :ensure t
+    :commands (trashed)
+    :config
+    (setq trashed-action-confirmer 'y-or-n-p)
+    (setq trashed-use-header-line t)
+    (setq trashed-sort-key '("Date deleted" . t))
+    (setq trashed-date-format "%Y-%m-%d %H:%M:%S"))
 #+end_src
 
 ** Finally, we provide the =unravel-dired.el= module
