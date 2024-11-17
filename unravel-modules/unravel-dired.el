@@ -11,6 +11,8 @@
   :ensure nil
   :commands (dired)
   :config
+  (setq insert-directory-program
+        (or (executable-find "gls") "/opt/homebrew/bin/gls"))
   (setq dired-listing-switches
         "-AGFhlv --group-directories-first --time-style=long-iso"))
 

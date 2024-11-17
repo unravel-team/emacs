@@ -940,6 +940,7 @@ in the function ~prot/enable-variable-pitch~.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   (use-package exec-path-from-shell
     :ensure t
+    :demand t
     :config
     (exec-path-from-shell-initialize))
 #+end_src
@@ -2455,6 +2456,8 @@ for the ~ls~ manpage to learn about what I have here. In short:
     :ensure nil
     :commands (dired)
     :config
+    (setq insert-directory-program
+          (or (executable-find "gls") "/opt/homebrew/bin/gls"))
     (setq dired-listing-switches
           "-AGFhlv --group-directories-first --time-style=long-iso"))
 #+end_src
