@@ -1659,22 +1659,26 @@ static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][S
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
-(use-package dabbrev
-  :ensure nil
-  :commands (dabbrev-expand dabbrev-completion)
-  :config
-;;;; `dabbrev' (dynamic word completion (dynamic abbreviations))
-  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
-  (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
-  (setq dabbrev-backward-only nil)
-  (setq dabbrev-case-distinction 'case-replace)
-  (setq dabbrev-case-fold-search nil)
-  (setq dabbrev-case-replace 'case-replace)
-  (setq dabbrev-check-other-buffers t)
-  (setq dabbrev-eliminate-newlines t)
-  (setq dabbrev-upcase-means-case-search t)
-  (setq dabbrev-ignored-buffer-modes
-        '(archive-mode image-mode docview-mode pdf-view-mode)))
+  (use-package dabbrev
+    :ensure nil
+    :commands (dabbrev-expand dabbrev-completion)
+    :bind
+    ;; Swap the default key-bindings
+    (("M-/" . dabbrev-completion)
+     ("C-M-/" . dabbrev-expand))
+    :config
+  ;;;; `dabbrev' (dynamic word completion (dynamic abbreviations))
+    (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+    (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
+    (setq dabbrev-backward-only nil)
+    (setq dabbrev-case-distinction 'case-replace)
+    (setq dabbrev-case-fold-search nil)
+    (setq dabbrev-case-replace 'case-replace)
+    (setq dabbrev-check-other-buffers t)
+    (setq dabbrev-eliminate-newlines t)
+    (setq dabbrev-upcase-means-case-search t)
+    (setq dabbrev-ignored-buffer-modes
+          '(archive-mode image-mode docview-mode pdf-view-mode)))
 #+end_src
 
 ** The =unravel-completion.el= for in-buffer completion popup (~corfu~)

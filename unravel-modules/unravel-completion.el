@@ -168,6 +168,10 @@
 (use-package dabbrev
   :ensure nil
   :commands (dabbrev-expand dabbrev-completion)
+  :bind
+  ;; Swap the default key-bindings
+  (("M-/" . dabbrev-completion)
+   ("C-M-/" . dabbrev-expand))
   :config
 ;;;; `dabbrev' (dynamic word completion (dynamic abbreviations))
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
