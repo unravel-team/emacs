@@ -194,6 +194,7 @@
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :bind
   (:map global-map
+        ;; Prot's bindings
         ("M-K" . consult-keep-lines) ; M-S-k is similar to M-S-5 (M-%)
         ("M-F" . consult-focus-lines)   ; same principle
         ("M-s M-b" . consult-buffer)
@@ -205,7 +206,7 @@
         ("M-s M-m" . consult-mark)
         ("M-s M-y" . consult-yank-pop)
         ("M-s M-s" . consult-outline)
-        ;; C-x bindings in `ctl-x-map'
+        ;; Overriding defaults: C-x bindings in `ctl-x-map'
         ("C-x M-:" . consult-complex-command) ;; orig. repeat-complex-command
         ("C-x b" . consult-buffer) ;; orig. switch-to-buffer
         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
@@ -225,6 +226,9 @@
         ("M-g g" . consult-goto-line) ;; orig. goto-line
         ("M-g M-g" . consult-goto-line) ;; orig. goto-line
         ("M-g o" . consult-outline) ;; Alternative: consult-org-heading
+        ;; My bindings from my Helm workflow
+        ("C-x c i" . consult-imenu)
+        ("C-c s" . consult-ripgrep)
         :map consult-narrow-map
         ("?" . consult-narrow-help))
   :config
