@@ -1910,6 +1910,8 @@ vertical layout. Under the hood, it takes care to be responsive and to
 handle even massive completion tables gracefully.
 #+end_quote
 
+I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provide. The configuration for that is also part of this section.
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Vertical completion layout (vertico)
   (use-package vertico
@@ -1927,6 +1929,23 @@ handle even massive completion tables gracefully.
       ;; or root '/' directory, Vertico will clear the old path to keep
       ;; only your current input.
       (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)))
+
+  (use-package vertico-repeat
+    :after vertico
+    :bind ( :map global-map
+            ("M-R" . vertico-repeat)
+            :map vertico-map
+            ("M-N" . vertico-repeat-next)
+            ("M-P" . vertico-repeat-previous))
+    :hook (minibuffer-setup . vertico-repeat-save))
+
+  (use-package vertico-suspend
+    :after vertico
+    :init
+    (setq enable-recursive-minibuffers t)
+    :bind ( :map global-map
+            ("M-S" . vertico-suspend)
+            ("C-x c b" . vertico-suspend)))
 #+end_src
 
 ** Finally, we provide the ~unravel-completion.el~ module

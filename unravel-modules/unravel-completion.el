@@ -351,4 +351,21 @@
     ;; only your current input.
     (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)))
 
+(use-package vertico-repeat
+  :after vertico
+  :bind ( :map global-map
+          ("M-R" . vertico-repeat)
+          :map vertico-map
+          ("M-N" . vertico-repeat-next)
+          ("M-P" . vertico-repeat-previous))
+  :hook (minibuffer-setup . vertico-repeat-save))
+
+(use-package vertico-suspend
+  :after vertico
+  :init
+  (setq enable-recursive-minibuffers t)
+  :bind ( :map global-map
+          ("M-S" . vertico-suspend)
+          ("C-x c b" . vertico-suspend)))
+
 (provide 'unravel-completion)
