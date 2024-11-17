@@ -84,6 +84,7 @@
   (setq org-adapt-indentation nil)      ; No, non, nein, όχι!
   (setq org-special-ctrl-a/e nil)
   (setq org-special-ctrl-k nil)
+  (setq org-use-speed-commands t)
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-hide-emphasis-markers nil)
   (setq org-hide-macro-markers nil)
