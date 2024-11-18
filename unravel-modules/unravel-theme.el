@@ -28,9 +28,7 @@
           (agenda-structure . (variable-pitch light 1.9))
           (t . (variable-pitch 1.1))))
   (setq ef-themes-disable-other-themes t)
-  (mapc #'disable-theme custom-enabled-themes)
-
-  (ef-themes-select 'ef-elea-light))
+  (mapc #'disable-theme custom-enabled-themes))
 
 ;;;; Lin
 ;; Read the lin manual: <https://protesilaos.com/emacs/lin>.
@@ -148,7 +146,8 @@
             :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
 
     (when (or modus-themes-p ef-themes-p)
-      (theme-buffet-timer-hours 2))))
+      (theme-buffet-timer-hours 2)
+      (theme-buffet-a-la-carte))))
 
 ;;;; Fontaine (font configurations)
 ;; Read the manual: <https://protesilaos.com/emacs/fontaine>

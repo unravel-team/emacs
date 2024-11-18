@@ -429,9 +429,7 @@ Prot is the lead developer and maintainer of this package.
             (agenda-structure . (variable-pitch light 1.9))
             (t . (variable-pitch 1.1))))
     (setq ef-themes-disable-other-themes t)
-    (mapc #'disable-theme custom-enabled-themes)
-
-    (ef-themes-select 'ef-elea-light))
+    (mapc #'disable-theme custom-enabled-themes))
 #+end_src
 
 ** The =unravel-theme.el= section for ~lin~
@@ -646,7 +644,8 @@ Bruno Boal is the lead developer and Prot is a co-maintainer.
               :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
 
       (when (or modus-themes-p ef-themes-p)
-        (theme-buffet-timer-hours 2))))
+        (theme-buffet-timer-hours 2)
+        (theme-buffet-a-la-carte))))
 #+end_src
 
 ** The =unravel-theme.el= section about ~fontaine~
