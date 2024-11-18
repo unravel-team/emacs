@@ -4121,15 +4121,27 @@ automatically for every newly visited file, add a hook like this:
 (add-hook 'SOME-MAJOR-mode #'eglot-ensure)
 #+end_quote
 
+I use ~eglot~ as the main LSP entry point, and as such, I have key-bindings for the common functionality implemented by ~eglot~.
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Eglot (built-in client for the language server protocol)
   (use-package eglot
     :ensure nil
     :functions (eglot-ensure)
     :commands (eglot)
+    :bind
+    ( :map eglot-mode-map
+      ("C-c e r" . eglot-rename)
+      ("C-c e o" . eglot-code-action-organize-imports)
+      ("C-c e d" . eldoc)
+      ("C-c e c" . eglot-code-actions)
+      ("C-c e f" . eglot-format)
+      ;; Since eglot plugs into flymake anyway
+      ("C-c e l" . flymake-show-buffer-diagnostics))
     :config
     (setq eglot-sync-connect nil)
-    (setq eglot-autoshutdown t))
+    (setq eglot-autoshutdown t)
+    (setq eglot-extend-to-xref t))
 #+end_src
 
 ** The =unravel-langs.el= settings for ~markdown-mode~
@@ -4226,40 +4238,40 @@ of packaging. I use it whenever I work on my numerous Emacs packages.
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;; Flymake
-(use-package flymake
-  :ensure nil
-  :bind
-  (:map flymake-mode-map
-    ("C-c ! s" . flymake-start)
-    ("C-c ! l" . flymake-show-buffer-diagnostics) ; Emacs28
-    ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
-    ("C-c ! n" . flymake-goto-next-error)
-    ("C-c ! p" . flymake-goto-prev-error))
-  :config
-  (setq flymake-fringe-indicator-position 'left-fringe)
-  (setq flymake-suppress-zero-counters t)
-  (setq flymake-no-changes-timeout nil)
-  (setq flymake-start-on-flymake-mode t)
-  (setq flymake-start-on-save-buffer t)
-  (setq flymake-proc-compilation-prevents-syntax-check t)
-  (setq flymake-wrap-around nil)
-  (setq flymake-mode-line-format
-        '("" flymake-mode-line-exception flymake-mode-line-counters))
-  ;; NOTE 2023-07-03: `prot-modeline.el' actually defines the counters
-  ;; itself and ignores this.
-  (setq flymake-mode-line-counter-format
-        '("" flymake-mode-line-error-counter
-          flymake-mode-line-warning-counter
-          flymake-mode-line-note-counter ""))
-  (setq flymake-show-diagnostics-at-end-of-line nil)) ; Emacs 30
+  ;;; Flymake
+  (use-package flymake
+    :ensure nil
+    :bind
+    (:map flymake-mode-map
+      ("C-c ! s" . flymake-start)
+      ("C-c ! l" . flymake-show-buffer-diagnostics) ; Emacs28
+      ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
+      ("C-c ! n" . flymake-goto-next-error)
+      ("C-c ! p" . flymake-goto-prev-error))
+    :config
+    (setq flymake-fringe-indicator-position 'left-fringe)
+    (setq flymake-suppress-zero-counters t)
+    (setq flymake-no-changes-timeout nil)
+    (setq flymake-start-on-flymake-mode t)
+    (setq flymake-start-on-save-buffer t)
+    (setq flymake-proc-compilation-prevents-syntax-check t)
+    (setq flymake-wrap-around nil)
+    (setq flymake-mode-line-format
+          '("" flymake-mode-line-exception flymake-mode-line-counters))
+    ;; NOTE 2023-07-03: `prot-modeline.el' actually defines the counters
+    ;; itself and ignores this.
+    (setq flymake-mode-line-counter-format
+          '("" flymake-mode-line-error-counter
+            flymake-mode-line-warning-counter
+            flymake-mode-line-note-counter ""))
+    (setq flymake-show-diagnostics-at-end-of-line nil)) ; Emacs 30
 
-;;; Elisp packaging requirements
-(use-package package-lint-flymake
-  :ensure t
-  :after flymake
-  :config
-  (add-hook 'flymake-diagnostic-functions #'package-lint-flymake))
+  ;;; Elisp packaging requirements
+  (use-package package-lint-flymake
+    :ensure t
+    :after flymake
+    :config
+    (add-hook 'flymake-diagnostic-functions #'package-lint-flymake))
 #+end_src
 
 ** The =unravel-langs.el= settings for ~outline-minor-mode~
@@ -4587,6 +4599,14 @@ Prot is the developer of this package.
     :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
 #+end_src
 
+** The =unravel-langs.el= section for Python
+:PROPERTIES:
+:CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618
+:END:
+
+The built-in Python mode for Emacs goes a long way. We build minimal tooling around this mode, specifically to support ~eglot~ and Python's virtualenv system.
+
+Anytime you create a virtualenv, you should run the following command: =pip3 install ruff
 ** Finally, we provide the =unravel-langs.el= module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"

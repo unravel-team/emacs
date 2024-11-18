@@ -30,9 +30,19 @@
   :ensure nil
   :functions (eglot-ensure)
   :commands (eglot)
+  :bind
+  ( :map eglot-mode-map
+    ("C-c e r" . eglot-rename)
+    ("C-c e o" . eglot-code-action-organize-imports)
+    ("C-c e d" . eldoc)
+    ("C-c e c" . eglot-code-actions)
+    ("C-c e f" . eglot-format)
+    ;; Since eglot plugs into flymake anyway
+    ("C-c e l" . flymake-show-buffer-diagnostics))
   :config
   (setq eglot-sync-connect nil)
-  (setq eglot-autoshutdown t))
+  (setq eglot-autoshutdown t)
+  (setq eglot-extend-to-xref t))
 
 ;;; Markdown (markdown-mode)
 (use-package markdown-mode
