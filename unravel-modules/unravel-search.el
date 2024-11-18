@@ -1,3 +1,10 @@
+(use-package imenu
+  :ensure nil
+  :config
+  ;; Don't limit item length, this makes imenu less useful in
+  ;; consult-imenu
+  (setq imenu-max-item-length 'unlimited))
+
 ;;; Isearch, occur, grep
 (use-package isearch
   :ensure nil

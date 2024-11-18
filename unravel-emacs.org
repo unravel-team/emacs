@@ -2209,7 +2209,23 @@ For starters, just learn:
 Now on to the configurations.
 #+end_quote
 
-** The =unravel-search.el= on isearch lax space
+** The =unravel-search.el= section on imenu
+:PROPERTIES:
+:CUSTOM_ID: h:7151F001-75DB-4808-95CB-3BC6BEC6A8CA
+:END:
+
+~imenu~ is amazing and I use it as my primary tool for navigating any file. Here, we make a small tweak to ensure that ~consult-imenu~ returns good ~imenu~ results to us.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el" :mkdirp yes
+  (use-package imenu
+    :ensure nil
+    :config
+    ;; Don't limit item length, this makes imenu less useful in
+    ;; consult-imenu
+    (setq imenu-max-item-length 'unlimited))
+#+end_src
+
+** The =unravel-search.el= section on isearch lax space
 :PROPERTIES:
 :CUSTOM_ID: h:95947b37-2071-4ee7-a201-8e19bf3322e9
 :END:
@@ -2226,7 +2242,7 @@ do exactly this for regular =C-s= (~isearch-forward~) and =C-r=
 (~isearch-backward~).
 #+end_quote
 
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el" :mkdirp yes
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
   ;;; Isearch, occur, grep
   (use-package isearch
     :ensure nil
@@ -2260,7 +2276,7 @@ longer in character count than ~lazy-highlight-no-delay-length~.
   (setq lazy-highlight-no-delay-length 4))
 #+end_src
 
-** The =unravel-search.el= on isearch match counter
+** The =unravel-search.el= section on isearch match counter
 :PROPERTIES:
 :CUSTOM_ID: h:acfdc17f-7ffb-48d3-90ff-49bd00463934
 :END:
