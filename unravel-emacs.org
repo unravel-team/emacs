@@ -387,6 +387,7 @@ Now we are ready to load our per-module configuration files:
   (require 'unravel-window)
   (require 'unravel-git)
   (require 'unravel-org)
+  (require 'unravel-shell)
   (require 'unravel-langs)
 #+end_src
 
@@ -4042,6 +4043,37 @@ title of the task, and the like. The documentation string of
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
 (provide 'unravel-org)
+#+end_src
+
+* The =unravel-shell.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:1E30455D-BB40-44E7-9FB1-92529FE03BDE
+:END:
+
+I use ~vterm~ for my shell inside Emacs, and at the moment, this section is about ~vterm~ configuration only.
+
+** The =unravel-shell.el= section for ~vterm~
+:PROPERTIES:
+:CUSTOM_ID: h:2945DD5C-6AF1-4323-A287-A4F5C109471C
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-shell.el" :mkdirp yes
+  ;;;; Vterm
+  (use-package vterm
+    :ensure t
+    :bind
+    ("C-x m" . vterm)
+    :config
+    (setq vterm-shell (or (executable-find "fish") "/opt/homebrew/bin/fish")))
+#+end_src
+
+** Finally, we provide the =unravel-shell.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:83F2ADFB-D72B-4F8C-8B01-BA1A9CA4939C
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-shell.el"
+(provide 'unravel-shell)
 #+end_src
 
 * The =unravel-langs.el= module

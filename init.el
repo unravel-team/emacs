@@ -92,4 +92,5 @@ making an abbreviation to a function."
 (require 'unravel-window)
 (require 'unravel-git)
 (require 'unravel-org)
+(require 'unravel-shell)
 (require 'unravel-langs)
