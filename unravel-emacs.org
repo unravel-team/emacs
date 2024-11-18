@@ -4292,8 +4292,6 @@ of packaging. I use it whenever I work on my numerous Emacs packages.
     (setq flymake-wrap-around nil)
     (setq flymake-mode-line-format
           '("" flymake-mode-line-exception flymake-mode-line-counters))
-    ;; NOTE 2023-07-03: `prot-modeline.el' actually defines the counters
-    ;; itself and ignores this.
     (setq flymake-mode-line-counter-format
           '("" flymake-mode-line-error-counter
             flymake-mode-line-warning-counter
@@ -4640,7 +4638,33 @@ Prot is the developer of this package.
 
 The built-in Python mode for Emacs goes a long way. We build minimal tooling around this mode, specifically to support ~eglot~ and Python's virtualenv system.
 
-Anytime you create a virtualenv, you should run the following command: =pip3 install ruff
+Anytime you create a virtualenv, you should run the following command: =pip3 install ruff python-lsp-server python-lsp-ruff=
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Configuration for Python Programming
+
+  (use-package python
+    :ensure nil
+    :hook
+    ((python-ts-mode . eglot-ensure)
+     (python-mode . eglot-ensure))
+    :config
+    (setq python-shell-dedicated 'project))
+
+  (use-package pyvenv
+    :ensure t
+    :commands (pyvenv-create pyvenv-workon pyvenv-activate pyvenv-deactivate)
+    :config
+    (setenv "WORKON_HOME" "~/.cache/venvs/")
+    (pyvenv-tracking-mode 1))
+
+  (use-package auto-virtualenv
+    :ensure t
+    :config
+    (setq auto-virtualenv-verbose t)
+    (auto-virtualenv-setup))
+#+end_src
+
 ** Finally, we provide the =unravel-langs.el= module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"

@@ -90,8 +90,6 @@
   (setq flymake-wrap-around nil)
   (setq flymake-mode-line-format
         '("" flymake-mode-line-exception flymake-mode-line-counters))
-  ;; NOTE 2023-07-03: `prot-modeline.el' actually defines the counters
-  ;; itself and ignores this.
   (setq flymake-mode-line-counter-format
         '("" flymake-mode-line-error-counter
           flymake-mode-line-warning-counter
@@ -343,5 +341,28 @@ Perform the comparison with `string<'."
           ("M-s" . nil) ; used for search related keybindings
           ("M-?" . nil)) ; `xref-find-references` uses it.
   :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
+
+;;;; Configuration for Python Programming
+
+(use-package python
+  :ensure nil
+  :hook
+  ((python-ts-mode . eglot-ensure)
+   (python-mode . eglot-ensure))
+  :config
+  (setq python-shell-dedicated 'project))
+
+(use-package pyvenv
+  :ensure t
+  :commands (pyvenv-create pyvenv-workon pyvenv-activate pyvenv-deactivate)
+  :config
+  (setenv "WORKON_HOME" "~/.cache/venvs/")
+  (pyvenv-tracking-mode 1))
+
+(use-package auto-virtualenv
+  :ensure t
+  :config
+  (setq auto-virtualenv-verbose t)
+  (auto-virtualenv-setup))
 
 (provide 'unravel-langs)
