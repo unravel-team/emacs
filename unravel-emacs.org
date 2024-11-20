@@ -1837,7 +1837,7 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
           ;; Prot's bindings
           ("M-K" . consult-keep-lines) ; M-S-k is similar to M-S-5 (M-%)
           ("M-F" . consult-focus-lines)   ; same principle
-          ("M-s M-b" . consult-buffer)
+          ("M-s M-b" . consult-buffer) ; Start opening anything from here
           ("M-s M-f" . consult-fd)
           ("M-s M-g" . consult-ripgrep)
           ("M-s M-h" . consult-history)
@@ -1848,7 +1848,6 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
           ("M-s M-s" . consult-outline)
           ;; Overriding defaults: C-x bindings in `ctl-x-map'
           ("C-x M-:" . consult-complex-command) ;; orig. repeat-complex-command
-          ("C-x b" . consult-buffer) ;; orig. switch-to-buffer
           ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
           ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
           ("C-x t b" . consult-buffer-other-tab) ;; orig. switch-to-buffer-other-tab
@@ -2967,7 +2966,9 @@ best changes I ever did to boost my productivity:
 + Backronym: Buffers Encapsulated in Frames Realise Advanced
   Management of Emacs.
 
-Note: I also add ~beframe~ as a source for ~consult-buffers~. This code comes from the ~beframe~ manual and lets me look at frame-specific buffers first when using ~consult-buffer~.
+I add ~beframe~ as a source for ~consult-buffers~. This code comes from the ~beframe~ manual and lets me look at frame-specific buffers first when using ~consult-buffer~ (=M-s M-b=) ([[#h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d][The =unravel-completion.el= settings for ~consult~]])
+
+I replace the default =C-x b= (~switch-to-buffer~) with the beframe'd version of the same command, because this lets me focus on the buffers in the current frame, which is what I generally want. When I need to access everything, I use the consult version of the command as mentioned above.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
   ;;; Frame-isolated buffers
@@ -2983,6 +2984,7 @@ Note: I also add ~beframe~ as a source for ~consult-buffers~. This code comes fr
     ;; commands prompts for a frame.  Call the `buffer-menu' via M-x if
     ;; you absolutely need the global list of buffers.
     ("C-x C-b" . beframe-buffer-menu)
+    ("C-x b" . beframe-switch-buffer)
     ("C-x B" . select-frame-by-name)
     :config
     (setq beframe-functions-in-frames '(project-prompt-project-dir))

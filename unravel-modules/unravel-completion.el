@@ -214,7 +214,7 @@
         ;; Prot's bindings
         ("M-K" . consult-keep-lines) ; M-S-k is similar to M-S-5 (M-%)
         ("M-F" . consult-focus-lines)   ; same principle
-        ("M-s M-b" . consult-buffer)
+        ("M-s M-b" . consult-buffer) ; Start opening anything from here
         ("M-s M-f" . consult-fd)
         ("M-s M-g" . consult-ripgrep)
         ("M-s M-h" . consult-history)
@@ -225,7 +225,6 @@
         ("M-s M-s" . consult-outline)
         ;; Overriding defaults: C-x bindings in `ctl-x-map'
         ("C-x M-:" . consult-complex-command) ;; orig. repeat-complex-command
-        ("C-x b" . consult-buffer) ;; orig. switch-to-buffer
         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
         ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
         ("C-x t b" . consult-buffer-other-tab) ;; orig. switch-to-buffer-other-tab

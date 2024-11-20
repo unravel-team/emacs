@@ -109,6 +109,7 @@
   ;; commands prompts for a frame.  Call the `buffer-menu' via M-x if
   ;; you absolutely need the global list of buffers.
   ("C-x C-b" . beframe-buffer-menu)
+  ("C-x b" . beframe-switch-buffer)
   ("C-x B" . select-frame-by-name)
   :config
   (setq beframe-functions-in-frames '(project-prompt-project-dir))
