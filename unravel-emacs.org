@@ -4663,6 +4663,21 @@ Prot is the developer of this package.
     :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
 #+end_src
 
+** The =unravel-langs.el= settings for ~apheleia~ (code formatting)
+:PROPERTIES:
+:CUSTOM_ID: h:07B0E6F4-050E-4A7D-B489-E919E4887FF5
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package apheleia
+    :ensure t
+    :demand t
+    :config
+    (apheleia-global-mode +1)
+    (with-eval-after-load 'apheleia-formatters
+      (push '(zprint . ("zprint")) apheleia-formatters)))
+#+end_src
+
 ** The =unravel-langs.el= section for Python
 :PROPERTIES:
 :CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618

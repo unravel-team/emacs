@@ -342,6 +342,14 @@ Perform the comparison with `string<'."
           ("M-?" . nil)) ; `xref-find-references` uses it.
   :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
 
+(use-package apheleia
+  :ensure t
+  :demand t
+  :config
+  (apheleia-global-mode +1)
+  (with-eval-after-load 'apheleia-formatters
+    (push '(zprint . ("zprint")) apheleia-formatters)))
+
 ;;;; Configuration for Python Programming
 
 (use-package python
