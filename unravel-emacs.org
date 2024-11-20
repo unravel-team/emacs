@@ -4670,7 +4670,12 @@ Prot is the developer of this package.
 
 The built-in Python mode for Emacs goes a long way. We build minimal tooling around this mode, specifically to support ~eglot~ and Python's virtualenv system.
 
-Anytime you create a virtualenv, you should run the following command: =pip3 install ruff python-lsp-server python-lsp-ruff=
+Run the following commands to make sure you have the developer dependencies installed globally:
+
+- =pipx= : Installed by =brew install pipx=
+- =ruff= : An extremely fast Python linter, and code formatter, written in Rust. Installed by  =pipx install ruff=
+  - Ruff is also a langauge server, but it only provides functionality related to formating and linting. As it adds more over time (like go-to definition), I may make it my primary language server
+- =pylsp= : The defacto language server for Python. Install with =pipx install python-lsp-server=
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Configuration for Python Programming

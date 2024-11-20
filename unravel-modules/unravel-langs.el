@@ -346,23 +346,16 @@ Perform the comparison with `string<'."
 
 (use-package python
   :ensure nil
-  :hook
-  ((python-ts-mode . eglot-ensure)
-   (python-mode . eglot-ensure))
+  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project))
 
 (use-package pyvenv
   :ensure t
+  :after python
   :commands (pyvenv-create pyvenv-workon pyvenv-activate pyvenv-deactivate)
   :config
   (setenv "WORKON_HOME" "~/.cache/venvs/")
   (pyvenv-tracking-mode 1))
-
-(use-package auto-virtualenv
-  :ensure t
-  :config
-  (setq auto-virtualenv-verbose t)
-  (auto-virtualenv-setup))
 
 (provide 'unravel-langs)
