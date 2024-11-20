@@ -44,4 +44,4 @@
 
 ;; Name the default frame
 ;; You can select a frame with M-x select-frame-by-name
-(add-hook 'after-init-hook (lambda () (set-frame-name "unravel")))
+(add-hook 'after-init-hook (lambda () (set-frame-name "unravel/emacs")))
