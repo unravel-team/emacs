@@ -2960,6 +2960,14 @@ and the other more basic functions I have defined for this purpose.
   (setq window-min-width 30))
 #+end_src
 
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+  (use-package window
+    :ensure nil
+    :config
+    (setq display-buffer-reuse-frames t)
+    (setq recenter-positions '(top middle bottom)))
+#+end_src
+
 ** The =unravel-window.el= section about ~beframe~
 :PROPERTIES:
 :CUSTOM_ID: h:77e4f174-0c86-460d-8a54-47545f922ae9

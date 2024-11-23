@@ -96,6 +96,12 @@
   (setq window-min-height 3)
   (setq window-min-width 30))
 
+(use-package window
+  :ensure nil
+  :config
+  (setq display-buffer-reuse-frames t)
+  (setq recenter-positions '(top middle bottom)))
+
 ;;; Frame-isolated buffers
 ;; Another package of mine.  Read the manual:
 ;; <https://protesilaos.com/emacs/beframe>.
