@@ -37,7 +37,7 @@ evaluate the following code block or do =C-c C-v C-t=. All files will
 be updated accordingly.
 #+end_quote
 
-#+src emacs-lisp :tangle no :results none
+#+begin_src emacs-lisp :tangle no :results none
 (org-babel-tangle)
 #+end_src
 
@@ -1089,6 +1089,16 @@ with ~savehist-mode~ ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][The =unravel-co
 
   (with-eval-after-load 'savehist
     (add-to-list 'savehist-additional-variables 'register-alist)))
+#+end_src
+
+** The =unravel-essentials.el= settings for files
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  (use-package files
+    :ensure nil
+    :config
+    (setq confirm-kill-emacs #'y-or-n-p)
+    (setq require-final-newline t))
 #+end_src
 
 ** The =unravel-essentials.el= section for ~delete-selection-mode~

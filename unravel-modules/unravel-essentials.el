@@ -62,6 +62,12 @@
   (with-eval-after-load 'savehist
     (add-to-list 'savehist-additional-variables 'register-alist)))
 
+(use-package files
+  :ensure nil
+  :config
+  (setq confirm-kill-emacs #'y-or-n-p)
+  (setq require-final-newline t))
+
 ;;;; Delete selection
 (use-package delsel
   :ensure nil
