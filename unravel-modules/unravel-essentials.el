@@ -181,13 +181,18 @@ If the region is selected, retain the original behaviour, otherwise call
 
 (use-package simple
   :ensure nil
-  :after vertico ; so that we can bind to vertico-map
+  :after vertico ;; so that we can bind to vertico-map
   :bind
   ;; Rebind `C-w' to work differently based on whether a region is
   ;; active.
   ( :map global-map
     ("C-w" . vedang/backward-kill-word-or-kill-region)
     :map vertico-map
-    ("C-l" . vedang/backward-kill-word-or-kill-region)))
+    ("C-l" . vedang/backward-kill-word-or-kill-region))
+  :hook
+  ((before-save . delete-trailing-whitespace)
+   (text-mode . turn-on-visual-line-mode))
+  :config
+  (setq column-number-mode t))
 
 (provide 'unravel-essentials)
