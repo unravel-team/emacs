@@ -40,6 +40,11 @@
     ;; Create reminders for tasks with a due date when this file is read.
     (org-agenda-to-appt)))
 
+(use-package paragraphs
+  :ensure nil
+  :config
+  (setq sentence-end-double-space nil))
+
 ;;; Org-mode (personal information manager)
 (use-package org
   :ensure nil

@@ -3368,7 +3368,7 @@ branches, etc.
 :CUSTOM_ID: h:4e7035c5-9350-4c51-be85-85f2539ed295
 :END:
 
-Finally, we ~provide~ the module. 
+Finally, we ~provide~ the module.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el"
 (provide 'unravel-git)
@@ -3516,6 +3516,18 @@ done at a specific time, such as coaching sessions ([[#h:f8f06938-0dfe-45c3-b4cf
 
     ;; Create reminders for tasks with a due date when this file is read.
     (org-agenda-to-appt)))
+#+end_src
+
+** The =unravel-org.el= section on paragraphs
+:PROPERTIES:
+:CUSTOM_ID: h:71AF485F-9C6B-4936-B50F-3A126663FFB0
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  (use-package paragraphs
+    :ensure nil
+    :config
+    (setq sentence-end-double-space nil))
 #+end_src
 
 ** The =unravel-org.el= section with basic Org settings
