@@ -3116,6 +3116,30 @@ leads to the current heading. Same idea for programming modes. Neat!
       (breadcrumb-local-mode 1))))
 #+end_src
 
+** The =unravel-window.el= section for Zone (~zone~)
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+  (use-package zone
+    :ensure nil
+    :config
+    (zone-when-idle 300))
+#+end_src
+
+** The =unravel-window.el= section for displaying time
+:PROPERTIES:
+:CUSTOM_ID: h:8E669AD7-D3BC-4168-AFAD-C6D4A25AF860
+:END:
+
+I like being able to see the time in the modeline.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
+  (use-package time
+    :ensure nil
+    :config
+    (setq display-time-day-and-date t)
+    (display-time))
+#+end_src
+
 ** Finally, we provide the =unravel-window.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:2124c200-734d-49c4-aeb1-513caaf957ae

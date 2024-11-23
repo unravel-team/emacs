@@ -159,4 +159,15 @@ With optional argument FRAME, return the list of buffers of FRAME."
   (("C-x <right>" . winner-redo)
    ("C-x <left>" . winner-undo)))
 
+(use-package zone
+  :ensure nil
+  :config
+  (zone-when-idle 300))
+
+(use-package time
+  :ensure nil
+  :config
+  (setq display-time-day-and-date t)
+  (display-time))
+
 (provide 'unravel-window)
