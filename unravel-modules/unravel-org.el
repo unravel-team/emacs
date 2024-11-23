@@ -192,6 +192,17 @@
   :ensure nil
   :bind ("C-c c" . org-capture))
 
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1)
+  (add-to-list 'hippie-expand-try-functions-list
+               'yas-hippie-try-expand))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :after yasnippet)
+
 ;;;; agenda
 (use-package org-agenda
   :ensure nil

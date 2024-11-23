@@ -3852,6 +3852,26 @@ title of the task, and the like. The documentation string of
     :bind ("C-c c" . org-capture))
 #+end_src
 
+** The =unravel-org.el= section on YASnippet
+:PROPERTIES:
+:CUSTOM_ID: h:75C672E5-4636-4CC0-A5ED-500EAFAB01DE
+:END:
+
+~yasnippet~ is the primary tool I use when I need templates of any kind. Since most of my templating is in ~org-mode~, it makes sense to keep YAS in this section.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  (use-package yasnippet
+    :ensure t
+    :config
+    (yas-global-mode 1)
+    (add-to-list 'hippie-expand-try-functions-list
+                 'yas-hippie-try-expand))
+
+  (use-package yasnippet-snippets
+    :ensure t
+    :after yasnippet)
+#+end_src
+
 ** The =unravel-org.el= Org agenda settings
 :PROPERTIES:
 :CUSTOM_ID: h:7fe87b83-2815-4617-a5f9-d3417dd9d248
