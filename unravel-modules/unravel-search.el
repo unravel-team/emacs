@@ -64,7 +64,11 @@
   ;; All those have been changed for Emacs 28
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
   (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
-  (setq xref-file-name-display 'project-relative))
+  (setq xref-file-name-display 'project-relative)
+  (setq xref-search-program (if (or (executable-find "rg")
+                                    (executable-find "ripgrep"))
+                                'ripgrep
+                              'grep)))
 
 (use-package grep
   :ensure nil

@@ -2323,7 +2323,7 @@ Here I am making some minor tweaks to =*occur*= buffer (remember to
 read the introduction to this section ([[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= module]])).
 I always want (i) the cursor to be at the top of the buffer, (ii) the
 current line to be highlighted, as it is easier for selection
-purposes ... 
+purposes ...
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
@@ -2360,37 +2360,41 @@ purposes ...
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
-;;; grep and xref
-(use-package re-builder
-  :ensure nil
-  :commands (re-builder regexp-builder)
-  :config
-  (setq reb-re-syntax 'read))
+  ;;; grep and xref
+  (use-package re-builder
+    :ensure nil
+    :commands (re-builder regexp-builder)
+    :config
+    (setq reb-re-syntax 'read))
 
-(use-package xref
-  :ensure nil
-  :commands (xref-find-definitions xref-go-back)
-  :config
-  ;; All those have been changed for Emacs 28
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
-  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
-  (setq xref-file-name-display 'project-relative))
+  (use-package xref
+    :ensure nil
+    :commands (xref-find-definitions xref-go-back)
+    :config
+    ;; All those have been changed for Emacs 28
+    (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
+    (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
+    (setq xref-file-name-display 'project-relative)
+    (setq xref-search-program (if (or (executable-find "rg")
+                                      (executable-find "ripgrep"))
+                                  'ripgrep
+                                'grep)))
 
-(use-package grep
-  :ensure nil
-  :commands (grep lgrep rgrep)
-  :config
-  (setq grep-save-buffers nil)
-  (setq grep-use-headings t) ; Emacs 30
+  (use-package grep
+    :ensure nil
+    :commands (grep lgrep rgrep)
+    :config
+    (setq grep-save-buffers nil)
+    (setq grep-use-headings t) ; Emacs 30
 
-  (let ((executable (or (executable-find "rg") "grep"))
-        (rgp (string-match-p "rg" grep-program)))
-    (setq grep-program executable)
-    (setq grep-template
-          (if rgp
-              "/usr/bin/rg -nH --null -e <R> <F>"
-            "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
-    (setq xref-search-program (if rgp 'ripgrep 'grep))))
+    (let ((executable (or (executable-find "rg") "grep"))
+          (rgp (string-match-p "rg" grep-program)))
+      (setq grep-program executable)
+      (setq grep-template
+            (if rgp
+                "/usr/bin/rg -nH --null -e <R> <F>"
+              "/usr/bin/grep <X> <C> -nH --null -e <R> <F>"))
+      (setq xref-search-program (if rgp 'ripgrep 'grep))))
 #+end_src
 
 ** The =unravel-search.el= setup for editable grep buffers (~grep-edit-mode~ or ~wgrep~)
