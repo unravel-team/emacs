@@ -168,10 +168,6 @@
 (use-package dabbrev
   :ensure nil
   :commands (dabbrev-expand dabbrev-completion)
-  :bind
-  ;; Swap the default key-bindings
-  (("M-/" . dabbrev-completion)
-   ("C-M-/" . dabbrev-expand))
   :config
 ;;;; `dabbrev' (dynamic word completion (dynamic abbreviations))
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
@@ -185,6 +181,12 @@
   (setq dabbrev-upcase-means-case-search t)
   (setq dabbrev-ignored-buffer-modes
         '(archive-mode image-mode docview-mode pdf-view-mode)))
+
+(use-package hippie-ext
+  :ensure nil
+  :bind
+  ;; Replace the default dabbrev
+  ("M-/" . hippie-expand))
 
 ;;; Corfu (in-buffer completion popup)
 (use-package corfu

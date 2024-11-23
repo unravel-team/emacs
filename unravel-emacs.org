@@ -1722,8 +1722,7 @@ basis.
 #+begin_quote
 The built-in ~dabbrev~ package provides a text completion method that
 reads the contents of a buffer and expands the text before the cursor
-to match possible candidates. This is done with =M-/= (~dabbrev-expand~)
-which is what I use most of the time to perform in-buffer completions.
+to match possible candidates...
 
 The term "dabbrev" stands for "dynamic abbreviation". Emacs also has
 static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][Settings for static text expansion
@@ -1734,10 +1733,6 @@ static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][S
   (use-package dabbrev
     :ensure nil
     :commands (dabbrev-expand dabbrev-completion)
-    :bind
-    ;; Swap the default key-bindings
-    (("M-/" . dabbrev-completion)
-     ("C-M-/" . dabbrev-expand))
     :config
   ;;;; `dabbrev' (dynamic word completion (dynamic abbreviations))
     (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
@@ -1751,6 +1746,20 @@ static, user-defined abbreviations ([[#h:fd84b79a-351e-40f0-b383-bf520d77834b][S
     (setq dabbrev-upcase-means-case-search t)
     (setq dabbrev-ignored-buffer-modes
           '(archive-mode image-mode docview-mode pdf-view-mode)))
+#+end_src
+
+** The =unravel-completion.el= settings for dynamic text expansion (~hippie~)
+
+Hippie is a built-in expansion mechanism that competes with dabbrev. I prefer hippie because of the simpler configuration and detailed expansion options it provides.
+
+Hippie uses Dabbrev as one of the expansion sources, so all the dabbrev settings above are still important.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  (use-package hippie-ext
+    :ensure nil
+    :bind
+    ;; Replace the default dabbrev
+    ("M-/" . hippie-expand))
 #+end_src
 
 ** The =unravel-completion.el= for in-buffer completion popup (~corfu~)
