@@ -217,7 +217,7 @@
   (setq denote-buffer-has-backlinks-string " (<--->)")
   (setq denote-backlinks-show-context t)
   (setq denote-org-store-link-to-heading t)
-  
+
   ;; Journal settings
   (setq denote-journal-extras-keyword "")
 
