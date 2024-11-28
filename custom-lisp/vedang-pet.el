@@ -539,6 +539,15 @@ must both be installed into the current project first."
 
 
 
+(defun pet-eglot--adjust-path-advice (fn &rest args)
+  "Adjust paths before looking up Python language servers.
+
+FN is `executable-find' (Eglot 1.17+). ARGS is the arguments to FN."
+  (pcase-let ((`(,command . ,_) args))
+    (if (member command '("pylsp" "pyls" "basedpyright-langserver" "pyright-langserver" "jedi-language-server" "ruff-lsp"))
+        (pet-adjust-paths-executable-find command)
+      (apply fn args))))
+
 (defun pet--adjust-path (bin-dir)
   "Add BIN-DIR to the various places that `executable-find' looks at, when
 it looks for an executable."
@@ -546,7 +555,7 @@ it looks for an executable."
     (setq-local exec-path (cons (concat bin-dir "/") exec-path)))
   (when (not (memql bin-dir tramp-remote-path))
     (setq-local tramp-remote-path (cons bin-dir tramp-remote-path)))
-  (setenv "PATH" (string-join bin-dir path-separator)))
+  (setenv "PATH" (string-join exec-path path-separator)))
 
 (defun pet-adjust-paths-executable-find (executable)
   "Adjust paths so that we can find the correct EXECUTABLE for the current
@@ -775,7 +784,6 @@ default otherwise."
 
 
 
-(defvar eglot-workspace-configuration)
 (declare-function jsonrpc--process "ext:jsonrpc")
 (declare-function eglot--executable-find "ext:eglot")
 (declare-function eglot--workspace-configuration-plist "ext:eglot")
@@ -784,8 +792,8 @@ default otherwise."
 (defun pet-eglot--executable-find-advice (fn &rest args)
   "Look up Python language servers using `pet-executable-find'.
 
-FN is `eglot--executable-find', or `executable-find' (1.17+), depending
-on the version of `eglot' being used. ARGS is the arguments to FN."
+FN is `eglot--executable-find', (Eglot 1.16 or below only). ARGS is the
+arguments to FN."
   (pcase-let ((`(,command . ,_) args))
     (if (member command '("pylsp" "pyls" "basedpyright-langserver" "pyright-langserver" "jedi-language-server" "ruff-lsp"))
         (pet-executable-find command)
@@ -875,7 +883,7 @@ COMMAND is the name of the Python language server command."
                   (copy-tree b t)))
 
 (defun pet-eglot--workspace-configuration-plist-advice (fn &rest args)
-  "Enrich `eglot-workspace-configuration' with paths found by `pet'.
+  "Enrich `eglot--workspace-configuration-plist' with paths found by `pet'.
 
 FN is `eglot--workspace-configuration-plist', ARGS is the
 arguments to `eglot--workspace-configuration-plist'."
@@ -921,7 +929,7 @@ FN is `eglot--guess-contact', ARGS is the arguments to
       ;; Eglot version 1.16 or below
       (advice-add 'eglot--executable-find :around #'pet-eglot--executable-find-advice)
     ;; Eglot version 1.17 and above
-    (advice-add 'executable-find :around #'pet-eglot--executable-find-advice))
+    (advice-add 'eglot-ensure :before #'pet-eglot--adjust-path-advice))
   (advice-add 'eglot--workspace-configuration-plist :around #'pet-eglot--workspace-configuration-plist-advice)
   (advice-add 'eglot--guess-contact :around #'pet-eglot--guess-contact-advice))
 
@@ -931,7 +939,7 @@ FN is `eglot--guess-contact', ARGS is the arguments to
       ;; Eglot version 1.16 or below
       (advice-remove 'eglot--executable-find #'pet-eglot--executable-find-advice)
     ;; Eglot version 1.17 and above
-    (advice-remove 'executable-find #'pet-eglot--executable-find-advice))
+    (advice-remove 'eglot-ensure #'pet-eglot--adjust-path-advice))
   (advice-remove 'eglot--workspace-configuration-plist #'pet-eglot--workspace-configuration-plist-advice)
   (advice-remove 'eglot--guess-contact #'pet-eglot--guess-contact-advice))
 
