@@ -76,10 +76,10 @@
 (use-package flymake
   :ensure nil
   :bind
-  (:map flymake-mode-map
+  ( :map flymake-mode-map
     ("C-c ! s" . flymake-start)
-    ("C-c ! l" . flymake-show-buffer-diagnostics) ; Emacs28
-    ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
+    ("C-c ! l" . flymake-show-buffer-diagnostics)      ; Emacs28
+    ("C-c ! L" . flymake-show-project-diagnostics)     ; Emacs28
     ("C-c ! n" . flymake-goto-next-error)
     ("C-c ! p" . flymake-goto-prev-error))
   :config
