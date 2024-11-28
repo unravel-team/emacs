@@ -3769,13 +3769,13 @@ Org agenda, in particular, provides commands to filter tasks by tag:
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
-;;;; tags
-(use-package org
-  :ensure nil
-  :config
-  (setq org-tag-alist nil)
-  (setq org-auto-align-tags nil)
-  (setq org-tags-column 0))
+  ;;;; tags
+  (use-package org
+    :ensure nil
+    :config
+    (setq org-tag-alist nil)
+    (setq org-auto-align-tags nil)
+    (setq org-tags-column 0))
 #+end_src
 
 ** The =unravel-org.el= Org time/state logging
