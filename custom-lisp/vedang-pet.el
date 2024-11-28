@@ -3,7 +3,7 @@
 ;; Author: Jimmy Yuen Ho Wong <wyuenho@gmail.com>
 ;; Maintainer: Jimmy Yuen Ho Wong <wyuenho@gmail.com>
 ;; Version: 3.1.0
-;; Package-Requires: ((emacs "26.3") (f "0.6.0") (map "3.3.1") (seq "2.24"))
+;; Package-Requires: ((emacs "26.1") (f "0.6.0") (map "3.3.1") (seq "2.24"))
 ;; Homepage: https://github.com/wyuenho/emacs-pet/
 ;; Keywords: tools
 
@@ -539,15 +539,6 @@ must both be installed into the current project first."
 
 
 
-(defun pet-eglot--adjust-path-advice (fn &rest args)
-  "Adjust paths before looking up Python language servers.
-
-FN is `executable-find' (Eglot 1.17+). ARGS is the arguments to FN."
-  (pcase-let ((`(,command . ,_) args))
-    (if (member command '("pylsp" "pyls" "basedpyright-langserver" "pyright-langserver" "jedi-language-server" "ruff-lsp"))
-        (pet-adjust-paths-executable-find command)
-      (apply fn args))))
-
 (defun pet--adjust-path (bin-dir)
   "Add BIN-DIR to the various places that `executable-find' looks at, when
 it looks for an executable."
@@ -785,18 +776,16 @@ default otherwise."
 
 
 (declare-function jsonrpc--process "ext:jsonrpc")
-(declare-function eglot--executable-find "ext:eglot")
 (declare-function eglot--workspace-configuration-plist "ext:eglot")
 (declare-function eglot--guess-contact "ext:eglot")
 
-(defun pet-eglot--executable-find-advice (fn &rest args)
-  "Look up Python language servers using `pet-executable-find'.
+(defun pet-eglot--adjust-path-advice (fn &rest args)
+  "Adjust paths before looking up Python language servers.
 
-FN is `eglot--executable-find', (Eglot 1.16 or below only). ARGS is the
-arguments to FN."
+FN is `eglot-ensure'. ARGS is the arguments to FN."
   (pcase-let ((`(,command . ,_) args))
     (if (member command '("pylsp" "pyls" "basedpyright-langserver" "pyright-langserver" "jedi-language-server" "ruff-lsp"))
-        (pet-executable-find command)
+        (pet-adjust-paths-executable-find command)
       (apply fn args))))
 
 (defun pet-lookup-eglot-server-initialization-options (command)
@@ -925,21 +914,13 @@ FN is `eglot--guess-contact', ARGS is the arguments to
 
 (defun pet-eglot-setup ()
   "Set up Eglot to use server executables and virtualenvs found by PET."
-  (if (fboundp 'eglot--executable-find)
-      ;; Eglot version 1.16 or below
-      (advice-add 'eglot--executable-find :around #'pet-eglot--executable-find-advice)
-    ;; Eglot version 1.17 and above
-    (advice-add 'eglot-ensure :before #'pet-eglot--adjust-path-advice))
+  (advice-add 'eglot-ensure :before #'pet-eglot--adjust-path-advice)
   (advice-add 'eglot--workspace-configuration-plist :around #'pet-eglot--workspace-configuration-plist-advice)
   (advice-add 'eglot--guess-contact :around #'pet-eglot--guess-contact-advice))
 
 (defun pet-eglot-teardown ()
   "Tear down PET advices to Eglot."
-  (if (fboundp 'eglot--executable-find)
-      ;; Eglot version 1.16 or below
-      (advice-remove 'eglot--executable-find #'pet-eglot--executable-find-advice)
-    ;; Eglot version 1.17 and above
-    (advice-remove 'eglot-ensure #'pet-eglot--adjust-path-advice))
+  (advice-remove 'eglot-ensure #'pet-eglot--adjust-path-advice)
   (advice-remove 'eglot--workspace-configuration-plist #'pet-eglot--workspace-configuration-plist-advice)
   (advice-remove 'eglot--guess-contact #'pet-eglot--guess-contact-advice))
 
