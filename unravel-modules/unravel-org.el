@@ -40,7 +40,7 @@
     ;; Create reminders for tasks with a due date when this file is read.
     (org-agenda-to-appt)))
 
-(use-package paragraphs
+(use-package emacs
   :ensure nil
   :config
   (setq sentence-end-double-space nil))

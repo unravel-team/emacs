@@ -3540,7 +3540,7 @@ done at a specific time, such as coaching sessions ([[#h:f8f06938-0dfe-45c3-b4cf
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
-  (use-package paragraphs
+  (use-package emacs
     :ensure nil
     :config
     (setq sentence-end-double-space nil))
@@ -4979,7 +4979,7 @@ NOTE: All these settings are being added after the provide form, which is a big 
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
-  (use-package startup
+  (use-package emacs
     :ensure nil
     :config
     (setq user-mail-address "vedang@unravel.tech"))
