@@ -3002,9 +3002,15 @@ best changes I ever did to boost my productivity:
 + Backronym: Buffers Encapsulated in Frames Realise Advanced
   Management of Emacs.
 
-I add ~beframe~ as a source for ~consult-buffers~. This code comes from the ~beframe~ manual and lets me look at frame-specific buffers first when using ~consult-buffer~ (=M-s M-b=) ([[#h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d][The =unravel-completion.el= settings for ~consult~]])
+Some notes on how I use beframe:
 
-I replace the default =C-x b= (~switch-to-buffer~) with the beframe'd version of the same command, because this lets me focus on the buffers in the current frame, which is what I generally want. When I need to access everything, I use the consult version of the command as mentioned above.
+- I add ~beframe~ as a source for ~consult-buffers~.
+  + This code comes from the ~beframe~ manual and lets me look at frame-specific buffers first when using ~consult-buffer~ (=M-s M-b=) ([[#h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d][The =unravel-completion.el= settings for ~consult~]])
+- I replace the default =C-x b= (~switch-to-buffer~) with the beframe'd version of the same command.
+  + This lets me focus on the buffers in the current frame, which is what I generally want. When I need to access files or buffers which are not open yet, I use either:
+    - The consult version of the command (=M-s M-b=)
+    - ~project.el~ to find a file in the current project (=C-x p f=)
+- When I am done with the frame, I delete all the buffers in the frame using ~beframe-kill-buffers-matching-regexp~ (=C-c b k=) with regex ~*~. This automatically kills the frame.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-window.el"
   ;;; Frame-isolated buffers
