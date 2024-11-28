@@ -29,7 +29,7 @@
 (use-package eglot
   :ensure nil
   :demand t ; Not a mistake, we need to load Eglot elisp code before
-                                        ; we open any Python file.
+            ; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind
@@ -78,8 +78,8 @@
   :bind
   ( :map flymake-mode-map
     ("C-c ! s" . flymake-start)
-    ("C-c ! l" . flymake-show-buffer-diagnostics)      ; Emacs28
-    ("C-c ! L" . flymake-show-project-diagnostics)     ; Emacs28
+    ("C-c ! l" . flymake-show-buffer-diagnostics)  ; Emacs28
+    ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
     ("C-c ! n" . flymake-goto-next-error)
     ("C-c ! p" . flymake-goto-prev-error))
   :config
@@ -171,9 +171,6 @@
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
     ("C-c d j" . denote-journal-extras-new-entry)
     ("C-c d s" . denote-sort-dired)
-    ;; Bindings to personal functions (defined below)
-    ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
-    ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry)
     :map text-mode-map
     ("C-c d B" . denote-backlinks)
     ("C-c d b" . denote-find-backlink)
@@ -203,7 +200,7 @@
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
   (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)
-  (setq denote-date-format nil) ; read its doc string
+  (setq denote-date-format nil)         ; read its doc string
   (setq denote-date-prompt-use-org-read-date t)
   (setq denote-prompts '(title keywords subdirectory signature))
 
@@ -230,99 +227,118 @@
   (add-to-list 'denote-templates '(insight . "insight"))
   (add-to-list 'denote-templates '(weekly_intentions . "weekint"))
   (add-to-list 'denote-templates '(weekly_report . "weekrpt"))
-  (add-to-list 'denote-templates '(checkin . "checkin"))
+  (add-to-list 'denote-templates '(sketch . "sketch"))
 
   ;; Front-matter for Org files
   (setq denote-org-front-matter
         ":PROPERTIES:
-:ID: %4$s
-:CREATED: %2$s
-:END:
-#+title:      %1$s
-#+filetags:   %3$s
-#+date:       %2$s
-#+identifier: %4$s
-\n")
+  :ID: %4$s
+  :CREATED: %2$s
+  :END:
+  #+title:      %1$s
+  #+filetags:   %3$s
+  #+date:       %2$s
+  #+identifier: %4$s
+  \n"))
 
-  (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
-    "Create a new microblog entry.
-Set the title of the new entry according to the value of the user option
-`denote-journal-extras-title-format'.
+(defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
+  "Create a new blog entry.
 
-With optional DATE as a prefix argument, prompt for a date.  If
-`denote-date-prompt-use-org-read-date' is non-nil, use the Org
-date selection module.
+  With optional DATE as a prefix argument, prompt for a date.  If
+  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
+  date selection module.
 
-When called from Lisp DATE is a string and has the same format as
-that covered in the documentation of the `denote' function.  It
-is internally processed by `denote-parse-date'."
-    (interactive (list (when current-prefix-arg (denote-date-prompt))))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-journal-extras-daily--title-format internal-date)
-       '("draft" "microblog")
-       nil nil date
-       ;; See YASnippet
-       "microblog")))
+  When called from Lisp DATE is a string and has the same format as
+  that covered in the documentation of the `denote' function.  It
+  is internally processed by `denote-parse-date'."
+  (interactive (list (when current-prefix-arg (denote-date-prompt))))
+  (let ((internal-date (denote-parse-date date))
+        (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+    (denote
+     (denote-title-prompt)
+     '("draft")
+     nil nil date
+     ;; See YASnippet
+     "fullblog")))
 
-  (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
-    "Create a new blog entry.
+(defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
+  "Create a new microblog entry.
+  Set the title of the new entry according to the value of the user option
+  `denote-journal-extras-title-format'.
 
-With optional DATE as a prefix argument, prompt for a date.  If
-`denote-date-prompt-use-org-read-date' is non-nil, use the Org
-date selection module.
+  With optional DATE as a prefix argument, prompt for a date.  If
+  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
+  date selection module.
 
-When called from Lisp DATE is a string and has the same format as
-that covered in the documentation of the `denote' function.  It
-is internally processed by `denote-parse-date'."
-    (interactive (list (when current-prefix-arg (denote-date-prompt))))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-title-prompt)
-       '("draft")
-       nil nil date
-       ;; See YASnippet
-       "fullblog")))
+  When called from Lisp DATE is a string and has the same format as
+  that covered in the documentation of the `denote' function.  It
+  is internally processed by `denote-parse-date'."
+  (interactive (list (when current-prefix-arg (denote-date-prompt))))
+  (let ((internal-date (denote-parse-date date))
+        (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+    (denote
+     (denote-journal-extras-daily--title-format internal-date)
+     '("draft" "microblog")
+     nil nil date
+     ;; See YASnippet
+     "microblog")))
 
-  (defun vedang/denote-link-ol-get-id ()
-    "Get the CUSTOM_ID of the current entry.
-If the entry already has a CUSTOM_ID, return it as-is, else
-create a new one."
-    (interactive)
-    (let* ((pos (point))
-           (id (org-entry-get pos "CUSTOM_ID")))
-      (if (and (stringp id) (string-match-p "\\S-" id))
-          id
-        (setq id (org-id-new "h"))
-        (org-entry-put pos "CUSTOM_ID" id)
-        id)))
+(defun vedang/denote-link-ol-get-id ()
+  "Get the CUSTOM_ID of the current entry.
 
-  (defun vedang/denote--split-luhman-sig (signature)
-    "Split numbers and letters in Luhmann-style SIGNATURE string."
-    (replace-regexp-in-string
-     "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
-     (replace-regexp-in-string
-      "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
-      signature)))
+If the entry already has a CUSTOM_ID, return it as-is, else create a new
+one.
 
-  (defun vedang/denote--pad-sig (signature)
-    "Create a new signature with padded spaces for all components"
-    (combine-and-quote-strings
-     (mapcar
-      (lambda (x)
-        (string-pad x 5 32 t))
-      (split-string (vedang/denote--split-luhman-sig signature) "=" t))
-     "="))
+If we are creating a new ID, add a CREATED property with the current
+timestamp as well.
 
-  (defun vedang/denote-sort-for-signatures (sig1 sig2)
-    "Return non-nil if SIG1 is smaller that SIG2.
-Perform the comparison with `string<'."
-    (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
+This function is based on `denote-link-ol-get-id', with minor
+modifications."
+  (interactive)
+  (let* ((pos (point))
+         (id (org-entry-get pos "CUSTOM_ID"))
+         (created (org-entry-get pos "CREATED")))
+    (if (and (stringp id) (string-match-p "\\S-" id))
+        id
+      (setq id (org-id-new "h"))
+      (org-entry-put pos "CUSTOM_ID" id))
+    (when (not created)
+      (setq created (format-time-string (org-time-stamp-format t t) (current-time)))
+      (org-entry-put pos "CREATED" created))
+    id))
 
-  (setq denote-sort-signature-comparison-function
-        #'vedang/denote-sort-for-signatures))
+(defun vedang/denote--split-luhman-sig (signature)
+  "Split numbers and letters in Luhmann-style SIGNATURE string."
+  (replace-regexp-in-string
+   "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
+   (replace-regexp-in-string
+    "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
+    signature)))
+
+(defun vedang/denote--pad-sig (signature)
+  "Create a new signature with padded spaces for all components"
+  (combine-and-quote-strings
+   (mapcar
+    (lambda (x)
+      (string-pad x 5 32 t))
+    (split-string (vedang/denote--split-luhman-sig signature) "=" t))
+   "="))
+
+(defun vedang/denote-sort-for-signatures (sig1 sig2)
+  "Return non-nil if SIG1 is smaller that SIG2.
+
+  Perform the comparison with `string<'."
+  (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
+
+(use-package denote
+  :ensure t
+  :bind
+  ( :map global-map
+    ;; Bindings to personal functions (defined above)
+    ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
+    ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry))
+  :config
+  (setq denote-sort-signature-comparison-function #'vedang/denote-sort-for-signatures))
 
 (use-package consult-denote
   :ensure t
@@ -373,9 +389,18 @@ Perform the comparison with `string<'."
           '(ruff-isort ruff)))
   (with-eval-after-load 'eglot
     (require 'vedang-pet)
+    ;; The -10 here is a way to define the priority of the function in
+    ;; the list of hook functions. We want `pet-mode' to run before
+    ;; any other configured hook function.
     (add-hook 'python-base-mode-hook #'pet-mode -10)))
 
+;;;; Configuration for Zig Programming
+
 (use-package zig-mode
-  :ensure t)
+  :ensure t
+;;; Uncomment this if you want Eglot to start automatically. I don't
+;;; recommend it, but that's just me.
+  ;; :hook ((zig-mode . eglot-ensure))
+  )
 
 (provide 'unravel-langs)
