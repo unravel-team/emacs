@@ -4895,7 +4895,33 @@ If you want to start the language server automatically you need to:
     (auto-virtualenv-setup))
 #+end_src
 
+** The =unravel-langs.el= section for Ziglang
+:PROPERTIES:
+:CUSTOM_ID: h:4C1D1E7E-7FA1-4D76-A6CF-6D89A10376B6
+:CREATED: [2024-11-27 Wed 22:51]
+:END:
+
+I use the Emacs major mode ~zig-mode~, along with the Ziglang langauge server ~zls~ (via ~eglot~) for all my Zig programming requirements
+
+To install ~zig~ and ~zls~ on MacOS:
+
+=brew install zig zls=
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Configuration for Zig Programming
+
+  (use-package zig-mode
+    :ensure t
+  ;;; Uncomment this if you want Eglot to start automatically. I don't
+  ;;; recommend it, but that's just me.
+    ;; :hook ((zig-mode . eglot-ensure))
+    )
+#+end_src
+
 ** Finally, we provide the =unravel-langs.el= module
+:PROPERTIES:
+:CUSTOM_ID: h:924224F1-61A0-4CCD-A3C3-4F230D3CF0A0
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
 (provide 'unravel-langs)

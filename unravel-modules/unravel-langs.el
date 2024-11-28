@@ -375,4 +375,7 @@ Perform the comparison with `string<'."
     (require 'vedang-pet)
     (add-hook 'python-base-mode-hook #'pet-mode -10)))
 
+(use-package zig-mode
+  :ensure t)
+
 (provide 'unravel-langs)
