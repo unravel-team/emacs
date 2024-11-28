@@ -3611,10 +3611,7 @@ on how I use Org.
       ("M-." . org-edit-special) ; alias for C-c ' (mnenomic is global M-. that goes to source)
       :map org-src-mode-map
       ("M-," . org-edit-src-exit) ; see M-. above
-      :map narrow-map
-      ("b" . org-narrow-to-block)
-      ("e" . org-narrow-to-element)
-      ("s" . org-narrow-to-subtree))
+      )
     :config
   ;;;; general settings
     (setq org-ellipsis "...")
@@ -3668,6 +3665,29 @@ on how I use Org.
     (defvar org-archive-directory (concat org-directory "/archive")
       "Directory under which all archived content is stored.")
     (setq org-archive-location (concat org-archive-directory "/%s_archive::")))
+#+end_src
+
+** The =unravel-org.el= section for narrowing and folding
+:PROPERTIES:
+:CUSTOM_ID: h:D11C6331-86BB-466D-AF65-A2A50F49A808
+:CREATED: [2024-11-28 Thu 15:55]
+:END:
+Narrowing and folding are really powerful ways of working with org-mode, since we tend to create so many nodes and subtrees when we write documents in Org
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  ;;; Narrowing and Folding
+  (use-package org
+    :ensure nil
+    :bind
+    ( :map narrow-map
+      ("b" . org-narrow-to-block)
+      ("e" . org-narrow-to-element)
+      ("s" . org-narrow-to-subtree)))
+
+  (use-package org-fold
+    :ensure nil
+    :config
+    (setq org-fold-catch-invisible-edits 'show-and-error))
 #+end_src
 ** The =unravel-org.el= Org to-do and refile settings
 :PROPERTIES:
