@@ -9,3 +9,4 @@ eln-cache/
 transient/
 .org-id-locations
 ielm-history.eld
+multisession/
