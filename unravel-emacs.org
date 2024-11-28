@@ -3653,6 +3653,22 @@ on how I use Org.
     (setq org-priority-faces nil))
 #+end_src
 
+** The =unravel-org.el= section for archival settings
+:PROPERTIES:
+:CUSTOM_ID: h:119A0C7D-03E1-41D0-AC98-F14FD92245F1
+:CREATED: [2024-11-28 Thu 11:46]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  ;;;; archival, org-archive
+  (use-package org
+    :ensure nil
+    :config
+    ;; Setup directory and file paths for org
+    (defvar org-archive-directory (concat org-directory "/archive")
+      "Directory under which all archived content is stored.")
+    (setq org-archive-location (concat org-archive-directory "/%s_archive::")))
+#+end_src
 ** The =unravel-org.el= Org to-do and refile settings
 :PROPERTIES:
 :CUSTOM_ID: h:024dd541-0061-4a10-b10b-b17dcd4794b9
