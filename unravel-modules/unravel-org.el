@@ -404,8 +404,6 @@
   ;;   (setq org-habit-show-all-today t)
   )
 
-(provide 'unravel-org)
-
 ;;;; org-capture
 (use-package org-capture
   :ensure nil
@@ -718,3 +716,6 @@
           :clock-resume t
           :immediate-finish t)
         org-capture-templates))
+
+(provide 'unravel-org)
+

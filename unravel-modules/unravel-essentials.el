@@ -196,9 +196,10 @@ If the region is selected, retain the original behaviour, otherwise call
   :config
   (setq column-number-mode t))
 
-(provide 'unravel-essentials)
 
 (use-package startup
   :ensure nil
   :config
   (setq user-mail-address "vedang@unravel.tech"))
+
+(provide 'unravel-essentials)

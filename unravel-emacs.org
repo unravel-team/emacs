@@ -4970,6 +4970,14 @@ To install ~zig~ and ~zls~ on MacOS:
 :END:
 I want this section to contain all the personal configuration that anyone using this repo should modify. But I don't know how to do this properly at the moment, so just noting things here until then.
 
+NOTE: All these settings are being added after the provide form, which is a big no-no. I don't know how to fix this at the moment.
+
+** My personal user settings
+:PROPERTIES:
+:CUSTOM_ID: h:9757A878-D383-47F4-94FD-98374954F83A
+:CREATED:  [2024-11-28 Thu 16:19]
+:END:
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   (use-package startup
     :ensure nil
@@ -4979,6 +4987,10 @@ I want this section to contain all the personal configuration that anyone using 
 #+end_src
 
 ** My personal settings for ~org-capture~
+:PROPERTIES:
+:CUSTOM_ID: h:12636C22-D561-4726-8B37-10BD21737D54
+:CREATED:  [2024-11-28 Thu 16:20]
+:END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
   ;;;; org-capture
