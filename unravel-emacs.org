@@ -4804,35 +4804,92 @@ Prot is the developer of this package.
 :CREATED: [2024-11-21 Thu 22:51]
 :END:
 
-The built-in Python mode for Emacs goes a long way. We build minimal tooling around this mode, specifically to support ~eglot~ and Python's virtualenv system.
+The built-in Python mode for Emacs goes a long way. I use the following stack when programming Python:
 
-Run the following commands to make sure you have the developer dependencies installed globally:
+- =poetry= for package and venv management
+- =pylsp= as the language server
+- =ruff= as the linting and formatting tool
 
-- =pipx= : Installed by =brew install pipx=
-- =ruff= : An extremely fast Python linter, and code formatter, written in Rust. Installed by  =pipx install ruff=
-  - Ruff is also a langauge server, but it only provides functionality related to formating and linting. As it adds more over time (like go-to definition), I may make it my primary language server
-- =pylsp= : The defacto language server for Python. Install with =pipx install python-lsp-server=
+Run the following commands in every virtualenv environment to setup the necessary developer tooling:
+
+- =poetry add ruff python-lsp-server python-lsp-ruff --group dev=
+  + Ruff is an extremely fast Python linter, and code formatter, written in Rust. Ruff is also a langauge server, but it only provides functionality related to formating and linting. As it adds more over time (like go-to definition), I may make it my primary language server
+  + Python LSP Server (provides the binary ~pylsp~) is the defacto language server for Python.
+  + =python-lsp-ruff= provides tight integration between ~pylsp~ and ~ruff~, enabling the language server to use ruff for it's linting and formatting capabilities.
+- =poetry add pytest --group test=
+
+Poetry takes care of setting up the venv properly, so if you replace the default commands with poetry versions, you are good to go. In practice, this means:
+
+- Use ~C-u C-c C-p~ command (=run-python=, with an argument) to start the Inferior Python Shell, instead of ~C-c C-p~.
+  - This will prompt you for a command, with the default value being =python3 -i=. Change it to =poetry run python3 -i=.
+- Modify the ~C-c C-v~ command (=python-check=) to =poetry run ruff check <filename>=
+
+I run ~eglot~ on demand, that is, I do not start a language server automatically when I open a Python file. This ensures that ~emacs-pet~ can setup the venv for the project and use executables only from the virtualenv. (Note: We also setup the ~emacs-pet~ hook to be the first thing that runs when python mode is activated, so automatically starting ~eglot~ by uncommenting the ~eglot-ensure~ hook below should also work. But running manually is just how I prefer it.)
+
+If you want to start the language server automatically you need to:
+
+- Install ~python-language-server~ and ~ruff~ globally, so that it's always available to Emacs.
+  - =brew install pipx=
+  - =pipx install ruff python-language-server=
+- Uncomment the ~:hook~ in the Python ~use-package~ form below
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Configuration for Python Programming
 
   (use-package python
     :ensure nil
-    :hook
-    ((python-ts-mode . eglot-ensure)
-     (python-mode . eglot-ensure))
+    :ensure-system-package (dasel sqlite3)
+  ;;; Uncomment this if you want Eglot to start automatically. I don't
+  ;;; recommend it because it does not give you time to activate the
+  ;;; appropriate VirtualEnv and get the best of the situation.
+    ;; :hook ((python-base-mode . eglot-ensure))
     :config
-    (setq python-shell-dedicated 'project))
+    (setq python-shell-dedicated 'project)
+    ;; Apheleia is an Emacs package for formatting code as you save
+    ;; it. Here we are asking Apheleia to use Ruff for formatting our
+    ;; Python code.
+    (with-eval-after-load 'apheleia
+      (setf (alist-get 'python-mode apheleia-mode-alist)
+            '(ruff-isort ruff))
+      (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+            '(ruff-isort ruff)))
+    (with-eval-after-load 'eglot
+      (require 'vedang-pet)
+      ;; The -10 here is a way to define the priority of the function in
+      ;; the list of hook functions. We want `pet-mode' to run before
+      ;; any other configured hook function.
+      (add-hook 'python-base-mode-hook #'pet-mode -10)))
+#+end_src
 
+*** Tooling I have tried and rejected or failed to setup correctly
+:PROPERTIES:
+:CUSTOM_ID: h:AA769AC9-18D9-4971-81C9-8DF7AD920013
+:END:
+
+- Auto-virtualenv: For virtualenv setup and detection
+- Pyvenv's WORKON_HOME: WORKON_HOME is useful if you keep all your venvs in the same directory. This is not generally what most people do.
+  - Config: ~(setenv "WORKON_HOME" "~/.cache/venvs/")~
+
+#+begin_src emacs-lisp
   (use-package pyvenv
     :ensure t
+    :after python
     :commands (pyvenv-create pyvenv-workon pyvenv-activate pyvenv-deactivate)
+    :hook
+    ((python-base-mode . pyvenv-mode)))
+
+  (use-package pet ;; Python Environment Tracker
+    :ensure t
+    :after (python eglot)
+    :ensure-system-package (dasel sqlite3)
     :config
-    (setenv "WORKON_HOME" "~/.cache/venvs/")
-    (pyvenv-tracking-mode 1))
+    ;; We use `add-hook' instead of :hook to be able to specify the -10
+    ;; (call as early as possible)
+    (add-hook 'python-base-mode-hook #'pet-mode -10))
 
   (use-package auto-virtualenv
     :ensure t
+    :after python
     :config
     (setq auto-virtualenv-verbose t)
     (auto-virtualenv-setup))

@@ -356,16 +356,23 @@ Perform the comparison with `string<'."
 
 (use-package python
   :ensure nil
-  :hook ((python-base-mode . eglot-ensure))
+  :ensure-system-package (dasel sqlite3)
+;;; Uncomment this if you want Eglot to start automatically. I don't
+;;; recommend it because it does not give you time to activate the
+;;; appropriate VirtualEnv and get the best of the situation.
+  ;; :hook ((python-base-mode . eglot-ensure))
   :config
-  (setq python-shell-dedicated 'project))
-
-(use-package pyvenv
-  :ensure t
-  :after python
-  :commands (pyvenv-create pyvenv-workon pyvenv-activate pyvenv-deactivate)
-  :config
-  (setenv "WORKON_HOME" "~/.cache/venvs/")
-  (pyvenv-tracking-mode 1))
+  (setq python-shell-dedicated 'project)
+  ;; Apheleia is an Emacs package for formatting code as you save
+  ;; it. Here we are asking Apheleia to use Ruff for formatting our
+  ;; Python code.
+  (with-eval-after-load 'apheleia
+    (setf (alist-get 'python-mode apheleia-mode-alist)
+          '(ruff-isort ruff))
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist)
+          '(ruff-isort ruff)))
+  (with-eval-after-load 'eglot
+    (require 'vedang-pet)
+    (add-hook 'python-base-mode-hook #'pet-mode -10)))
 
 (provide 'unravel-langs)
