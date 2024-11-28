@@ -15,7 +15,8 @@
   (setq kill-do-not-save-duplicates t)
   (setq scroll-error-top-bottom t)
   (setq echo-keystrokes-help t) ; Emacs 30
-  (setq epa-keys-select-method 'minibuffer)) ; Emacs 30
+  (setq epa-keys-select-method 'minibuffer) ; Emacs 30
+  (setq debug-on-error t))
 
 (use-package exec-path-from-shell
   :ensure t
