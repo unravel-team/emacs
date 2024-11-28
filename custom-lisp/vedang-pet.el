@@ -914,7 +914,7 @@ FN is `eglot--guess-contact', ARGS is the arguments to
 
 (defun pet-eglot-setup ()
   "Set up Eglot to use server executables and virtualenvs found by PET."
-  (advice-add 'eglot-ensure :before #'pet-eglot--adjust-path-advice)
+  (advice-add 'eglot-ensure :around #'pet-eglot--adjust-path-advice)
   (advice-add 'eglot--workspace-configuration-plist :around #'pet-eglot--workspace-configuration-plist-advice)
   (advice-add 'eglot--guess-contact :around #'pet-eglot--guess-contact-advice))
 
