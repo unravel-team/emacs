@@ -28,6 +28,8 @@
 ;;;; Eglot (built-in client for the language server protocol)
 (use-package eglot
   :ensure nil
+  :demand t ; Not a mistake, we need to load Eglot elisp code before
+                                        ; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind

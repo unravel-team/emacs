@@ -4289,10 +4289,14 @@ automatically for every newly visited file, add a hook like this:
 
 I use ~eglot~ as the main LSP entry point, and as such, I have key-bindings for the common functionality implemented by ~eglot~.
 
+Note that demanding ~eglot~ is not a mistake. I want it loaded so that I can advice functions for different programming langauges. For example, Python uses ~emacs-pet~ for tracking the environment of each project, and this needs to load after ~eglot~ so that it can advice the necessary functions.
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Eglot (built-in client for the language server protocol)
   (use-package eglot
     :ensure nil
+    :demand t ; Not a mistake, we need to load Eglot elisp code before
+              ; we open any Python file.
     :functions (eglot-ensure)
     :commands (eglot)
     :bind
