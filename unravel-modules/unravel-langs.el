@@ -266,8 +266,8 @@ is internally processed by `denote-parse-date'."
        ;; See YASnippet
        "microblog")))
 
-(defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
-  "Create a new blog entry.
+  (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
+    "Create a new blog entry.
 
 With optional DATE as a prefix argument, prompt for a date.  If
 `denote-date-prompt-use-org-read-date' is non-nil, use the Org
@@ -276,53 +276,53 @@ date selection module.
 When called from Lisp DATE is a string and has the same format as
 that covered in the documentation of the `denote' function.  It
 is internally processed by `denote-parse-date'."
-  (interactive (list (when current-prefix-arg (denote-date-prompt))))
-  (let ((internal-date (denote-parse-date date))
-        (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-    (denote
-     (denote-title-prompt)
-     '("draft")
-     nil nil date
-     ;; See YASnippet
-     "fullblog")))
+    (interactive (list (when current-prefix-arg (denote-date-prompt))))
+    (let ((internal-date (denote-parse-date date))
+          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+      (denote
+       (denote-title-prompt)
+       '("draft")
+       nil nil date
+       ;; See YASnippet
+       "fullblog")))
 
-(defun vedang/denote-link-ol-get-id ()
-  "Get the CUSTOM_ID of the current entry.
+  (defun vedang/denote-link-ol-get-id ()
+    "Get the CUSTOM_ID of the current entry.
 If the entry already has a CUSTOM_ID, return it as-is, else
 create a new one."
-  (interactive)
-  (let* ((pos (point))
-         (id (org-entry-get pos "CUSTOM_ID")))
-    (if (and (stringp id) (string-match-p "\\S-" id))
-        id
-      (setq id (org-id-new "h"))
-      (org-entry-put pos "CUSTOM_ID" id)
-      id)))
+    (interactive)
+    (let* ((pos (point))
+           (id (org-entry-get pos "CUSTOM_ID")))
+      (if (and (stringp id) (string-match-p "\\S-" id))
+          id
+        (setq id (org-id-new "h"))
+        (org-entry-put pos "CUSTOM_ID" id)
+        id)))
 
-(defun vedang/denote--split-luhman-sig (signature)
-  "Split numbers and letters in Luhmann-style SIGNATURE string."
-  (replace-regexp-in-string
-   "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
-   (replace-regexp-in-string
-    "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
-    signature)))
+  (defun vedang/denote--split-luhman-sig (signature)
+    "Split numbers and letters in Luhmann-style SIGNATURE string."
+    (replace-regexp-in-string
+     "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
+     (replace-regexp-in-string
+      "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
+      signature)))
 
-(defun vedang/denote--pad-sig (signature)
-  "Create a new signature with padded spaces for all components"
-  (combine-and-quote-strings
-   (mapcar
-    (lambda (x)
-      (string-pad x 5 32 t))
-    (split-string (vedang/denote--split-luhman-sig signature) "=" t))
-   "="))
+  (defun vedang/denote--pad-sig (signature)
+    "Create a new signature with padded spaces for all components"
+    (combine-and-quote-strings
+     (mapcar
+      (lambda (x)
+        (string-pad x 5 32 t))
+      (split-string (vedang/denote--split-luhman-sig signature) "=" t))
+     "="))
 
-(defun vedang/denote-sort-for-signatures (sig1 sig2)
-  "Return non-nil if SIG1 is smaller that SIG2.
+  (defun vedang/denote-sort-for-signatures (sig1 sig2)
+    "Return non-nil if SIG1 is smaller that SIG2.
 Perform the comparison with `string<'."
-  (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
+    (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
 
-(setq denote-sort-signature-comparison-function
-      #'vedang/denote-sort-for-signatures))
+  (setq denote-sort-signature-comparison-function
+        #'vedang/denote-sort-for-signatures))
 
 (use-package consult-denote
   :ensure t

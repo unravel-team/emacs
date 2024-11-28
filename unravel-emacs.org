@@ -4561,9 +4561,6 @@ Prot is the developer and maintainer of this package.
       ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
       ("C-c d j" . denote-journal-extras-new-entry)
       ("C-c d s" . denote-sort-dired)
-      ;; Bindings to personal functions (defined below)
-      ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
-      ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry)
       :map text-mode-map
       ("C-c d B" . denote-backlinks)
       ("C-c d b" . denote-find-backlink)
@@ -4593,7 +4590,7 @@ Prot is the developer and maintainer of this package.
     (setq denote-infer-keywords t)
     (setq denote-sort-keywords t)
     (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)
-    (setq denote-date-format nil) ; read its doc string
+    (setq denote-date-format nil)         ; read its doc string
     (setq denote-date-prompt-use-org-read-date t)
     (setq denote-prompts '(title keywords subdirectory signature))
 
@@ -4620,52 +4617,30 @@ Prot is the developer and maintainer of this package.
     (add-to-list 'denote-templates '(insight . "insight"))
     (add-to-list 'denote-templates '(weekly_intentions . "weekint"))
     (add-to-list 'denote-templates '(weekly_report . "weekrpt"))
-    (add-to-list 'denote-templates '(checkin . "checkin"))
+    (add-to-list 'denote-templates '(sketch . "sketch"))
 
     ;; Front-matter for Org files
     (setq denote-org-front-matter
           ":PROPERTIES:
-  :ID: %4$s
-  :CREATED: %2$s
-  :END:
-  ,#+title:      %1$s
-  ,#+filetags:   %3$s
-  ,#+date:       %2$s
-  ,#+identifier: %4$s
-  \n")
-
-    (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
-      "Create a new microblog entry.
-  Set the title of the new entry according to the value of the user option
-  `denote-journal-extras-title-format'.
-
-  With optional DATE as a prefix argument, prompt for a date.  If
-  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
-  date selection module.
-
-  When called from Lisp DATE is a string and has the same format as
-  that covered in the documentation of the `denote' function.  It
-  is internally processed by `denote-parse-date'."
-      (interactive (list (when current-prefix-arg (denote-date-prompt))))
-      (let ((internal-date (denote-parse-date date))
-            (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-        (denote
-         (denote-journal-extras-daily--title-format internal-date)
-         '("draft" "microblog")
-         nil nil date
-         ;; See YASnippet
-         "microblog")))
+    :ID: %4$s
+    :CREATED: %2$s
+    :END:
+    ,#+title:      %1$s
+    ,#+filetags:   %3$s
+    ,#+date:       %2$s
+    ,#+identifier: %4$s
+    \n"))
 
   (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
     "Create a new blog entry.
 
-  With optional DATE as a prefix argument, prompt for a date.  If
-  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
-  date selection module.
+    With optional DATE as a prefix argument, prompt for a date.  If
+    `denote-date-prompt-use-org-read-date' is non-nil, use the Org
+    date selection module.
 
-  When called from Lisp DATE is a string and has the same format as
-  that covered in the documentation of the `denote' function.  It
-  is internally processed by `denote-parse-date'."
+    When called from Lisp DATE is a string and has the same format as
+    that covered in the documentation of the `denote' function.  It
+    is internally processed by `denote-parse-date'."
     (interactive (list (when current-prefix-arg (denote-date-prompt))))
     (let ((internal-date (denote-parse-date date))
           (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
@@ -4676,18 +4651,51 @@ Prot is the developer and maintainer of this package.
        ;; See YASnippet
        "fullblog")))
 
+  (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
+    "Create a new microblog entry.
+    Set the title of the new entry according to the value of the user option
+    `denote-journal-extras-title-format'.
+
+    With optional DATE as a prefix argument, prompt for a date.  If
+    `denote-date-prompt-use-org-read-date' is non-nil, use the Org
+    date selection module.
+
+    When called from Lisp DATE is a string and has the same format as
+    that covered in the documentation of the `denote' function.  It
+    is internally processed by `denote-parse-date'."
+    (interactive (list (when current-prefix-arg (denote-date-prompt))))
+    (let ((internal-date (denote-parse-date date))
+          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+      (denote
+       (denote-journal-extras-daily--title-format internal-date)
+       '("draft" "microblog")
+       nil nil date
+       ;; See YASnippet
+       "microblog")))
+
   (defun vedang/denote-link-ol-get-id ()
     "Get the CUSTOM_ID of the current entry.
-  If the entry already has a CUSTOM_ID, return it as-is, else
-  create a new one."
+
+  If the entry already has a CUSTOM_ID, return it as-is, else create a new
+  one.
+
+  If we are creating a new ID, add a CREATED property with the current
+  timestamp as well.
+
+  This function is based on `denote-link-ol-get-id', with minor
+  modifications."
     (interactive)
     (let* ((pos (point))
-           (id (org-entry-get pos "CUSTOM_ID")))
+           (id (org-entry-get pos "CUSTOM_ID"))
+           (created (org-entry-get pos "CREATED")))
       (if (and (stringp id) (string-match-p "\\S-" id))
           id
         (setq id (org-id-new "h"))
-        (org-entry-put pos "CUSTOM_ID" id)
-        id)))
+        (org-entry-put pos "CUSTOM_ID" id))
+      (when (not created)
+        (setq created (format-time-string (org-time-stamp-format t t) (current-time)))
+        (org-entry-put pos "CREATED" created))
+      id))
 
   (defun vedang/denote--split-luhman-sig (signature)
     "Split numbers and letters in Luhmann-style SIGNATURE string."
@@ -4708,11 +4716,19 @@ Prot is the developer and maintainer of this package.
 
   (defun vedang/denote-sort-for-signatures (sig1 sig2)
     "Return non-nil if SIG1 is smaller that SIG2.
-  Perform the comparison with `string<'."
+
+    Perform the comparison with `string<'."
     (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
 
-  (setq denote-sort-signature-comparison-function
-        #'vedang/denote-sort-for-signatures))
+  (use-package denote
+    :ensure t
+    :bind
+    ( :map global-map
+      ;; Bindings to personal functions (defined above)
+      ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
+      ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry))
+    :config
+    (setq denote-sort-signature-comparison-function #'vedang/denote-sort-for-signatures))
 #+end_src
 
 *** The =unravel-langs.el= integration between Consult and Denote (~consult-denote~)
@@ -4785,6 +4801,7 @@ Prot is the developer of this package.
 ** The =unravel-langs.el= section for Python
 :PROPERTIES:
 :CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618
+:CREATED: [2024-11-21 Thu 22:51]
 :END:
 
 The built-in Python mode for Emacs goes a long way. We build minimal tooling around this mode, specifically to support ~eglot~ and Python's virtualenv system.
