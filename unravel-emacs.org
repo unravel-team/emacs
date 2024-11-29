@@ -4861,15 +4861,6 @@ Poetry takes care of setting up the venv properly, so if you replace the default
   - This will prompt you for a command, with the default value being =python3 -i=. Change it to =poetry run python3 -i=.
 - Modify the ~C-c C-v~ command (=python-check=) to =poetry run ruff check <filename>=
 
-I run ~eglot~ on demand, that is, I do not start a language server automatically when I open a Python file. This ensures that ~emacs-pet~ can setup the venv for the project and use executables only from the virtualenv. (Note: We also setup the ~emacs-pet~ hook to be the first thing that runs when python mode is activated, so automatically starting ~eglot~ by uncommenting the ~eglot-ensure~ hook below should also work. But running manually is just how I prefer it.)
-
-If you want to start the language server automatically you need to:
-
-- Install ~python-language-server~ and ~ruff~ globally, so that it's always available to Emacs.
-  - =brew install pipx=
-  - =pipx install ruff python-language-server=
-- Uncomment the ~:hook~ in the Python ~use-package~ form below
-
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Configuration for Python Programming
 
@@ -4879,7 +4870,7 @@ If you want to start the language server automatically you need to:
   ;;; Uncomment this if you want Eglot to start automatically. I don't
   ;;; recommend it because it does not give you time to activate the
   ;;; appropriate VirtualEnv and get the best of the situation.
-    ;; :hook ((python-base-mode . eglot-ensure))
+    :hook ((python-base-mode . eglot-ensure))
     :config
     (setq python-shell-dedicated 'project)
     ;; Apheleia is an Emacs package for formatting code as you save
@@ -4951,8 +4942,7 @@ To install ~zig~ and ~zls~ on MacOS:
     :ensure t
   ;;; Uncomment this if you want Eglot to start automatically. I don't
   ;;; recommend it, but that's just me.
-    ;; :hook ((zig-mode . eglot-ensure))
-    )
+    :hook ((zig-mode . eglot-ensure)))
 #+end_src
 
 ** Finally, we provide the =unravel-langs.el= module

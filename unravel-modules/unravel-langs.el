@@ -376,7 +376,7 @@ modifications."
 ;;; Uncomment this if you want Eglot to start automatically. I don't
 ;;; recommend it because it does not give you time to activate the
 ;;; appropriate VirtualEnv and get the best of the situation.
-  ;; :hook ((python-base-mode . eglot-ensure))
+  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project)
   ;; Apheleia is an Emacs package for formatting code as you save
@@ -400,7 +400,6 @@ modifications."
   :ensure t
 ;;; Uncomment this if you want Eglot to start automatically. I don't
 ;;; recommend it, but that's just me.
-  ;; :hook ((zig-mode . eglot-ensure))
-  )
+  :hook ((zig-mode . eglot-ensure)))
 
 (provide 'unravel-langs)
