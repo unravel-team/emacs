@@ -3645,11 +3645,7 @@ on how I use Org.
     (setq org-highlight-latex-and-related nil) ; other options affect elisp regexp in src blocks
     (setq org-fontify-quote-and-verse-blocks t)
     (setq org-fontify-whole-block-delimiter-line t)
-    (setq org-track-ordered-property-with-tag t)
-    (setq org-highest-priority ?A)
-    (setq org-lowest-priority ?C)
-    (setq org-default-priority ?A)
-    (setq org-priority-faces nil))
+    (setq org-track-ordered-property-with-tag t))
 #+end_src
 
 ** The =unravel-org.el= section for archival settings
@@ -3816,6 +3812,22 @@ Org agenda, in particular, provides commands to filter tasks by tag:
     (setq org-tags-column 0))
 #+end_src
 
+** The =unravel-org.el= Org priorities settings
+:PROPERTIES:
+:CUSTOM_ID: h:5D8AF9BA-E1D5-4908-834D-E21718199D88
+:CREATED:  [2024-11-30 Sat 16:33]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  ;;; org-priorities
+  (use-package org
+    :ensure nil
+    :config
+    (setq org-highest-priority ?A)
+    (setq org-lowest-priority ?C)
+    (setq org-default-priority ?A)
+    (setq org-priority-faces nil))
+#+end_src
 ** The =unravel-org.el= Org time/state logging
 :PROPERTIES:
 :CUSTOM_ID: h:0884658e-9eb5-47e3-9338-66e09004a1a0

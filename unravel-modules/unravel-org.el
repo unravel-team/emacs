@@ -103,11 +103,7 @@
   (setq org-highlight-latex-and-related nil) ; other options affect elisp regexp in src blocks
   (setq org-fontify-quote-and-verse-blocks t)
   (setq org-fontify-whole-block-delimiter-line t)
-  (setq org-track-ordered-property-with-tag t)
-  (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?C)
-  (setq org-default-priority ?A)
-  (setq org-priority-faces nil))
+  (setq org-track-ordered-property-with-tag t))
 
 ;;;; archival, org-archive
 (use-package org
@@ -167,6 +163,15 @@
   (setq org-tag-alist nil)
   (setq org-auto-align-tags nil)
   (setq org-tags-column 0))
+
+;;; org-priorities
+(use-package org
+  :ensure nil
+  :config
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority ?C)
+  (setq org-default-priority ?A)
+  (setq org-priority-faces nil))
 
 ;;;; log
 (use-package org
