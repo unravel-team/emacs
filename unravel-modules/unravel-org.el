@@ -144,8 +144,8 @@
   (setq org-outline-path-complete-in-steps nil)
   (setq org-reverse-note-order nil)
   (setq org-todo-keywords
-        '((sequence "PROJECT(p!)" "TODO(t!)" "WORKING(w!)" "|" "CANCEL(c@)" "DONE(d!)")
-          (sequence "FOLLOWUP(f!)" "WAITING(a@/!)" "DELEGATED(e@/!)")))
+        '((sequence "TODO(t!)" "WORKING(w!)" "|" "CANCEL(c@)" "DONE(d!)")
+          (sequence "PROJECT(p!)" "FOLLOWUP(f!)" "WAITING(a@/!)" "DELEGATED(e@/!)")))
 
   (defface prot/org-bold-done
     '((t :inherit (bold org-done)))
