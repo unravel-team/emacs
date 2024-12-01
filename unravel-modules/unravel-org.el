@@ -327,24 +327,25 @@ Skips capture tasks and tasks with subtasks"
 
 ;;;;; Basic agenda setup
   (setq org-agenda-files `(,org-directory))
-  (setq org-agenda-span 'week)
+  (setq org-agenda-span 'day)
   (setq org-agenda-start-on-weekday 1)  ; Monday
   (setq org-agenda-confirm-kill t)
   (setq org-agenda-show-all-dates t)
   (setq org-agenda-show-outline-path nil)
-  (setq org-agenda-window-setup 'current-window)
+  ;; Show me only the Agenda window when I ask for Agenda
+  (setq org-agenda-window-setup 'other-frame)
   (setq org-agenda-skip-comment-trees t)
   (setq org-agenda-menu-show-matcher t)
   (setq org-agenda-menu-two-columns nil)
-  (setq org-agenda-sticky nil)
-  (setq org-agenda-custom-commands-contexts nil)
+  ;; Don't recalculate agenda unless I explicitly say so.
+  (setq org-agenda-sticky t)
+    (setq org-agenda-custom-commands-contexts nil)
   (setq org-agenda-max-entries nil)
   (setq org-agenda-max-todos nil)
   (setq org-agenda-max-tags nil)
   (setq org-agenda-max-effort nil)
 
 ;;;;; General agenda view options
-  ;; NOTE 2021-12-07: Check further below my `org-agenda-custom-commands'
   (setq org-agenda-prefix-format
         '((agenda . " %i %-12:c%?-12t% s")
           (todo . " %i %-12:c")
@@ -362,11 +363,6 @@ Skips capture tasks and tasks with subtasks"
   (setq org-agenda-remove-times-when-in-prefix nil)
   (setq org-agenda-remove-timeranges-from-blocks nil)
   (setq org-agenda-compact-blocks nil)
-  (setq org-agenda-block-separator ?—)
-
-;;;;; Agenda marks
-  (setq org-agenda-bulk-mark-char "#")
-  (setq org-agenda-persistent-marks nil)
 
 ;;;;; Agenda diary entries
   (setq org-agenda-insert-diary-strategy 'date-tree)
@@ -396,7 +392,7 @@ Skips capture tasks and tasks with subtasks"
   (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
   (setq org-agenda-skip-timestamp-if-deadline-is-shown t)
   (setq org-agenda-skip-deadline-if-done nil)
-  (setq org-agenda-skip-deadline-prewarning-if-scheduled 1)
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled)
   (setq org-agenda-skip-scheduled-delay-if-deadline nil)
   (setq org-agenda-skip-additional-timestamps-same-entry nil)
   (setq org-agenda-skip-timestamp-if-done nil)
@@ -444,36 +440,25 @@ Skips capture tasks and tasks with subtasks"
   (setq org-agenda-tags-column -100)
 
 ;;;;; Agenda entry
-  ;; NOTE: I do not use this right now.  Leaving everything to its
-  ;; default value.
   (setq org-agenda-start-with-entry-text-mode nil)
   (setq org-agenda-entry-text-maxlines 5)
   (setq org-agenda-entry-text-exclude-regexps nil)
   (setq org-agenda-entry-text-leaders "    > ")
+  (setq org-agenda-text-search-extra-files '(agenda-archives))
 
 ;;;;; Agenda logging and clocking
-  ;; NOTE: I do not use these yet, though I plan to.  Leaving everything
-  ;; to its default value for the time being.
-  (setq org-agenda-log-mode-items '(closed clock))
-  (setq org-agenda-clock-consistency-checks
-        '((:max-duration "10:00" :min-duration 0 :max-gap "0:05" :gap-ok-around
-                         ("4:00")
-                         :default-face ; This should definitely be reviewed
-                         ((:background "DarkRed")
-                          (:foreground "white"))
-                         :overlap-face nil :gap-face nil :no-end-time-face nil
-                         :long-face nil :short-face nil)))
+  (setq org-agenda-log-mode-items '(clock))
   (setq org-agenda-log-mode-add-notes t)
   (setq org-agenda-start-with-log-mode nil)
   (setq org-agenda-start-with-clockreport-mode nil)
-  (setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 2))
+  (setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3 :fileskip0 t :compact t :narrow 80))
   (setq org-agenda-search-view-always-boolean nil)
   (setq org-agenda-search-view-force-full-words nil)
   (setq org-agenda-search-view-max-outline-level 0)
   (setq org-agenda-search-headline-for-time t)
   (setq org-agenda-use-time-grid t)
   (setq org-agenda-cmp-user-defined nil)
-  (setq org-agenda-sort-notime-is-late t) ; Org 9.4
+  (setq org-agenda-sort-notime-is-late t)   ; Org 9.4
   (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
 
 ;;;;; Agenda column view
@@ -485,327 +470,75 @@ Skips capture tasks and tasks with subtasks"
   (setq org-agenda-auto-exclude-function nil)
   (setq org-agenda-bulk-custom-functions nil)
 
-  ;; ;;;;; Agenda habits
-  ;;   (require 'org-habit)
-  ;;   (setq org-habit-graph-column 50)
-  ;;   (setq org-habit-preceding-days 9)
-  ;;   ;; Always show the habit graph, even if there are no habits for
-  ;;   ;; today.
-  ;;   (setq org-habit-show-all-today t)
-  )
+  ;; Note: This is a column format that's been useful a few times.
+  ;; Noting it here so that I can use it when needed.
+  ;; (setq org-columns-default-format
+  ;;     "%50ITEM(Task) %5Effort(Effort){:} %5CLOCKSUM %3PRIORITY %20CLOSED %20DEADLINE %20SCHEDULED %20TIMESTAMP %TODO %CATEGORY(Category) %TAGS")
+;;;;; Custom views for Agenda
+  (setq org-agenda-custom-commands
+        '(("g" "GTD Agenda"
+           ((agenda ""
+                    ((org-agenda-overriding-header
+                      "Your Meetings today")
+                     (org-agenda-entry-types '(:timestamp :sexp))
+                     (org-agenda-repeating-timestamp-show-all t)
+                     (org-agenda-time-grid
+                      '((daily today require-timed)
+                        (800 1000 1200 1400 1600 1800 2000 2200)
+                        " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+                     (org-agenda-current-time-string
+                      "◀── now ─────────────────────────────────────────────────")))
+            (tags-todo "+important-notoday"
+                       ((org-agenda-overriding-header
+                         "These are your IMPORTANT Tasks")
+                        (org-agenda-dim-blocked-tasks)
+                        ;; Sorting is *really* slowing it down.
 
-;;;; org-capture
-(use-package org-capture
+                        ;; @TODO: Figure out a way to speed this up,
+                        ;; maybe by specifying certain files here and
+                        ;; creating a separate custom agenda for all
+                        ;; important tasks.
+                        ;; (org-agenda-sorting-strategy
+                        ;;  '(timestamp-down effort-up))
+                        ))
+            (agenda ""
+                    ((org-agenda-overriding-header
+                      "These are your URGENT Tasks")
+                     (org-agenda-entry-types '(:deadline))
+                     (org-deadline-warning-days 2)
+                     (org-agenda-sorting-strategy
+                      '(habit-down priority-down timestamp-down))))
+            (tags-todo "+joy-notoday"
+                       ((org-agenda-overriding-header
+                         "These tasks bring JOY")
+                        (org-agenda-dim-blocked-tasks)))
+            (tags-todo "+notoday"
+                       ((org-agenda-overriding-header
+                         "I will NOT DO these today")
+                        (org-agenda-dim-blocked-tasks)))))
+          ("i" "Your IMPORTANT Tasks"
+           ((tags-todo "+important-notoday"
+                       ((org-agenda-overriding-header
+                         "These are your IMPORTANT Tasks")
+                        (org-agenda-dim-blocked-tasks)))))
+          ("u" "Your URGENT Tasks"
+           ((agenda ""
+                    ((org-agenda-overriding-header
+                      "These are your URGENT Tasks")
+                     (org-agenda-entry-types '(:deadline))
+                     (org-deadline-warning-days 2)
+                     (org-agenda-sorting-strategy
+                      '(habit-down priority-down timestamp-down))))))
+          ("n" "Your NEXT Tasks" tags-todo "+next")
+          ("h" "Your Habits" tags-todo "STYLE=\"habit\"")
+          ("r" "Refile" tags "+refile"))))
+
+;;;;; Agenda habits
+(use-package org-habit
   :ensure nil
   :config
-;;; Default definitions for variables used in capture templates
-  (when (not (boundp 'org-blogpost-file))
-    (defvar org-blogpost-file org-default-notes-file
-      "File in which blogposts and microblogposts are stored."))
-  (when (not (boundp 'org-company-file))
-    (defvar org-company-file org-default-notes-file
-      "File in which company documentation is stored."))
-
-;;; *CRITICAL NOTE* Read before modifying the push stack below:
-  ;; Pushing to capture templates is a stack. What goes in first shows
-  ;; up at the bottom of the capture templates list.
-
-;;; Templates for thinking tools
-  (push '("T" "Templates for Helping Me Think") org-capture-templates)
-  ;; Capture a decision that you've taken, for review and reflection later.
-  (push `("Td" "Decision Journal" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.decision.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Create a Current Reality Tree for a problem
-  (push `("Tc" "Current Reality Tree" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.crt.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Create an Evaporating Cloud for a problem
-  (push `("Te" "Evaporating Cloud" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.ec.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Create a Future Reality Tree for a problem
-  (push `("Tf" "Future Reality Tree" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.frt.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Create a Prerequisite Tree for a problem
-  (push `("Tp" "Prerequisite Tree" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.prt.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Create a Transition Tree for a problem
-  (push `("Tt" "Transition Tree" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.trt.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Capture a new Business idea for sketching out / thinking through
-  (push `("Tb" "Business Canvas" entry
-          (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/business.canvas.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Capture a customer persona, note that this is always captured in
-  ;; the current clocking task, and is something I should do under the
-  ;; business canvas.
-  (push `("TP" "Customer Persona (under Business Canvas)" entry
-          (clock)
-          (file ,(expand-file-name "capture-templates/business.customer.persona.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Capture a customer journey through your product, note that this is
-  ;; always captured in the current clocking task
-  (push `("Tj" "Customer Journey (under Business Canvas)" entry
-          (clock)
-          (file ,(expand-file-name "capture-templates/business.customer.journey.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-;;; Templates for capturing data about myself on a day-to-day basis
-  (push '("d" "Templates for Capturing Data (personal)") org-capture-templates)
-
-  ;; Capture weight / food. This seems hard to get into a laptop habit.
-  ;; This is the kind of quantitative life that a mobile solution would
-  ;; have helped with.
-
-  (push `("dw" "Weight Tracking" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/bodylog.weight.org"))
-          :clock-in t
-          :clock-resume t
-          :immediate-finish t
-          :empty-lines 1)
-        org-capture-templates)
-
-  (push `("df" "Food Tracking" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/bodylog.food.org"))
-          :clock-in t
-          :clock-resume t
-          :immediate-finish t
-          :empty-lines 1)
-        org-capture-templates)
-
-  (push `("dd" "Downtime Tracking" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/bodylog.dt.org"))
-          :clock-in t
-          :clock-resume t
-          :immediate-finish t
-          :empty-lines 1)
-        org-capture-templates)
-
-;;; Templates for capturing build in public ideas
-  (push '("b" "Templates for Capturing Build in Public") org-capture-templates)
-
-  ;; Capture Micro-blogging
-  (push `("bm" "New Microblogging entry" entry
-          (file+olp+datetree org-blogpost-file "Microblogging")
-          (file ,(expand-file-name "capture-templates/microblog.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; New blogpost idea
-  (push `("bb" "New Blogpost entry" entry
-          (file+headline org-blogpost-file "Meta: Blogposts to write")
-          (file ,(expand-file-name "capture-templates/todo.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-;;; Templates for when I want to capture specific feedback about something
-  (push '("f" "Templates for Feedback, Reflection, Journaling") org-capture-templates)
-
-  ;; Capture feedback for people I am working with
-  (push `("fp" "Feedback for People I'm working with" item
-          (file+headline org-company-file "Feedback")
-          (file ,(expand-file-name "capture-templates/feedback.others.org"))
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; The monthly newsletter to send to investors, friends and mentors
-  (push `("fn" "Company Newsletters" entry
-          (file+headline org-company-file "Company Newsletters")
-          (file ,(expand-file-name "capture-templates/business.updates.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  ;; Capture suggestions / ideas from other people, which can be
-  ;; expanded into actual projects later.
-  (push `("fs" "Ideas and Suggestions" entry
-          (file+headline org-company-file "Ideas and Suggestions")
-          (file ,(expand-file-name "capture-templates/suggestion.org"))
-          :prepend t
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-;;; Templates for planning on a day-to-day basis
-  (push '("p" "Templates for Planning") org-capture-templates)
-
-  ;; Deliberately plan out and make a routine out of start of day and
-  ;; end of day activities.
-
-  (push `("ps" "The Start of Day Planning Routine" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/workday.start.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  (push `("pe" "The End of Day Reflection Routine" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/workday.end.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-  (push `("pn" "The Next Day Intentions Routine" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/workday.next.org"))
-          :prepend nil
-          :clock-in t
-          :clock-resume t
-          :empty-lines 1)
-        org-capture-templates)
-
-;;; Templates for capturing meetings, events, something happening at this time
-  (push '("m" "Templates for Capturing Meetings or Events") org-capture-templates)
-
-  ;; Capture an upcoming meeting or one that has already happened
-  (push `("mp" "Meeting some other day" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/meeting.org"))
-          :prepend t
-          :clock-in t
-          :clock-resume t
-          :time-prompt t)
-        org-capture-templates)
-
-  ;; Capture notes for an ongoing meeting or a meeting that's already
-  ;; happened.
-  (push `("mn" "Meeting today" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/meeting.org"))
-          :prepend t
-          :clock-in t
-          :clock-resume t)
-        org-capture-templates)
-
-;;; Templates for Capturing Tasks
-  (push '("t" "Templates for Capturing Tasks") org-capture-templates)
-
-  ;; Set up a new habit for tracking. This should be refiled to the
-  ;; correct location later.
-  (push `("th" "Habit" entry
-          (file+headline org-default-notes-file "My Habit Tracker")
-          (file ,(expand-file-name "capture-templates/habit.org")))
-        org-capture-templates)
-
-  ;; One-click Capture for replying to emails from notmuch. Creates a
-  ;; task to remind you that you need to reply to this email.
-  (push `("tr" "Respond to email" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/reply.org"))
-          :clock-in t
-          :clock-resume t
-          :immediate-finish t)
-        org-capture-templates)
-
-  ;; One-click capture of links from the clipboard. Used in conjunction
-  ;; with `org-protocol', or as a stand-alone to capture links.
-  (push `("tw" "Website Link Immediate Capture" entry
-          (file+olp org-default-notes-file "Links Captured from the Browser")
-          (file ,(expand-file-name "capture-templates/website.org"))
-          :immediate-finish t)
-        org-capture-templates)
-
-  ;; A more nuanced capture for browser links, which I use for cleaning
-  ;; out my browser 2/3 times a week.
-  (push `("tl" "Website Link Pinboard Capture" entry
-          (file+olp org-default-notes-file "Links Captured from the Browser")
-          (file ,(expand-file-name "capture-templates/pinboard.capture.org"))
-          :clock-in t
-          :clock-resume t
-          :immediate-finish t)
-        org-capture-templates)
-
-  ;; Capture a task where someone expects me to communicate when it's done
-  (push `("tj" "Jira or External-facing Task" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/jira.org"))
-          :clock-in t
-          :clock-resume t)
-        org-capture-templates)
-
-  ;; One-click Capture for Tasks. Captures the task immediately and gets
-  ;; out of your way.
-  (push `("ti" "Simple Task Immediate Finish" entry
-          (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/todo.org"))
-          :clock-in t
-          :clock-resume t
-          :immediate-finish t)
-        org-capture-templates))
+  (setq org-habit-graph-column 50)
+  (setq org-habit-preceding-days 9)
+  (setq org-habit-show-all-today t))
 
 (provide 'unravel-org)
-
