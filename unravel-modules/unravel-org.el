@@ -247,6 +247,33 @@ Skips capture tasks and tasks with subtasks"
   (setq org-link-keep-stored-after-insertion nil)
   (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id))
 
+;;; org-list
+(use-package org-list
+  :ensure nil
+  :config
+  (setq org-list-demote-modify-bullet
+        '(("+" . "-") ("-" . "+") ("*" . "+"))))
+
+;; From @suvrat to keep touch-typing when working with lists.
+(defun suv/org-move-item-or-tree ()
+  (interactive)
+  (message "Use f, b, n, p to move individual items. Use C-{f,b,n,p} for point movement.")
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "f") 'org-shiftmetaright)
+    (define-key map (kbd "b") 'org-shiftmetaleft)
+    (define-key map (kbd "n") 'org-metadown)
+    (define-key map (kbd "p") 'org-metaup)
+    (define-key map (kbd "C-f") 'forward-char)
+    (define-key map (kbd "C-b") 'backward-char)
+    (define-key map (kbd "C-n") 'next-line)
+    (define-key map (kbd "C-p") 'previous-line)
+    (set-transient-map map t)))
+
+(use-package org
+  :ensure nil
+  :config
+  (define-key org-mode-map (kbd "C-c j") 'suv/org-move-item-or-tree))
+
 ;;;; code blocks
 (use-package org
   :ensure nil
