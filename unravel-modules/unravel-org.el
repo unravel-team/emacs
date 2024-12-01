@@ -135,12 +135,14 @@
   (setq org-refile-targets
         '((org-agenda-files . (:maxlevel . 2))
           (nil . (:maxlevel . 2))))
-  (setq org-refile-use-outline-path t)
+  (setq org-refile-use-outline-path 'file)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
   (setq org-refile-use-cache t)
+  (setq org-outline-path-complete-in-steps nil)
   (setq org-reverse-note-order nil)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "|" "CANCEL(c@)" "DONE(d!)")))
+        '((sequence "PROJECT(p!)" "TODO(t!)" "WORKING(w!)" "|" "CANCEL(c@)" "DONE(d!)")
+          (sequence "FOLLOWUP(f!)" "WAITING(a@/!)" "DELEGATED(e@/!)")))
 
   (defface prot/org-bold-done
     '((t :inherit (bold org-done)))
@@ -148,7 +150,7 @@
 
   (setq org-todo-keyword-faces
         '(("CANCEL" . prot/org-bold-done)))
-  (setq org-use-fast-todo-selection 'expert)
+  (setq org-use-fast-todo-selection t)
 
   (setq org-fontify-done-headline nil)
   (setq org-fontify-todo-headline nil)
