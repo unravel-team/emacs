@@ -3637,11 +3637,9 @@ on how I use Org.
             ("x" . "example")
             ("X" . "export")
             ("q" . "quote")))
-    (setq org-fold-catch-invisible-edits 'show)
     (setq org-return-follows-link nil)
     (setq org-loop-over-headlines-in-active-region 'start-level)
     (setq org-modules '(ol-info ol-eww))
-    (setq org-use-sub-superscripts '{})
     (setq org-insert-heading-respect-content t)
     (setq org-read-date-prefer-future 'time)
     (setq org-highlight-latex-and-related nil) ; other options affect elisp regexp in src blocks
@@ -3933,20 +3931,21 @@ something like the following:
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
-;;;; export
-(use-package org
-  :ensure nil
-  :init
-  ;; NOTE 2023-05-20: Must be evaluated before Org is loaded,
-  ;; otherwise we have to use the Custom UI.  No thanks!
-  (setq org-export-backends '(html texinfo md))
-  :config
-  (setq org-export-with-toc t)
-  (setq org-export-headline-levels 8)
-  (setq org-export-dispatch-use-expert-ui nil)
-  (setq org-html-htmlize-output-type nil)
-  (setq org-html-head-include-default-style nil)
-  (setq org-html-head-include-scripts nil))
+  ;;;; export
+  (use-package org
+    :ensure nil
+    :init
+    ;; NOTE 2023-05-20: Must be evaluated before Org is loaded,
+    ;; otherwise we have to use the Custom UI.  No thanks!
+    (setq org-export-backends '(html texinfo md))
+    :config
+    (setq org-export-with-toc t)
+    (setq org-export-headline-levels 8)
+    (setq org-export-dispatch-use-expert-ui nil)
+    (setq org-html-htmlize-output-type nil)
+    (setq org-html-head-include-default-style nil)
+    (setq org-html-head-include-scripts nil)
+    (setq org-use-sub-superscripts '{}))
 #+end_src
 
 ** The =unravel-org.el= Org capture templates (~org-capture~)

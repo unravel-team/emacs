@@ -95,11 +95,9 @@
           ("x" . "example")
           ("X" . "export")
           ("q" . "quote")))
-  (setq org-fold-catch-invisible-edits 'show)
   (setq org-return-follows-link nil)
   (setq org-loop-over-headlines-in-active-region 'start-level)
   (setq org-modules '(ol-info ol-eww))
-  (setq org-use-sub-superscripts '{})
   (setq org-insert-heading-respect-content t)
   (setq org-read-date-prefer-future 'time)
   (setq org-highlight-latex-and-related nil) ; other options affect elisp regexp in src blocks
@@ -213,7 +211,8 @@
   (setq org-export-dispatch-use-expert-ui nil)
   (setq org-html-htmlize-output-type nil)
   (setq org-html-head-include-default-style nil)
-  (setq org-html-head-include-scripts nil))
+  (setq org-html-head-include-scripts nil)
+  (setq org-use-sub-superscripts '{}))
 
 ;;;; org-capture
 (use-package org-capture
