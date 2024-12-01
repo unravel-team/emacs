@@ -10,3 +10,5 @@ transient/
 .org-id-locations
 ielm-history.eld
 multisession/
+.cask/
+org-clock-save.el
