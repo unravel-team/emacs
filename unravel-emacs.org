@@ -371,6 +371,22 @@ making an abbreviation to a function."
      (error "%s is not an abbrev table" ,table)))
 #+end_src
 
+** COMMENT The =init.el= section for when I need to test on Emacs 28
+:PROPERTIES:
+:CUSTOM_ID: h:71A9907E-C8A3-477B-9CE7-F0394ED6234E
+:CREATED:  [2024-12-01 Sun 21:47]
+:END:
+
+When I need this, I uncomment this section and reexport my settings:
+
+#+begin_src emacs-lisp
+  ;; Use-Package is not built into Emacs 28
+  (when (version< emacs-version "29")
+    (eval-when-compile
+      ;; Following line is not needed if use-package.el is in ~/.emacs.d
+      (add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/use-package-2.4.6/"))
+      (require 'use-package)))
+#+end_src
 ** The =init.el= final part to load the individual modules
 :PROPERTIES:
 :CUSTOM_ID: h:e6c4acf5-5b51-4b38-a86a-bf3f698ac872
