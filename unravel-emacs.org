@@ -3654,6 +3654,8 @@ on how I use Org.
 :CREATED: [2024-11-28 Thu 11:46]
 :END:
 
+I like all my archived files to sit in a single location, because I generally do not refer to archived notes unless I am specifically looking for something. Note that these settings depend on the ~org-directory~ being set ([[#h:e03df1e0-b43e-49b5-978e-6a511165617c][The =unravel-org.el= section with basic Org settings]])
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
   ;;;; archival, org-archive
   (use-package org
