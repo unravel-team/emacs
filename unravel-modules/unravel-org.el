@@ -292,7 +292,7 @@ Skips capture tasks and tasks with subtasks"
   :init
   ;; NOTE 2023-05-20: Must be evaluated before Org is loaded,
   ;; otherwise we have to use the Custom UI.  No thanks!
-  (setq org-export-backends '(html texinfo md))
+  (setq org-export-backends '(html texinfo md beamer))
   :config
   (setq org-export-with-toc t)
   (setq org-export-headline-levels 8)
@@ -301,6 +301,41 @@ Skips capture tasks and tasks with subtasks"
   (setq org-html-head-include-default-style nil)
   (setq org-html-head-include-scripts nil)
   (setq org-use-sub-superscripts '{}))
+
+(use-package ox-latex
+  :ensure nil
+  :config
+  (setq org-latex-packages-alist
+        '(("capitalize" "cleveref" nil)
+          ("" "booktabs" nil)
+          ("" "svg" nil)
+          ("" "fontspec" nil)))
+  (when (executable-find "pygmentize")
+    (add-to-list 'org-latex-packages-alist '("newfloat" "minted" nil))
+    (setq org-latex-src-block-backend 'minted))
+  (setq org-latex-reference-command "\\cref{%s}")
+  (setq org-latex-tables-booktabs t)
+  (setq org-latex-compiler "lualatex")
+  (setq org-latex-hyperref-template
+        "\\hypersetup{
+ pdfauthor={%a},
+ pdftitle={%t},
+ pdfkeywords={%k},
+ pdfsubject={%d},
+ pdfcreator={%c},
+ pdflang={%L},
+ linktoc=all,
+ colorlinks=true,
+ linkcolor=blue,
+ urlcolor=blue,
+ citecolor=blue,
+ pdfborder={0 0 1}
+ }
+")
+  (when (executable-find "latexmk")
+    (setq org-latex-pdf-process
+          '("latexmk -f -pdf -%latex --jobname=%b  -file-line-error --synctex=1 -shell-escape -interaction=nonstopmode -output-directory=%o %f")))
+  (setq org-image-actual-width nil))
 
 ;;;; org-capture
 (use-package org-capture
