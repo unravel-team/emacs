@@ -210,7 +210,34 @@
   (setq org-log-into-drawer t)
   (setq org-log-note-clock-out nil)
   (setq org-log-redeadline 'time)
-  (setq org-log-reschedule 'time))
+  (setq org-log-reschedule 'time)
+  ;; Persist clock across Emacs sessions
+  (org-clock-persistence-insinuate))
+
+;;; org-clock
+(use-package org-clock
+  :ensure nil
+  :config
+  (setq org-clock-history-length 20)
+  (setq org-clock-in-resume t)
+  (setq org-clock-into-drawer "CLOCK")
+  (setq org-clock-out-remove-zero-time-clocks t)
+  (setq org-clock-persist t)
+  (setq org-clock-auto-clock-resolution 'when-no-clock-is-running)
+  (setq org-clock-report-include-clocking-task t)
+
+  ;; List of TODO states to clock-in
+  (setq vm/todo-list '("TODO" "WAITING"))
+
+  ;; Change task state to WORKING when clocking in
+  (defun bh/clock-in-to-working (kw)
+    "Switch task from TODO to WORKING when clocking in.
+Skips capture tasks and tasks with subtasks"
+    (when (and (not (and (boundp 'org-capture-mode) org-capture-mode))
+               (member kw vm/todo-list))
+      "WORKING"))
+
+  (setq org-clock-in-switch-to-state 'bh/clock-in-to-working))
 
 ;;;; links
 (use-package org
