@@ -131,6 +131,9 @@
 ;;;; refile, todo
 (use-package org
   :ensure nil
+  :bind
+  ( :map org-mode-map
+    ("C-c t" . org-todo))
   :config
   (setq org-refile-targets
         '((org-agenda-files . (:maxlevel . 2))
@@ -217,6 +220,8 @@
 ;;; org-clock
 (use-package org-clock
   :ensure nil
+  :bind
+  ("C-<f11>" . org-clock-goto)
   :config
   (setq org-clock-history-length 20)
   (setq org-clock-in-resume t)

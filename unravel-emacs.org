@@ -3758,6 +3758,9 @@ the capture phase ([[#h:f8f06938-0dfe-45c3-b4cf-996d36cba82d][The =unravel-org.e
   ;;;; refile, todo
   (use-package org
     :ensure nil
+    :bind
+    ( :map org-mode-map
+      ("C-c t" . org-todo))
     :config
     (setq org-refile-targets
           '((org-agenda-files . (:maxlevel . 2))
@@ -3890,6 +3893,8 @@ mistakes or figure out intent in the absence of further clarification
   ;;; org-clock
   (use-package org-clock
     :ensure nil
+    :bind
+    ("C-<f11>" . org-clock-goto)
     :config
     (setq org-clock-history-length 20)
     (setq org-clock-in-resume t)
