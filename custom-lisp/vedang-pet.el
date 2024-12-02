@@ -546,7 +546,7 @@ it looks for an executable."
     (setq-local exec-path (cons (concat bin-dir "/") exec-path)))
   (when (not (memql bin-dir tramp-remote-path))
     (setq-local tramp-remote-path (cons bin-dir tramp-remote-path)))
-  (setenv "PATH" (string-join exec-path path-separator)))
+  bin-dir)
 
 (defun pet-adjust-paths-executable-find (executable)
   "Adjust paths so that we can find the correct EXECUTABLE for the current
@@ -779,14 +779,13 @@ default otherwise."
 (declare-function eglot--workspace-configuration-plist "ext:eglot")
 (declare-function eglot--guess-contact "ext:eglot")
 
-(defun pet-eglot--adjust-path-advice (fn &rest args)
-  "Adjust paths before looking up Python language servers.
+(defun pet-eglot--adjust-paths-advice ()
+  "Adjust paths BEFORE looking up Python language servers.
 
-FN is `eglot-ensure'. ARGS is the arguments to FN."
-  (pcase-let ((`(,command . ,_) args))
-    (if (member command '("pylsp" "pyls" "basedpyright-langserver" "pyright-langserver" "jedi-language-server" "ruff-lsp"))
-        (pet-adjust-paths-executable-find command)
-      (apply fn args))))
+We advice `eglot-ensure' with this function, below."
+  (when (derived-mode-p (if (functionp 'python-base-mode) 'python-base-mode 'python-mode))
+    ;; The command passed to adjust-paths is a dummy, we just want the appropriate variables to be set.
+    (pet-adjust-paths-executable-find "pylsp")))
 
 (defun pet-lookup-eglot-server-initialization-options (command)
   "Return LSP initializationOptions for Eglot.
@@ -914,13 +913,13 @@ FN is `eglot--guess-contact', ARGS is the arguments to
 
 (defun pet-eglot-setup ()
   "Set up Eglot to use server executables and virtualenvs found by PET."
-  (advice-add 'eglot-ensure :around #'pet-eglot--adjust-path-advice)
+  (advice-add 'eglot-ensure :before #'pet-eglot--adjust-paths-advice)
   (advice-add 'eglot--workspace-configuration-plist :around #'pet-eglot--workspace-configuration-plist-advice)
   (advice-add 'eglot--guess-contact :around #'pet-eglot--guess-contact-advice))
 
 (defun pet-eglot-teardown ()
   "Tear down PET advices to Eglot."
-  (advice-remove 'eglot-ensure #'pet-eglot--adjust-path-advice)
+  (advice-remove 'eglot-ensure #'pet-eglot--adjust-paths-advice)
   (advice-remove 'eglot--workspace-configuration-plist #'pet-eglot--workspace-configuration-plist-advice)
   (advice-remove 'eglot--guess-contact #'pet-eglot--guess-contact-advice))
 
