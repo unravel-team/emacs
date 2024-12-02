@@ -4410,6 +4410,24 @@ I use ~vterm~ for my shell inside Emacs, and at the moment, this section is abou
     (setq vterm-shell (or (executable-find "fish") "/opt/homebrew/bin/fish")))
 #+end_src
 
+** The =unravel-shell.el= section for ~zoxide~
+:PROPERTIES:
+:CUSTOM_ID: h:6D2BDBA6-EBCE-4DEC-ABDD-4BB106ED5988
+:CREATED:  [2024-12-02 Mon 08:34]
+:END:
+
+~zoxide~ is an amazing tool for quickly navigating to the "right place" on the terminal. I cannot imagine using the terminal without it. Since Emacs is where I do most of my file opening, I can use my Emacs navigation to enrich my Zoxide database and improve the scoring of different paths inside Zoxide. This is how to do it:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-shell.el"
+  ;;; Enrich zoxide db based on everything I open in Emacs
+  (when (executable-find "zoxide")
+    (use-package zoxide
+      :ensure t
+      :config
+      (add-hook 'find-file-hook #'zoxide-add)
+      (add-hook 'dired-mode-hook #'zoxide-add)))
+#+end_src
+
 ** Finally, we provide the =unravel-shell.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:83F2ADFB-D72B-4F8C-8B01-BA1A9CA4939C
@@ -5152,6 +5170,10 @@ To install ~zig~ and ~zls~ on MacOS:
 #+end_src
 
 ** The =unravel-langs.el= section for Clojure
+:PROPERTIES:
+:CUSTOM_ID: h:705CEAA5-00C4-4691-9425-7529981A8B18
+:CREATED:  [2024-12-02 Mon 08:34]
+:END:
 
 Clojure is my favorite programming language, and it has been my bread and butter language for well over a decade. I can only hope and pray for this to continue.
 

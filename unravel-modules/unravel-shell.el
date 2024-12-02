@@ -6,4 +6,12 @@
   :config
   (setq vterm-shell (or (executable-find "fish") "/opt/homebrew/bin/fish")))
 
+;;; Enrich zoxide db based on everything I open in Emacs
+(when (executable-find "zoxide")
+  (use-package zoxide
+    :ensure t
+    :config
+    (add-hook 'find-file-hook #'zoxide-add)
+    (add-hook 'dired-mode-hook #'zoxide-add)))
+
 (provide 'unravel-shell)
