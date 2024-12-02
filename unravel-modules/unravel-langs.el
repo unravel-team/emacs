@@ -402,4 +402,51 @@ modifications."
 ;;; recommend it, but that's just me.
   :hook ((zig-mode . eglot-ensure)))
 
+;;; Configuration for Clojure programming
+(use-package clojure-mode
+  :ensure t)
+
+(use-package cider
+  :ensure t
+  :after clojure-mode
+  :config
+  (defun cider-repl-prompt-on-newline (ns)
+    "Return a prompt string with newline.
+NS is the namespace information passed into the function by cider."
+    (concat ns ">\n"))
+  (setq cider-repl-prompt-function #'cider-repl-prompt-on-newline))
+
+(use-package clj-refactor
+  :ensure t
+  :after clojure-mode
+  :hook
+  ((clojure-mode . clj-refactor-mode))
+  :config
+  (cljr-add-keybindings-with-prefix "C-c m")
+  ;; Don't magically add stuff to the namespace requires form (because
+  ;; for big projects this operation is slow) it's easier to do this
+  ;; by hand (=add-missing= operation) after you've typed out what you
+  ;; wanted to.
+  (setq cljr-magic-requires nil))
+
+(use-package clojure-snippets
+  :ensure t
+  :after clojure-mode)
+
+(use-package jet
+  :ensure t
+  :config
+  (defun json->edn ()
+  "Convert the selected region, or entire file, from JSON to EDN."
+  (interactive)
+  (let ((b (if mark-active (region-beginning) (point-min)))
+        (e (if mark-active (region-end) (point-max)))
+        (jet (when (executable-find "jet")
+               "jet --pretty --keywordize keyword --from json --to edn")))
+    (if jet
+        (let ((p (point)))
+          (shell-command-on-region b e jet (current-buffer) t)
+          (goto-char p))
+      (user-error "Could not find jet installed")))))
+
 (provide 'unravel-langs)
