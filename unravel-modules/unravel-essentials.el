@@ -197,6 +197,9 @@ If the region is selected, retain the original behaviour, otherwise call
   :config
   (setq column-number-mode t))
 
+(use-package helpful
+  :ensure t)
+
 (use-package emacs
   :ensure nil
   :config

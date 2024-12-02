@@ -1331,6 +1331,18 @@ These are modifications to basic configuration I use on my Mac OSX machine.
     (setq column-number-mode t))
 #+end_src
 
+** The =unravel-essentials.el= section for ~helpful~
+:PROPERTIES:
+:CUSTOM_ID: h:ECAF81D8-4111-4C71-AB77-3C3D322B235F
+:CREATED:  [2024-12-02 Mon 09:50]
+:END:
+
+Helpful is a package that improves the default Emacs *Help* buffer. I don't want to replace what Emacs provides with default, and I find myself using Helpful only as an Avy action ([[#h:4E8593F7-C065-4DFA-B513-98602EC2BA1A][The =unravel-search.el= settings for ~avy~ (jumping)]]). However, it's really useful in that context.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  (use-package helpful
+    :ensure t)
+#+end_src
 ** Finally, we provide the =unravel-essentials.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
