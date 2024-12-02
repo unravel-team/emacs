@@ -103,7 +103,8 @@
   ("M-w" . easy-kill)) ; re-map kill-ring-save
 
 ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)
-(when (treesit-available-p)
+(when (and (fboundp 'treesit-available-p)
+           (treesit-available-p))
   (use-package expreg
     :ensure t
     :functions (prot/expreg-expand prot/expreg-expand-dwim)

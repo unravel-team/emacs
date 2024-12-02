@@ -12,3 +12,4 @@ ielm-history.eld
 multisession/
 .cask/
 org-clock-save.el
+tramp
