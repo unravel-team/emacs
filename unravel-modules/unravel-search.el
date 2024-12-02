@@ -101,4 +101,40 @@
     (setq wgrep-auto-save-buffer t)
     (setq wgrep-change-readonly-file t)))
 
+(use-package avy
+  :ensure t
+  :bind
+  ("M-j" . avy-goto-char-timer)
+  ("M-g SPC" . avy-goto-char-timer)
+  :config
+  ;; Mark text
+  (defun avy-action-mark-to-char (pt)
+    (activate-mark)
+    (goto-char pt))
+
+  (setf (alist-get ?  avy-dispatch-alist) 'avy-action-mark-to-char)
+
+  (with-eval-after-load 'helpful
+    (defun avy-action-helpful (pt)
+      (save-excursion
+        (goto-char pt)
+        (helpful-at-point))
+      (select-window
+       (cdr (ring-ref avy-ring 0)))
+      t)
+
+    (setf (alist-get ?H avy-dispatch-alist) 'avy-action-helpful))
+
+  (with-eval-after-load 'embark
+    (defun avy-action-embark (pt)
+      (unwind-protect
+          (save-excursion
+            (goto-char pt)
+            (embark-act))
+        (select-window
+         (cdr (ring-ref avy-ring 0))))
+      t)
+
+    (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)))
+
 (provide 'unravel-search)

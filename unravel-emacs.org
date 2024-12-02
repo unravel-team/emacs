@@ -2458,6 +2458,54 @@ edit mode, which ~grep-edit-mode~ also uses.
     (setq wgrep-change-readonly-file t)))
 #+end_src
 
+** The =unravel-search.el= settings for ~avy~ (jumping)
+:PROPERTIES:
+:CUSTOM_ID: h:4E8593F7-C065-4DFA-B513-98602EC2BA1A
+:CREATED:  [2024-12-02 Mon 08:51]
+:END:
+
+Avy is my favorite package to jump around on an Emacs screen. This section binds my primary entry-point to Avy (~avy-goto-char-timer~) to =M-j=. Here are important things about ~avy~ that you should know:
+
+- You can access a list of "actions" that you can perform with Avy by starting a selection (=M-j <type chars>=) and then pressing =?=
+- When you jump anywhere on the screen using avy, you can return to your starting point by using =C-x C-SPC= (~pop-global-mark~)
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+  (use-package avy
+    :ensure t
+    :bind
+    ("M-j" . avy-goto-char-timer)
+    ("M-g SPC" . avy-goto-char-timer)
+    :config
+    ;; Mark text
+    (defun avy-action-mark-to-char (pt)
+      (activate-mark)
+      (goto-char pt))
+
+    (setf (alist-get ?  avy-dispatch-alist) 'avy-action-mark-to-char)
+
+    (with-eval-after-load 'helpful
+      (defun avy-action-helpful (pt)
+        (save-excursion
+          (goto-char pt)
+          (helpful-at-point))
+        (select-window
+         (cdr (ring-ref avy-ring 0)))
+        t)
+
+      (setf (alist-get ?H avy-dispatch-alist) 'avy-action-helpful))
+
+    (with-eval-after-load 'embark
+      (defun avy-action-embark (pt)
+        (unwind-protect
+            (save-excursion
+              (goto-char pt)
+              (embark-act))
+          (select-window
+           (cdr (ring-ref avy-ring 0))))
+        t)
+
+      (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)))
+#+end_src
 ** Finally, we provide the =unravel-search.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
