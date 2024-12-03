@@ -13,3 +13,4 @@ multisession/
 .cask/
 org-clock-save.el
 tramp
+bookmarks
