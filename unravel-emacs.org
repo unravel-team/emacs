@@ -4943,14 +4943,14 @@ Prot is the developer and maintainer of this package.
     ;; Front-matter for Org files
     (setq denote-org-front-matter
           ":PROPERTIES:
-    :ID: %4$s
-    :CREATED: %2$s
-    :END:
-    ,#+title:      %1$s
-    ,#+filetags:   %3$s
-    ,#+date:       %2$s
-    ,#+identifier: %4$s
-    \n"))
+  :ID: %4$s
+  :CREATED: %2$s
+  :END:
+  ,#+title:      %1$s
+  ,#+filetags:   %3$s
+  ,#+date:       %2$s
+  ,#+identifier: %4$s
+  \n"))
 
   (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
     "Create a new blog entry.
