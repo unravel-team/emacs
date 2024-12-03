@@ -3906,6 +3906,7 @@ Org agenda, in particular, provides commands to filter tasks by tag:
             ("sketch" . ?s)
             ("feedback" . ?f)
             ("actionitems" . ?a)
+            ("noexport" . ?N)
             (:endgrouptag)
             (:startgrouptag)
             ("TaskType" . ?T)
@@ -4236,7 +4237,7 @@ title of the task, and the like. The documentation string of
     (setq org-agenda-menu-two-columns nil)
     ;; Don't recalculate agenda unless I explicitly say so.
     (setq org-agenda-sticky t)
-      (setq org-agenda-custom-commands-contexts nil)
+    (setq org-agenda-custom-commands-contexts nil)
     (setq org-agenda-max-entries nil)
     (setq org-agenda-max-todos nil)
     (setq org-agenda-max-tags nil)

@@ -180,6 +180,7 @@
           ("sketch" . ?s)
           ("feedback" . ?f)
           ("actionitems" . ?a)
+          ("noexport" . ?N)
           (:endgrouptag)
           (:startgrouptag)
           ("TaskType" . ?T)
