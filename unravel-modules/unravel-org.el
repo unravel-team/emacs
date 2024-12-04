@@ -634,7 +634,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Capture a decision that you've taken, for review and reflection later.
   (push `("Td" "Decision Journal" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.decision.org"))
+          (file ,(expand-file-name "capture-templates/thinking.decision.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -644,7 +644,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Create a Current Reality Tree for a problem
   (push `("Tc" "Current Reality Tree" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.crt.org"))
+          (file ,(expand-file-name "capture-templates/thinking.crt.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -654,7 +654,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Create an Evaporating Cloud for a problem
   (push `("Te" "Evaporating Cloud" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.ec.org"))
+          (file ,(expand-file-name "capture-templates/thinking.ec.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -664,7 +664,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Create a Future Reality Tree for a problem
   (push `("Tf" "Future Reality Tree" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.frt.org"))
+          (file ,(expand-file-name "capture-templates/thinking.frt.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -674,7 +674,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Create a Prerequisite Tree for a problem
   (push `("Tp" "Prerequisite Tree" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.prt.org"))
+          (file ,(expand-file-name "capture-templates/thinking.prt.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -684,7 +684,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Create a Transition Tree for a problem
   (push `("Tt" "Transition Tree" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/thinking.trt.org"))
+          (file ,(expand-file-name "capture-templates/thinking.trt.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -694,7 +694,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Capture a new Business idea for sketching out / thinking through
   (push `("Tb" "Business Canvas" entry
           (file+headline org-default-notes-file "Helping Me Think")
-          (file ,(expand-file-name "capture-templates/business.canvas.org"))
+          (file ,(expand-file-name "capture-templates/business.canvas.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -706,7 +706,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; business canvas.
   (push `("TP" "Customer Persona (under Business Canvas)" entry
           (clock)
-          (file ,(expand-file-name "capture-templates/business.customer.persona.org"))
+          (file ,(expand-file-name "capture-templates/business.customer.persona.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -717,7 +717,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; always captured in the current clocking task
   (push `("Tj" "Customer Journey (under Business Canvas)" entry
           (clock)
-          (file ,(expand-file-name "capture-templates/business.customer.journey.org"))
+          (file ,(expand-file-name "capture-templates/business.customer.journey.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -733,7 +733,7 @@ If WEEK-NUM is not provided, use the current week."
 
   (push `("dw" "Weight Tracking" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/bodylog.weight.org"))
+          (file ,(expand-file-name "capture-templates/bodylog.weight.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :immediate-finish t
@@ -742,7 +742,7 @@ If WEEK-NUM is not provided, use the current week."
 
   (push `("df" "Food Tracking" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/bodylog.food.org"))
+          (file ,(expand-file-name "capture-templates/bodylog.food.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :immediate-finish t
@@ -751,7 +751,7 @@ If WEEK-NUM is not provided, use the current week."
 
   (push `("dd" "Downtime Tracking" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/bodylog.dt.org"))
+          (file ,(expand-file-name "capture-templates/bodylog.dt.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :immediate-finish t
@@ -764,7 +764,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Capture Micro-blogging
   (push `("bm" "New Microblogging entry" entry
           (file+olp+datetree org-blogpost-file "Microblogging")
-          (file ,(expand-file-name "capture-templates/microblog.org"))
+          (file ,(expand-file-name "capture-templates/microblog.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -774,7 +774,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; New blogpost idea
   (push `("bb" "New Blogpost entry" entry
           (file+headline org-blogpost-file "Meta: Blogposts to write")
-          (file ,(expand-file-name "capture-templates/todo.org"))
+          (file ,(expand-file-name "capture-templates/todo.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -787,7 +787,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Capture feedback for people I am working with
   (push `("fp" "Feedback for People I'm working with" item
           (file+headline org-company-file "Feedback")
-          (file ,(expand-file-name "capture-templates/feedback.others.org"))
+          (file ,(expand-file-name "capture-templates/feedback.others.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :empty-lines 1)
@@ -796,7 +796,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; The monthly newsletter to send to investors, friends and mentors
   (push `("fn" "Company Newsletters" entry
           (file+headline org-company-file "Company Newsletters")
-          (file ,(expand-file-name "capture-templates/business.updates.org"))
+          (file ,(expand-file-name "capture-templates/business.updates.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -807,7 +807,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; expanded into actual projects later.
   (push `("fs" "Ideas and Suggestions" entry
           (file+headline org-company-file "Ideas and Suggestions")
-          (file ,(expand-file-name "capture-templates/suggestion.org"))
+          (file ,(expand-file-name "capture-templates/suggestion.org" user-emacs-directory))
           :prepend t
           :clock-in t
           :clock-resume t
@@ -822,7 +822,7 @@ If WEEK-NUM is not provided, use the current week."
 
   (push `("ps" "The Start of Day Planning Routine" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/workday.start.org"))
+          (file ,(expand-file-name "capture-templates/workday.start.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -831,7 +831,7 @@ If WEEK-NUM is not provided, use the current week."
 
   (push `("pe" "The End of Day Reflection Routine" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/workday.end.org"))
+          (file ,(expand-file-name "capture-templates/workday.end.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -840,7 +840,7 @@ If WEEK-NUM is not provided, use the current week."
 
   (push `("pn" "The Next Day Intentions Routine" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/workday.next.org"))
+          (file ,(expand-file-name "capture-templates/workday.next.org" user-emacs-directory))
           :prepend nil
           :clock-in t
           :clock-resume t
@@ -853,7 +853,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Capture an upcoming meeting or one that has already happened
   (push `("mp" "Meeting some other day" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/meeting.org"))
+          (file ,(expand-file-name "capture-templates/meeting.org" user-emacs-directory))
           :prepend t
           :clock-in t
           :clock-resume t
@@ -864,7 +864,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; happened.
   (push `("mn" "Meeting today" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/meeting.org"))
+          (file ,(expand-file-name "capture-templates/meeting.org" user-emacs-directory))
           :prepend t
           :clock-in t
           :clock-resume t)
@@ -877,14 +877,14 @@ If WEEK-NUM is not provided, use the current week."
   ;; correct location later.
   (push `("th" "Habit" entry
           (file+headline org-default-notes-file "My Habit Tracker")
-          (file ,(expand-file-name "capture-templates/habit.org")))
+          (file ,(expand-file-name "capture-templates/habit.org" user-emacs-directory)))
         org-capture-templates)
 
   ;; One-click Capture for replying to emails from notmuch. Creates a
   ;; task to remind you that you need to reply to this email.
   (push `("tr" "Respond to email" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/reply.org"))
+          (file ,(expand-file-name "capture-templates/reply.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :immediate-finish t)
@@ -894,7 +894,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; with `org-protocol', or as a stand-alone to capture links.
   (push `("tw" "Website Link Immediate Capture" entry
           (file+olp org-default-notes-file "Links Captured from the Browser")
-          (file ,(expand-file-name "capture-templates/website.org"))
+          (file ,(expand-file-name "capture-templates/website.org" user-emacs-directory))
           :immediate-finish t)
         org-capture-templates)
 
@@ -902,7 +902,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; out my browser 2/3 times a week.
   (push `("tl" "Website Link Pinboard Capture" entry
           (file+olp org-default-notes-file "Links Captured from the Browser")
-          (file ,(expand-file-name "capture-templates/pinboard.capture.org"))
+          (file ,(expand-file-name "capture-templates/pinboard.capture.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :immediate-finish t)
@@ -911,7 +911,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; Capture a task where someone expects me to communicate when it's done
   (push `("tj" "Jira or External-facing Task" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/jira.org"))
+          (file ,(expand-file-name "capture-templates/jira.org" user-emacs-directory))
           :clock-in t
           :clock-resume t)
         org-capture-templates)
@@ -920,7 +920,7 @@ If WEEK-NUM is not provided, use the current week."
   ;; out of your way.
   (push `("ti" "Simple Task Immediate Finish" entry
           (file+olp+datetree org-default-notes-file)
-          (file ,(expand-file-name "capture-templates/todo.org"))
+          (file ,(expand-file-name "capture-templates/todo.org" user-emacs-directory))
           :clock-in t
           :clock-resume t
           :immediate-finish t)
