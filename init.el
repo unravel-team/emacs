@@ -94,3 +94,4 @@ making an abbreviation to a function."
 (require 'unravel-org)
 (require 'unravel-shell)
 (require 'unravel-langs)
+(require 'vedang-personal)

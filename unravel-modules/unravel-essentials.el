@@ -200,9 +200,4 @@ If the region is selected, retain the original behaviour, otherwise call
 (use-package helpful
   :ensure t)
 
-(use-package emacs
-  :ensure nil
-  :config
-  (setq user-mail-address "vedang@unravel.tech"))
-
 (provide 'unravel-essentials)
