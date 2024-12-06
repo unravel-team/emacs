@@ -113,6 +113,16 @@ and nil otherwise."
   :group 'pet
   :type '(repeat string))
 
+(defcustom pet-fd-command "fd"
+  "The \"fd\" command in the system."
+  :type 'string
+  :group 'pet)
+
+(defcustom pet-fd-command-args '("-tf" "-cnever" "-H" "-a" "-g")
+  "The arguments to pass to the \"fd\" command."
+  :type '(repeat string)
+  :group 'pet)
+
 
 
 (defun pet--executable-find (command &optional remote)
@@ -191,21 +201,25 @@ FILE is a file name or a wildcard.
 
 Return absolute path to FILE if found, nil otherwise."
   (condition-case err
-      (when-let ((root (pet-project-root))
-                 (fileset
-                  (cond ((functionp 'projectile-dir-files)
-                         (mapcar (apply-partially #'concat root)
-                                 (projectile-dir-files (pet-project-root))))
-                        ((functionp 'project-files)
-                         (project-files (project-current)))
-                        (t (directory-files-recursively
-                            (pet-project-root)
-                            (wildcard-to-regexp file))))))
-        (seq-find (lambda (f)
-                    (string-match-p
-                     (wildcard-to-regexp file)
-                     (file-name-nondirectory f)))
-                  (sort fileset 'string<)))
+      (when-let ((root (pet-project-root)))
+        (if (executable-find pet-fd-command)
+            (car (cl-remove-if
+                  #'string-empty-p
+                  (apply #'process-lines `(,pet-fd-command ,@pet-fd-command-args ,file ,root))))
+          (when-let ((fileset
+                      (cond ((functionp 'projectile-dir-files)
+                             (mapcar (apply-partially #'concat root)
+                                     (projectile-dir-files (pet-project-root))))
+                            ((functionp 'project-files)
+                             (project-files (project-current)))
+                            (t (directory-files-recursively
+                                (pet-project-root)
+                                (wildcard-to-regexp file))))))
+            (seq-find (lambda (f)
+                        (string-match-p
+                         (wildcard-to-regexp file)
+                         (file-name-nondirectory f)))
+                      (sort fileset 'string<)))))
     (error (pet-report-error err))))
 
 (defun pet-find-file-from-project (file)
@@ -539,35 +553,6 @@ must both be installed into the current project first."
 
 
 
-(defun pet--adjust-path (bin-dir)
-  "Add BIN-DIR to the various places that `executable-find' looks at, when
-it looks for an executable."
-  (when (not (memql (concat bin-dir "/") exec-path))
-    (setq-local exec-path (cons (concat bin-dir "/") exec-path)))
-  (when (not (memql bin-dir tramp-remote-path))
-    (setq-local tramp-remote-path (cons bin-dir tramp-remote-path)))
-  bin-dir)
-
-(defun pet-adjust-paths-executable-find (executable)
-  "Adjust paths so that we can find the correct EXECUTABLE for the current
-Python project."
-  (cond ((and (pet-use-pre-commit-p)
-              (not (string-prefix-p "python" executable))
-              (pet-pre-commit-config-has-hook-p executable))
-         (condition-case err
-             (let* ((venv (or (pet-pre-commit-virtualenv-path executable)
-                              (user-error "`pre-commit' is configured but the hook `%s' does not appear to be installed" executable))))
-               (pet--adjust-path (concat (file-name-as-directory venv) (pet-system-bin-dir))))
-           (error (pet-report-error err))))
-        ((pet-virtualenv-root)
-         (pet--adjust-path (concat (file-name-as-directory (pet-virtualenv-root)) (pet-system-bin-dir))))
-        ((and (pet--executable-find "pyenv" t)
-              (condition-case err
-                  (car (process-lines "pyenv" "which" executable))
-                (error (pet-report-error err))))
-         (pet--adjust-path (file-name-parent-directory (car (process-lines "pyenv" "which" executable)))))
-        (t (pet-report-error "No path adjustment required"))))
-
 ;;;###autoload
 (defun pet-executable-find (executable)
   "Find the correct EXECUTABLE for the current Python project.
@@ -579,9 +564,31 @@ whatever environment if found by `pet-virtualenv-root', then
 The executable will only be searched in an environment created by
 a Python virtualenv management tool if the project is set up to
 use it."
-  (pet-adjust-paths-executable-find executable)
-  (or (pet--executable-find executable t)
-      (pet--executable-find (concat executable "3") t)))
+  (cond ((and (pet-use-pre-commit-p)
+              (not (string-prefix-p "python" executable))
+              (pet-pre-commit-config-has-hook-p executable))
+         (condition-case err
+             (let* ((venv (or (pet-pre-commit-virtualenv-path executable)
+                              (user-error "`pre-commit' is configured but the hook `%s' does not appear to be installed" executable)))
+                    (bin-dir (concat (file-name-as-directory venv) (pet-system-bin-dir)))
+                    (bin-path (concat bin-dir "/" executable)))
+               (if (file-exists-p bin-path)
+                   bin-path
+                 (user-error "`pre-commit' is configured but `%s' is not found in %s" executable bin-dir)))
+           (error (pet-report-error err))))
+        ((when-let* ((venv (pet-virtualenv-root))
+                     (path (list (concat (file-name-as-directory venv) (pet-system-bin-dir))))
+                     (exec-path path)
+                     (tramp-remote-path path)
+                     (process-environment (copy-sequence process-environment)))
+           (setenv "PATH" (string-join exec-path path-separator))
+           (pet--executable-find executable t)))
+        ((when (pet--executable-find "pyenv" t)
+           (condition-case err
+               (car (process-lines "pyenv" "which" executable))
+             (error (pet-report-error err)))))
+        (t (or (pet--executable-find executable t)
+               (pet--executable-find (concat executable "3") t)))))
 
 (defvar pet-project-virtualenv-cache nil)
 
@@ -775,70 +782,75 @@ default otherwise."
 
 
 
+(defvar eglot-workspace-configuration)
 (declare-function jsonrpc--process "ext:jsonrpc")
+(declare-function eglot--executable-find "ext:eglot")
+(declare-function eglot--uri-to-path "ext:eglot")
 (declare-function eglot--workspace-configuration-plist "ext:eglot")
 (declare-function eglot--guess-contact "ext:eglot")
 
-(defun pet-eglot--adjust-paths-advice ()
-  "Adjust paths BEFORE looking up Python language servers.
+(defun pet-eglot--executable-find-advice (fn &rest args)
+  "Look up Python language servers using `pet-executable-find'.
 
-We advice `eglot-ensure' with this function, below."
-  (when (derived-mode-p (if (functionp 'python-base-mode) 'python-base-mode 'python-mode))
-    ;; The command passed to adjust-paths is a dummy, we just want the appropriate variables to be set.
-    (pet-adjust-paths-executable-find "pylsp")))
+FN is `eglot--executable-find', ARGS is the arguments to
+`eglot--executable-find'."
+  (pcase-let ((`(,command . ,_) args))
+    (if (member command '("pylsp" "pyls" "pyright-langserver" "jedi-language-server" "ruff-lsp"))
+        (pet-executable-find command)
+      (apply fn args))))
 
 (defun pet-lookup-eglot-server-initialization-options (command)
   "Return LSP initializationOptions for Eglot.
 
 COMMAND is the name of the Python language server command."
-  (cond ((string-match-p "pylsp" command)
-         `(:pylsp
-           (:plugins
-            (:jedi
-             (:environment
-              ,(pet-virtualenv-root))
-             :ruff
-             (:executable
-              ,(pet-executable-find "ruff"))
-             :pylsp_mypy
-             (:overrides
-              ["--python-executable" ,(pet-executable-find "python") t])
-             :flake8
-             (:executable
-              ,(pet-executable-find "flake8"))
-             :pylint
-             (:executable
-              ,(pet-executable-find "pylint"))))))
-        ((string-match-p "pyls" command)
-         `(:pyls
-           (:plugins
-            (:jedi
-             (:environment
-              ,(pet-virtualenv-root))
-             :pylint
-             (:executable
-              ,(pet-executable-find "pylint"))))))
-        ((string-match-p "pyright-langserver" command)
-         `(:python
-           (:pythonPath
-            ,(pet-executable-find "python")
-            :venvPath
-            ,(pet-virtualenv-root))))
-        ((string-match-p "jedi-language-server" command)
-         `(:jedi
-           (:executable
-            (:command
-             ,(pet-executable-find "jedi-language-server"))
-            :workspace
-            (:environmentPath
-             ,(pet-executable-find "python")))))
-        ((string-match-p "ruff-lsp" command)
-         `(:settings
-           (:interpreter
-            ,(pet-executable-find "python")
-            :path
-            ,(pet-executable-find "ruff"))))
-        (t nil)))
+  (cond
+   ((not
+     (stringp command))
+    'nil)
+   ((string-match "pylsp" command)
+    (let nil
+      `(:pylsp
+        (:plugins
+         (:jedi
+          (:environment ,(pet-virtualenv-root))
+          :ruff
+          (:executable ,(pet-executable-find "ruff"))
+          :pylsp_mypy
+          (:overrides
+           ["--python-executable"
+            (\,
+             (pet-executable-find "python"))
+            t])
+          :flake8
+          (:executable ,(pet-executable-find "flake8"))
+          :pylint
+          (:executable ,(pet-executable-find "pylint")))))))
+   ((string-match "pyls" command)
+    (let nil
+      `(:pyls
+        (:plugins
+         (:jedi
+          (:environment ,(pet-virtualenv-root))
+          :pylint
+          (:executable ,(pet-executable-find "pylint")))))))
+   ((string-match "pyright-langserver" command)
+    (let nil
+      `(:python
+        (:pythonPath ,(pet-executable-find "python")
+                     :venvPath ,(pet-virtualenv-root)))))
+   ((string-match "jedi-language-server" command)
+    (let nil
+      `(:jedi
+        (:executable
+         (:command ,(pet-executable-find "jedi-language-server"))
+         :workspace
+         (:environmentPath ,(pet-executable-find "python"))))))
+   ((string-match "ruff-lsp" command)
+    (let nil
+      `(:settings
+        (:interpreter ,(pet-executable-find "python")
+                      :path ,(pet-executable-find "ruff")))))
+   (t 'nil)))
 
 (defalias 'pet--proper-list-p 'proper-list-p)
 (eval-when-compile
@@ -871,7 +883,7 @@ COMMAND is the name of the Python language server command."
                   (copy-tree b t)))
 
 (defun pet-eglot--workspace-configuration-plist-advice (fn &rest args)
-  "Enrich `eglot--workspace-configuration-plist' with paths found by `pet'.
+  "Enrich `eglot-workspace-configuration' with paths found by `pet'.
 
 FN is `eglot--workspace-configuration-plist', ARGS is the
 arguments to `eglot--workspace-configuration-plist'."
@@ -913,13 +925,13 @@ FN is `eglot--guess-contact', ARGS is the arguments to
 
 (defun pet-eglot-setup ()
   "Set up Eglot to use server executables and virtualenvs found by PET."
-  (advice-add 'eglot-ensure :before #'pet-eglot--adjust-paths-advice)
+  (advice-add 'eglot--executable-find :around #'pet-eglot--executable-find-advice)
   (advice-add 'eglot--workspace-configuration-plist :around #'pet-eglot--workspace-configuration-plist-advice)
   (advice-add 'eglot--guess-contact :around #'pet-eglot--guess-contact-advice))
 
 (defun pet-eglot-teardown ()
   "Tear down PET advices to Eglot."
-  (advice-remove 'eglot-ensure #'pet-eglot--adjust-paths-advice)
+  (advice-remove 'eglot--executable-find #'pet-eglot--executable-find-advice)
   (advice-remove 'eglot--workspace-configuration-plist #'pet-eglot--workspace-configuration-plist-advice)
   (advice-remove 'eglot--guess-contact #'pet-eglot--guess-contact-advice))
 
