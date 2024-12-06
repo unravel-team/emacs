@@ -14,4 +14,8 @@
     (add-hook 'find-file-hook #'zoxide-add)
     (add-hook 'dired-mode-hook #'zoxide-add)))
 
+;; Mode to read/write fish functions and files
+(use-package fish-mode
+  :ensure t)
+
 (provide 'unravel-shell)
