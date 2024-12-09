@@ -357,7 +357,8 @@ modifications."
           ("C-A-u" . paredit-backward-up)
           ;; Unbind things that I don't need
           ("M-s" . nil) ; used for search related keybindings
-          ("M-?" . nil)) ; `xref-find-references` uses it.
+          ("M-?" . nil) ; `xref-find-references' uses it.
+          ("RET" . nil)); `ielm-return' uses it.
   :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
 
 (use-package apheleia
@@ -448,5 +449,12 @@ NS is the namespace information passed into the function by cider."
           (shell-command-on-region b e jet (current-buffer) t)
           (goto-char p))
       (user-error "Could not find jet installed")))))
+
+;;; Settings for Interaction mode for Emacs-Lisp
+(use-package ielm
+  :ensure nil
+  :bind
+  ( :map ielm-map
+    ("C-j" . newline-and-indent)))
 
 (provide 'unravel-langs)

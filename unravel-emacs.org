@@ -5147,7 +5147,8 @@ Prot is the developer of this package.
             ("C-A-u" . paredit-backward-up)
             ;; Unbind things that I don't need
             ("M-s" . nil) ; used for search related keybindings
-            ("M-?" . nil)) ; `xref-find-references` uses it.
+            ("M-?" . nil) ; `xref-find-references' uses it.
+            ("RET" . nil)); `ielm-return' uses it.
     :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
 #+end_src
 
@@ -5333,6 +5334,20 @@ Clojure is my favorite programming language, and it has been my bread and butter
         (user-error "Could not find jet installed")))))
 #+end_src
 
+** The =unravel-langs.el= section for Emacs Lisp
+:PROPERTIES:
+:CUSTOM_ID: h:54D8C607-5CF6-425A-BFBD-0602334BE199
+:CREATED:  [2024-12-06 Fri 22:26]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;; Settings for Interaction mode for Emacs-Lisp
+  (use-package ielm
+    :ensure nil
+    :bind
+    ( :map ielm-map
+      ("C-j" . newline-and-indent)))
+#+end_src
 ** Finally, we provide the =unravel-langs.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:924224F1-61A0-4CCD-A3C3-4F230D3CF0A0
