@@ -45,11 +45,6 @@
   (setq diff-font-lock-syntax 'hunk-also))
 
 ;;; Interactive and powerful git front-end (Magit)
-(use-package transient
-  :defer t
-  :config
-  (setq transient-show-popup 0.5))
-
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
@@ -65,6 +60,12 @@
   ;; (setq git-commit-style-convention-checks '(non-empty-second-line))
 
   (setq magit-diff-refine-hunk t))
+
+(use-package transient
+  :ensure t
+  :after magit
+  :config
+  (setq transient-show-popup 0.5))
 
 (use-package magit-repos
   :ensure nil ; part of `magit'
