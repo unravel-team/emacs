@@ -15,3 +15,5 @@ org-clock-save.el
 tramp
 bookmarks
 url/
+elpaca/
+tree-sitter/
