@@ -40,9 +40,9 @@
 
 (setq load-prefer-newer t)
 
-;; Ensure that `describe-package' does not require a
-;; `package-refresh-contents'.
-(setq package-enable-at-startup t)
+;; Make sure that we do not enable `package.el', so that we can use
+;; `elpaca' instead.
+(setq package-enable-at-startup nil)
 
 ;; Name the default frame
 ;; You can select a frame with M-x select-frame-by-name

@@ -137,15 +137,17 @@ by delegating to the =init.el
   (setq load-prefer-newer t)
 #+end_src
 
-** The =early-init.el= initialises the package cache
+** The =early-init.el= package cache settings
 :PROPERTIES:
 :CUSTOM_ID: h:7a037504-8a2f-4df0-8482-ce6476354440
 :END:
 
+Do not initialize the package cache, we want to use ~elpaca~ instead of ~package.el~
+
 #+begin_src emacs-lisp :tangle "early-init.el"
-  ;; Ensure that `describe-package' does not require a
-  ;; `package-refresh-contents'.
-  (setq package-enable-at-startup t)
+  ;; Make sure that we do not enable `package.el', so that we can use
+  ;; `elpaca' instead.
+  (setq package-enable-at-startup nil)
 #+end_src
 
 ** The =early-init.el= gives a name to the default frame
@@ -271,7 +273,7 @@ This is where all the custom configuration sits for all the packages we use. We 
    '("unravel-modules" "custom-lisp"))
 #+end_src
 
-** The =init.el= settings for packages (=package.el=)
+** COMMENT The =init.el= settings for packages (=package.el=)
 :PROPERTIES:
 :CUSTOM_ID: h:424340cc-f3d7-4083-93c9-d852d40dfd40
 :END:
@@ -310,6 +312,60 @@ package archives, pinning packages, and setting priorities:
 
   ;; Let `package-install' suggest upgrades for built-in packages too.
   (setq package-install-upgrade-built-in t)
+#+end_src
+
+** The =init.el= section for using the Elpaca package manager
+:PROPERTIES:
+:CUSTOM_ID: h:13B17ABF-19E3-4723-9B72-E1201F7298AA
+:CREATED:  [2024-12-10 Tue 14:43]
+:END:
+
+#+begin_src emacs-lisp :tangle "init.el"
+  ;;; Install Elpaca
+
+  (defvar elpaca-installer-version 0.8)
+  (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+  (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                                :ref nil :depth 1
+                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                                :build (:not elpaca--activate-package)))
+  (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+         (build (expand-file-name "elpaca/" elpaca-builds-directory))
+         (order (cdr elpaca-order))
+         (default-directory repo))
+    (add-to-list 'load-path (if (file-exists-p build) build repo))
+    (unless (file-exists-p repo)
+      (make-directory repo t)
+      (when (< emacs-major-version 28) (require 'subr-x))
+      (condition-case-unless-debug err
+          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                    ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                    ,@(when-let* ((depth (plist-get order :depth)))
+                                                        (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                    ,(plist-get order :repo) ,repo))))
+                    ((zerop (call-process "git" nil buffer t "checkout"
+                                          (or (plist-get order :ref) "--"))))
+                    (emacs (concat invocation-directory invocation-name))
+                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                    ((require 'elpaca))
+                    ((elpaca-generate-autoloads "elpaca" repo)))
+              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+            (error "%s" (with-current-buffer buffer (buffer-string))))
+        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+    (unless (require 'elpaca-autoloads nil t)
+      (require 'elpaca)
+      (elpaca-generate-autoloads "elpaca" repo)
+      (load "./elpaca-autoloads")))
+  (add-hook 'after-init-hook #'elpaca-process-queues)
+  (elpaca `(,@elpaca-order))
+
+  ;; Install use-package support for Elpaca
+  (elpaca elpaca-use-package
+    ;; Enable use-package :ensure support for Elpaca.
+    (elpaca-use-package-mode))
 #+end_src
 
 ** The =init.el= macro to do nothing with Elisp code (~prot-emacs-comment~)
