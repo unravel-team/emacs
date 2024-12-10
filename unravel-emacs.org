@@ -1197,6 +1197,24 @@ process.
     ("M-w" . easy-kill)) ; re-map kill-ring-save
 #+end_src
 
+** The =unravel-essentials.el= section about ~treesit-auto~
+:PROPERTIES:
+:CUSTOM_ID: h:C9748AB2-AEFB-46E7-A3AD-0910D9CB153A
+:CREATED:  [2024-12-10 Tue 13:45]
+:END:
+
+~treesit-auto~ automatically downloads and installs tree-sitter modules. Tree-sitter is amazing new tech that is built into Emacs from v29 onwards, and enables much better syntax highlighting and code-navigation. I'll write more about tree-sitter in this section at a later date.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  ;;; Install and use tree-sitter major modes where possible
+  (use-package treesit-auto
+    :ensure t
+    :config
+    (setq treesit-auto-install 'prompt)
+    (treesit-auto-add-to-auto-mode-alist 'all)
+    (global-treesit-auto-mode))
+#+end_src
+
 ** The =unravel-essentials.el= section about ~expreg~ (tree-sitter mark syntactically)
 :PROPERTIES:
 :CUSTOM_ID: h:ceb193bf-0de3-4c43-8ab7-6daa50817754
