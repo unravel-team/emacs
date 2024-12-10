@@ -1,3 +1,5 @@
+;; early-init.el -*- lexical-binding: t; -*-
+
 ;;;; No GUI
 ;; I do not use those graphical elements by default, but I do enable
 ;; them from time-to-time for testing purposes or to demonstrate
@@ -45,3 +47,9 @@
 ;; Name the default frame
 ;; You can select a frame with M-x select-frame-by-name
 (add-hook 'after-init-hook (lambda () (set-frame-name "unravel/emacs")))
+
+;; Local Variables:
+;; no-byte-compile: t
+;; no-native-compile: t
+;; no-update-autoloads: t
+;; End:

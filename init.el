@@ -1,3 +1,5 @@
+;; init.el -*- lexical-binding: t; -*-
+
 ;; Make native compilation silent and prune its cache.
 (when (native-comp-available-p)
   (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
@@ -95,3 +97,9 @@ making an abbreviation to a function."
 (require 'unravel-shell)
 (require 'unravel-langs)
 (require 'vedang-personal)
+
+;; Local Variables:
+;; no-byte-compile: t
+;; no-native-compile: t
+;; no-update-autoloads: t
+;; End:

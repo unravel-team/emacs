@@ -80,6 +80,8 @@ by delegating to the =init.el
 :END:
 
 #+begin_src emacs-lisp :tangle "early-init.el"
+  ;; early-init.el -*- lexical-binding: t; -*-
+
   ;;;; No GUI
   ;; I do not use those graphical elements by default, but I do enable
   ;; them from time-to-time for testing purposes or to demonstrate
@@ -159,6 +161,22 @@ Naming frames allows you to select them using completion (=M-x select-frame-by-n
   (add-hook 'after-init-hook (lambda () (set-frame-name "unravel/emacs")))
 #+end_src
 
+** Finally, the =early-init.el= local variable settings
+:PROPERTIES:
+:CUSTOM_ID: h:C65F8419-568D-4B37-B864-5FF29F72F17B
+:CREATED:  [2024-12-10 Tue 14:39]
+:END:
+
+Note that this should be the last section of the ~early-init.el~ file.
+
+#+begin_src emacs-lisp :tangle "early-init.el"
+  ;; Local Variables:
+  ;; no-byte-compile: t
+  ;; no-native-compile: t
+  ;; no-update-autoloads: t
+  ;; End:
+#+end_src
+
 * The =init.el= file
 :PROPERTIES:
 :CUSTOM_ID: h:dae63bd9-93a8-41c4-af1b-d0f39ba50974
@@ -187,10 +205,12 @@ red spots everywhere, as if we have totally broken Emacs.
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "init.el"
-;; Make native compilation silent and prune its cache.
-(when (native-comp-available-p)
-  (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
-  (setq native-compile-prune-cache t)) ; Emacs 29
+  ;; init.el -*- lexical-binding: t; -*-
+
+  ;; Make native compilation silent and prune its cache.
+  (when (native-comp-available-p)
+    (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
+    (setq native-compile-prune-cache t)) ; Emacs 29
 #+end_src
 
 ** The =init.el= setting to send ~custom-file~ to oblivion
@@ -408,6 +428,15 @@ Now we are ready to load our per-module configuration files:
   (require 'vedang-personal)
 #+end_src
 
+** Finally, the =init.el= section for local variables
+
+#+begin_src emacs-lisp :tangle "init.el"
+  ;; Local Variables:
+  ;; no-byte-compile: t
+  ;; no-native-compile: t
+  ;; no-update-autoloads: t
+  ;; End:
+#+end_src
 * The =unravel-theme.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:8cf67c82-1ebb-4be8-b0e7-161bbf5419ce
