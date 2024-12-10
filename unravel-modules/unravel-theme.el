@@ -34,7 +34,7 @@
 ;; Read the lin manual: <https://protesilaos.com/emacs/lin>.
 (use-package lin
   :ensure t
-  :hook (after-init . lin-global-mode) ; applies to all `lin-mode-hooks'
+  :hook (elpaca-after-init . lin-global-mode) ; applies to all `lin-mode-hooks'
   :config
   (setopt lin-face 'lin-cyan))
 
@@ -43,7 +43,7 @@
 (use-package spacious-padding
   :ensure t
   :if (display-graphic-p)
-  :hook (after-init . spacious-padding-mode)
+  :hook (elpaca-after-init . spacious-padding-mode)
   :init
   ;; These are the defaults, but I keep it here for visiibility.
   (setq spacious-padding-widths
@@ -157,8 +157,8 @@
   :hook
   ;; Persist the latest font preset when closing/starting Emacs and
   ;; while switching between themes.
-  ((after-init . fontaine-mode)
-   (after-init . (lambda ()
+  ((elpaca-after-init . fontaine-mode)
+   (elpaca-after-init . (lambda ()
                    ;; Set last preset or fall back to desired style from `fontaine-presets'.
                    (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))))
    (enable-theme-functions . fontaine-apply-current-preset)

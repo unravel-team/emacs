@@ -89,14 +89,14 @@
 
 (use-package mb-depth
   :ensure nil
-  :hook (after-init . minibuffer-depth-indicate-mode)
+  :hook (elpaca-after-init . minibuffer-depth-indicate-mode)
   :config
   (setq read-minibuffer-restore-windows nil) ; Emacs 28
   (setq enable-recursive-minibuffers t))
 
 (use-package minibuf-eldef
   :ensure nil
-  :hook (after-init . minibuffer-electric-default-mode)
+  :hook (elpaca-after-init . minibuffer-electric-default-mode)
   :config
   (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
 
@@ -157,7 +157,7 @@
 ;;;; `savehist' (minibuffer and related histories)
 (use-package savehist
   :ensure nil
-  :hook (after-init . savehist-mode)
+  :hook (elpaca-after-init . savehist-mode)
   :config
   (setq savehist-file (locate-user-emacs-file "savehist"))
   (setq history-length 100)
@@ -191,7 +191,7 @@
 ;;; Corfu (in-buffer completion popup)
 (use-package corfu
   :ensure t
-  :hook (after-init . global-corfu-mode)
+  :hook (elpaca-after-init . global-corfu-mode)
   ;; I also have (setq tab-always-indent 'complete) for TAB to complete
   ;; when it does not need to perform an indentation change.
   :bind (:map corfu-map ("<tab>" . corfu-complete))
@@ -348,14 +348,14 @@
 ;;; Detailed completion annotations (marginalia.el)
 (use-package marginalia
   :ensure t
-  :hook (after-init . marginalia-mode)
+  :hook (elpaca-after-init . marginalia-mode)
   :config
   (setq marginalia-max-relative-age 0)) ; absolute time
 
 ;;; Vertical completion layout (vertico)
 (use-package vertico
   :ensure t
-  :hook (after-init . vertico-mode)
+  :hook (elpaca-after-init . vertico-mode)
   :config
   (setq vertico-scroll-margin 0)
   (setq vertico-count 5)

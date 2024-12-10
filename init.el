@@ -122,6 +122,10 @@ making an abbreviation to a function."
 (require 'unravel-langs)
 (require 'vedang-personal)
 
+;; Name the default frame
+;; You can select a frame with M-x select-frame-by-name
+(add-hook 'elpaca-after-init-hook (lambda () (set-frame-name "unravel/emacs")))
+
 ;; Local Variables:
 ;; no-byte-compile: t
 ;; no-native-compile: t

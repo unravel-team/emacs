@@ -150,19 +150,6 @@ Do not initialize the package cache, we want to use ~elpaca~ instead of ~package
   (setq package-enable-at-startup nil)
 #+end_src
 
-** The =early-init.el= gives a name to the default frame
-:PROPERTIES:
-:CUSTOM_ID: h:ad227f7e-b0a7-43f8-91d6-b50db82da9ad
-:END:
-
-Naming frames allows you to select them using completion (=M-x select-frame-by-name=).
-
-#+begin_src emacs-lisp :tangle "early-init.el"
-  ;; Name the default frame
-  ;; You can select a frame with M-x select-frame-by-name
-  (add-hook 'after-init-hook (lambda () (set-frame-name "unravel/emacs")))
-#+end_src
-
 ** Finally, the =early-init.el= local variable settings
 :PROPERTIES:
 :CUSTOM_ID: h:C65F8419-568D-4B37-B864-5FF29F72F17B
@@ -463,6 +450,7 @@ When I need this, I uncomment this section and reexport my settings:
       (add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/use-package-2.4.6/"))
       (require 'use-package)))
 #+end_src
+
 ** The =init.el= final part to load the individual modules
 :PROPERTIES:
 :CUSTOM_ID: h:e6c4acf5-5b51-4b38-a86a-bf3f698ac872
@@ -483,6 +471,20 @@ Now we are ready to load our per-module configuration files:
   (require 'unravel-langs)
   (require 'vedang-personal)
 #+end_src
+
+** The =init.el= section to name to the default frame
+:PROPERTIES:
+:CUSTOM_ID: h:ad227f7e-b0a7-43f8-91d6-b50db82da9ad
+:END:
+
+Naming frames allows you to select them using completion (=M-x select-frame-by-name=).
+
+#+begin_src emacs-lisp :tangle "init.el"
+  ;; Name the default frame
+  ;; You can select a frame with M-x select-frame-by-name
+  (add-hook 'elpaca-after-init-hook (lambda () (set-frame-name "unravel/emacs")))
+#+end_src
+
 
 ** Finally, the =init.el= section for local variables
 
@@ -574,7 +576,7 @@ Prot is the lead developer and maintainer of this package.
   ;; Read the lin manual: <https://protesilaos.com/emacs/lin>.
   (use-package lin
     :ensure t
-    :hook (after-init . lin-global-mode) ; applies to all `lin-mode-hooks'
+    :hook (elpaca-after-init . lin-global-mode) ; applies to all `lin-mode-hooks'
     :config
     (setopt lin-face 'lin-cyan))
 #+end_src
@@ -605,7 +607,7 @@ designs]] and [[https://github.com/minad/org-modern][Daniel Mendler's ~org-moder
   (use-package spacious-padding
     :ensure t
     :if (display-graphic-p)
-    :hook (after-init . spacious-padding-mode)
+    :hook (elpaca-after-init . spacious-padding-mode)
     :init
     ;; These are the defaults, but I keep it here for visiibility.
     (setq spacious-padding-widths
@@ -806,8 +808,8 @@ Another section defines some complementary functionality
     :hook
     ;; Persist the latest font preset when closing/starting Emacs and
     ;; while switching between themes.
-    ((after-init . fontaine-mode)
-     (after-init . (lambda ()
+    ((elpaca-after-init . fontaine-mode)
+     (elpaca-after-init . (lambda ()
                      ;; Set last preset or fall back to desired style from `fontaine-presets'.
                      (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))))
      (enable-theme-functions . fontaine-apply-current-preset)
@@ -1113,7 +1115,7 @@ technicalities.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
 (use-package recentf
   :ensure nil
-  :hook (after-init . recentf-mode)
+  :hook (elpaca-after-init . recentf-mode)
   :config
   (setq recentf-max-saved-items 100)
   (setq recentf-max-menu-items 25) ; I don't use the `menu-bar-mode', but this is good to know
@@ -1213,7 +1215,7 @@ with ~savehist-mode~ ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][The =unravel-co
 ;;;; Delete selection
 (use-package delsel
   :ensure nil
-  :hook (after-init . delete-selection-mode))
+  :hook (elpaca-after-init . delete-selection-mode))
 #+end_src
 
 ** The =unravel-essentials.el= settings for tooltips
@@ -1232,7 +1234,7 @@ messages (e.g. a different colour or a slant).
 ;;;; Tooltips (tooltip-mode)
 (use-package tooltip
   :ensure nil
-  :hook (after-init . tooltip-mode)
+  :hook (elpaca-after-init . tooltip-mode)
   :config
   (setq tooltip-delay 0.5
         tooltip-short-delay 0.5
@@ -1355,7 +1357,7 @@ I expect ~expreg~ to eventually completely replace ~easy-kill~ ()
   ;;;; Show battery status on the mode line (battery.el)
   (use-package battery
     :ensure nil
-    :hook (after-init . display-battery-mode)
+    :hook (elpaca-after-init . display-battery-mode)
     :config
     (setq battery-mode-line-format
           (cond
@@ -1650,7 +1652,7 @@ minibuffer. Let's have everything ignore casing by default.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (use-package mb-depth
   :ensure nil
-  :hook (after-init . minibuffer-depth-indicate-mode)
+  :hook (elpaca-after-init . minibuffer-depth-indicate-mode)
   :config
   (setq read-minibuffer-restore-windows nil) ; Emacs 28
   (setq enable-recursive-minibuffers t))
@@ -1680,7 +1682,7 @@ which can be confusing or distracting.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
 (use-package minibuf-eldef
   :ensure nil
-  :hook (after-init . minibuffer-electric-default-mode)
+  :hook (elpaca-after-init . minibuffer-electric-default-mode)
   :config
   (setq minibuffer-default-prompt-format " [%s]")) ; Emacs 29
 #+end_src
@@ -1839,7 +1841,7 @@ basis.
 ;;;; `savehist' (minibuffer and related histories)
 (use-package savehist
   :ensure nil
-  :hook (after-init . savehist-mode)
+  :hook (elpaca-after-init . savehist-mode)
   :config
   (setq savehist-file (locate-user-emacs-file "savehist"))
   (setq history-length 100)
@@ -1920,7 +1922,7 @@ Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][the =unravel-completion.el= 
 ;;; Corfu (in-buffer completion popup)
 (use-package corfu
   :ensure t
-  :hook (after-init . global-corfu-mode)
+  :hook (elpaca-after-init . global-corfu-mode)
   ;; I also have (setq tab-always-indent 'complete) for TAB to complete
   ;; when it does not need to perform an indentation change.
   :bind (:map corfu-map ("<tab>" . corfu-complete))
@@ -2218,7 +2220,7 @@ string) as well as a key binding, if it has one.
   ;;; Detailed completion annotations (marginalia.el)
   (use-package marginalia
     :ensure t
-    :hook (after-init . marginalia-mode)
+    :hook (elpaca-after-init . marginalia-mode)
     :config
     (setq marginalia-max-relative-age 0)) ; absolute time
 #+end_src
@@ -2240,7 +2242,7 @@ I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provi
   ;;; Vertical completion layout (vertico)
   (use-package vertico
     :ensure t
-    :hook (after-init . vertico-mode)
+    :hook (elpaca-after-init . vertico-mode)
     :config
     (setq vertico-scroll-margin 0)
     (setq vertico-count 5)
@@ -3200,7 +3202,7 @@ Some notes on how I use beframe:
   ;; <https://protesilaos.com/emacs/beframe>.
   (use-package beframe
     :ensure t
-    :hook (after-init . beframe-mode)
+    :hook (elpaca-after-init . beframe-mode)
     :bind
     ("C-x f" . other-frame-prefix)
     ("C-c b" . beframe-prefix-map)
@@ -3258,7 +3260,7 @@ for the standard ~undo~ command, though I personally only ever use
 (use-package frame
   :ensure nil
   :bind ("C-x u" . undelete-frame) ; I use only C-/ for `undo'
-  :hook (after-init . undelete-frame-mode))
+  :hook (elpaca-after-init . undelete-frame-mode))
 #+end_src
 
 #+begin_quote
@@ -3273,7 +3275,7 @@ frame.
 ;;; Window history (winner-mode)
 (use-package winner
   :ensure nil
-  :hook (after-init . winner-mode)
+  :hook (elpaca-after-init . winner-mode)
   :bind
   (("C-x <right>" . winner-redo)
    ("C-x <left>" . winner-undo)))

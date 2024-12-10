@@ -44,10 +44,6 @@
 ;; `elpaca' instead.
 (setq package-enable-at-startup nil)
 
-;; Name the default frame
-;; You can select a frame with M-x select-frame-by-name
-(add-hook 'after-init-hook (lambda () (set-frame-name "unravel/emacs")))
-
 ;; Local Variables:
 ;; no-byte-compile: t
 ;; no-native-compile: t

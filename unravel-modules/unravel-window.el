@@ -107,7 +107,7 @@
 ;; <https://protesilaos.com/emacs/beframe>.
 (use-package beframe
   :ensure t
-  :hook (after-init . beframe-mode)
+  :hook (elpaca-after-init . beframe-mode)
   :bind
   ("C-x f" . other-frame-prefix)
   ("C-c b" . beframe-prefix-map)
@@ -149,12 +149,12 @@ With optional argument FRAME, return the list of buffers of FRAME."
 (use-package frame
   :ensure nil
   :bind ("C-x u" . undelete-frame) ; I use only C-/ for `undo'
-  :hook (after-init . undelete-frame-mode))
+  :hook (elpaca-after-init . undelete-frame-mode))
 
 ;;; Window history (winner-mode)
 (use-package winner
   :ensure nil
-  :hook (after-init . winner-mode)
+  :hook (elpaca-after-init . winner-mode)
   :bind
   (("C-x <right>" . winner-redo)
    ("C-x <left>" . winner-undo)))

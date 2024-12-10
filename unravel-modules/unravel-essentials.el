@@ -26,7 +26,7 @@
 
 (use-package recentf
   :ensure nil
-  :hook (after-init . recentf-mode)
+  :hook (elpaca-after-init . recentf-mode)
   :config
   (setq recentf-max-saved-items 100)
   (setq recentf-max-menu-items 25) ; I don't use the `menu-bar-mode', but this is good to know
@@ -72,12 +72,12 @@
 ;;;; Delete selection
 (use-package delsel
   :ensure nil
-  :hook (after-init . delete-selection-mode))
+  :hook (elpaca-after-init . delete-selection-mode))
 
 ;;;; Tooltips (tooltip-mode)
 (use-package tooltip
   :ensure nil
-  :hook (after-init . tooltip-mode)
+  :hook (elpaca-after-init . tooltip-mode)
   :config
   (setq tooltip-delay 0.5
         tooltip-short-delay 0.5
@@ -139,7 +139,7 @@ word.  Fall back to regular `expreg-expand'."
 ;;;; Show battery status on the mode line (battery.el)
 (use-package battery
   :ensure nil
-  :hook (after-init . display-battery-mode)
+  :hook (elpaca-after-init . display-battery-mode)
   :config
   (setq battery-mode-line-format
         (cond
