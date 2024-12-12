@@ -28,8 +28,8 @@
 ;;;; Eglot (built-in client for the language server protocol)
 (use-package eglot
   :ensure nil
-  :demand t ; Not a mistake, we need to load Eglot elisp code before
-                                        ; we open any Python file.
+  :demand t ;; Not a mistake, we need to load Eglot elisp code before
+            ;; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind
@@ -375,7 +375,7 @@ modifications."
   :ensure nil
 ;;; Uncomment this if you want Eglot to start automatically. I prefer
 ;;; calling `M-x eglot' myself.
-  ;;  :hook ((python-base-mode . eglot-ensure))
+;;  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project)
   ;; Apheleia is an Emacs package for formatting code as you save

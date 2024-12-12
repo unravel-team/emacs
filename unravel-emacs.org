@@ -43,25 +43,6 @@ be updated accordingly.
 
 #+toc: headlines 2
 
-Here is what the generated directory structure should look like:
-
-#+begin_src sh :dir ~/src/prototypes/emacs-up :results raw
-  fd -e el -e org -E elpa | tree --fromfile
-#+end_src
-
-#+RESULTS:
-.
-├── early-init.el
-├── init.el
-├── unravel-emacs.org
-└── unravel-modules
-    ├── unravel-completion.el
-    ├── unravel-essentials.el
-    ├── unravel-langs.el
-    └── unravel-theme.el
-
-2 directories, 7 files
-
 To make a change to this Emacs configuration, edit this file and then type =C-c C-v C-t= (=M-x org-babel-tangle=) to republish all the relevant files.
 
 * The =early-init.el= file
@@ -306,6 +287,10 @@ package archives, pinning packages, and setting priorities:
 :CUSTOM_ID: h:13B17ABF-19E3-4723-9B72-E1201F7298AA
 :CREATED:  [2024-12-10 Tue 14:43]
 :END:
+
+I use ~elpaca~ for package management, and ~use-package~ for configuration management. This means that ~elpaca~ replaces the built-in ~package.el~ functionality.
+
+I do it this way because it simplifies my developement workflow for the emacs-lisp packages I want to contribute to. The built-in ~package.el~ is just fine, and if you prefer that, you should just COMMENT this section, uncomment [[#h:424340cc-f3d7-4083-93c9-d852d40dfd40][The =init.el= settings for packages (=package.el=)]] and re-export all the code-blocks.
 
 #+begin_src emacs-lisp :tangle "init.el"
   ;;; Install Elpaca
@@ -4204,17 +4189,17 @@ something like the following:
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
-;;;; code blocks
-(use-package org
-  :ensure nil
-  :config
-  (setq org-confirm-babel-evaluate nil)
-  (setq org-src-window-setup 'current-window)
-  (setq org-edit-src-persistent-message nil)
-  (setq org-src-fontify-natively t)
-  (setq org-src-preserve-indentation nil)
-  (setq org-src-tab-acts-natively t)
-  (setq org-edit-src-content-indentation 2))
+  ;;;; code blocks
+  (use-package org
+    :ensure nil
+    :config
+    (setq org-confirm-babel-evaluate nil)
+    (setq org-src-window-setup 'current-window)
+    (setq org-edit-src-persistent-message nil)
+    (setq org-src-fontify-natively t)
+    (setq org-src-preserve-indentation nil)
+    (setq org-src-tab-acts-natively t)
+    (setq org-edit-src-content-indentation 2))
 #+end_src
 
 ** The =unravel-org.el= Org export settings
@@ -4771,8 +4756,8 @@ Note that demanding ~eglot~ is not a mistake. I want it loaded so that I can adv
   ;;;; Eglot (built-in client for the language server protocol)
   (use-package eglot
     :ensure nil
-    :demand t ; Not a mistake, we need to load Eglot elisp code before
-              ; we open any Python file.
+    :demand t ;; Not a mistake, we need to load Eglot elisp code before
+              ;; we open any Python file.
     :functions (eglot-ensure)
     :commands (eglot)
     :bind
@@ -5426,17 +5411,17 @@ Clojure is my favorite programming language, and it has been my bread and butter
     :ensure t
     :config
     (defun json->edn ()
-    "Convert the selected region, or entire file, from JSON to EDN."
-    (interactive)
-    (let ((b (if mark-active (region-beginning) (point-min)))
-          (e (if mark-active (region-end) (point-max)))
-          (jet (when (executable-find "jet")
-                 "jet --pretty --keywordize keyword --from json --to edn")))
-      (if jet
-          (let ((p (point)))
-            (shell-command-on-region b e jet (current-buffer) t)
-            (goto-char p))
-        (user-error "Could not find jet installed")))))
+      "Convert the selected region, or entire file, from JSON to EDN."
+      (interactive)
+      (let ((b (if mark-active (region-beginning) (point-min)))
+            (e (if mark-active (region-end) (point-max)))
+            (jet (when (executable-find "jet")
+                   "jet --pretty --keywordize keyword --from json --to edn")))
+        (if jet
+            (let ((p (point)))
+              (shell-command-on-region b e jet (current-buffer) t)
+              (goto-char p))
+          (user-error "Could not find jet installed")))))
 #+end_src
 
 ** The =unravel-langs.el= section for Emacs Lisp
