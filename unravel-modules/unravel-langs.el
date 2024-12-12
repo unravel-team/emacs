@@ -29,7 +29,7 @@
 (use-package eglot
   :ensure nil
   :demand t ; Not a mistake, we need to load Eglot elisp code before
-            ; we open any Python file.
+                                        ; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind
@@ -373,11 +373,9 @@ modifications."
 
 (use-package python
   :ensure nil
-  :ensure-system-package (dasel sqlite3)
-;;; Uncomment this if you want Eglot to start automatically. I don't
-;;; recommend it because it does not give you time to activate the
-;;; appropriate VirtualEnv and get the best of the situation.
-  :hook ((python-base-mode . eglot-ensure))
+;;; Uncomment this if you want Eglot to start automatically. I prefer
+;;; calling `M-x eglot' myself.
+  ;;  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project)
   ;; Apheleia is an Emacs package for formatting code as you save
@@ -387,13 +385,18 @@ modifications."
     (setf (alist-get 'python-mode apheleia-mode-alist)
           '(ruff-isort ruff))
     (setf (alist-get 'python-ts-mode apheleia-mode-alist)
-          '(ruff-isort ruff)))
-  (with-eval-after-load 'eglot
-    (require 'vedang-pet)
-    ;; The -10 here is a way to define the priority of the function in
-    ;; the list of hook functions. We want `pet-mode' to run before
-    ;; any other configured hook function.
-    (add-hook 'python-base-mode-hook #'pet-mode -10)))
+          '(ruff-isort ruff))))
+
+(use-package pet
+  :ensure (:host github :repo "vedang/emacs-pet" :branch "fix-eglot-integration"
+                 ;; :remotes (("upstream" :repo "wyuenho/emacs-pet" :branch "main"))
+                 )
+  :ensure-system-package (dasel sqlite3)
+  :config
+  ;; The -10 here is a way to define the priority of the function in
+  ;; the list of hook functions. We want `pet-mode' to run before any
+  ;; other configured hook function.
+  (add-hook 'python-base-mode-hook #'pet-mode -10))
 
 ;;;; Configuration for Zig Programming
 
@@ -438,17 +441,17 @@ NS is the namespace information passed into the function by cider."
   :ensure t
   :config
   (defun json->edn ()
-  "Convert the selected region, or entire file, from JSON to EDN."
-  (interactive)
-  (let ((b (if mark-active (region-beginning) (point-min)))
-        (e (if mark-active (region-end) (point-max)))
-        (jet (when (executable-find "jet")
-               "jet --pretty --keywordize keyword --from json --to edn")))
-    (if jet
-        (let ((p (point)))
-          (shell-command-on-region b e jet (current-buffer) t)
-          (goto-char p))
-      (user-error "Could not find jet installed")))))
+    "Convert the selected region, or entire file, from JSON to EDN."
+    (interactive)
+    (let ((b (if mark-active (region-beginning) (point-min)))
+          (e (if mark-active (region-end) (point-max)))
+          (jet (when (executable-find "jet")
+                 "jet --pretty --keywordize keyword --from json --to edn")))
+      (if jet
+          (let ((p (point)))
+            (shell-command-on-region b e jet (current-buffer) t)
+            (goto-char p))
+        (user-error "Could not find jet installed")))))
 
 ;;; Settings for Interaction mode for Emacs-Lisp
 (use-package ielm
