@@ -4,6 +4,20 @@
   :config
   (setq user-mail-address "vedang@unravel.tech"))
 
+(use-package org
+  :ensure nil
+  :config
+  (setq org-default-notes-file
+        (expand-file-name "brain/daily.org" org-directory))
+  (setq org-blogpost-file
+        (expand-file-name "brain/projects/blogposts.org" org-directory))
+  (setq org-company-file
+        (expand-file-name "brain/daily.org" org-directory))
+  (setq org-agenda-files
+        (append (list org-default-notes-file
+                      (expand-file-name "brain/projects" org-directory)
+                      (expand-file-name "brain/areas/prm.org" org-directory)))))
+
 ;;;; org-capture
 (use-package org-capture
   :ensure nil

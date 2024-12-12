@@ -454,6 +454,8 @@ Now we are ready to load our per-module configuration files:
   (require 'unravel-org)
   (require 'unravel-shell)
   (require 'unravel-langs)
+  ;;; Comment this next line if you don't want to use my personal
+  ;;; settings (like specific directories or org variables)
   (require 'vedang-personal)
 #+end_src
 
@@ -3722,6 +3724,8 @@ done at a specific time, such as coaching sessions ([[#h:f8f06938-0dfe-45c3-b4cf
 :CUSTOM_ID: h:e03df1e0-b43e-49b5-978e-6a511165617c
 :END:
 
+By default, Org looks for files in the =~/org= directory. If you want to use a location other than the default localtion for your ~org-mode~ files, set the environment variable ~ORG_DIRECTORY~.
+
 #+begin_quote
 Org, also known as "Org mode", is one of the potentially most useful
 feature sets available to every Emacs user. At its core, Org is a
@@ -3762,8 +3766,8 @@ on how I use Org.
   (use-package org
     :ensure nil
     :init
-    (setq org-directory (expand-file-name "~/Tresors/Documents/diary"))
-    (setq org-default-notes-file (expand-file-name "brain/daily.org" org-directory))
+    (when (getenv "ORG_DIRECTORY")
+      (setq org-directory (expand-file-name (getenv "ORG_DIRECTORY"))))
     (setq org-imenu-depth 7)
 
     (add-to-list 'safe-local-variable-values '(org-hide-leading-stars . t))
@@ -4947,6 +4951,8 @@ Use the entry point ~M-x dictionary-search~
 :CUSTOM_ID: h:e86a66dc-7ef9-4f09-ad7e-946de2034e8d
 :END:
 
+By default, Denote looks for files in the =~/Documents/notes/= directory. If you want to use a location other than the default localtion for your ~denote~ files, set the environment variable ~DENOTE_DIRECTORY~.
+
 #+begin_quote
 This is another one of my packages and is extended by my
 ~consult-denote~ package ([[#h:ee82e629-fb05-4c75-9175-48a760a25691][The =unravel-langs.el= integration between Consult and Denote (~consult-denote~)]]).
@@ -5047,7 +5053,8 @@ Prot is the developer and maintainer of this package.
     (require 'denote-org-extras)
 
     ;; Remember to check the doc strings of those variables.
-    (setq denote-directory (expand-file-name "~/Tresors/Documents/diary/notes"))
+    (when (getenv "DENOTE_DIRECTORY")
+      (setq denote-directory (expand-file-name (getenv "DENOTE_DIRECTORY"))))
     (setq denote-infer-keywords t)
     (setq denote-sort-keywords t)
     (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)
@@ -6289,6 +6296,28 @@ I want this section to contain all the personal configuration that anyone using 
     :config
     (setq user-mail-address "vedang@unravel.tech"))
 
+#+end_src
+
+*** My personal settings for ~org~
+:PROPERTIES:
+:CUSTOM_ID: h:5E428EA8-8889-411A-A63B-70E33F12DBF0
+:CREATED:  [2024-12-12 Thu 19:39]
+:END:
+
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  (use-package org
+    :ensure nil
+    :config
+    (setq org-default-notes-file
+          (expand-file-name "brain/daily.org" org-directory))
+    (setq org-blogpost-file
+          (expand-file-name "brain/projects/blogposts.org" org-directory))
+    (setq org-company-file
+          (expand-file-name "brain/daily.org" org-directory))
+    (setq org-agenda-files
+          (append (list org-default-notes-file
+                        (expand-file-name "brain/projects" org-directory)
+                        (expand-file-name "brain/areas/prm.org" org-directory)))))
 #+end_src
 
 *** My personal settings for ~org-capture~

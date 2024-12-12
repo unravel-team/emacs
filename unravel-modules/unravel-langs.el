@@ -196,7 +196,8 @@
   (require 'denote-org-extras)
 
   ;; Remember to check the doc strings of those variables.
-  (setq denote-directory (expand-file-name "~/Tresors/Documents/diary/notes"))
+  (when (getenv "DENOTE_DIRECTORY")
+    (setq denote-directory (expand-file-name (getenv "DENOTE_DIRECTORY"))))
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
   (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)

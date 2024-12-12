@@ -49,8 +49,8 @@
 (use-package org
   :ensure nil
   :init
-  (setq org-directory (expand-file-name "~/Tresors/Documents/diary"))
-  (setq org-default-notes-file (expand-file-name "brain/daily.org" org-directory))
+  (when (getenv "ORG_DIRECTORY")
+    (setq org-directory (expand-file-name (getenv "ORG_DIRECTORY"))))
   (setq org-imenu-depth 7)
 
   (add-to-list 'safe-local-variable-values '(org-hide-leading-stars . t))

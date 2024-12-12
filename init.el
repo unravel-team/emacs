@@ -120,6 +120,8 @@ making an abbreviation to a function."
 (require 'unravel-org)
 (require 'unravel-shell)
 (require 'unravel-langs)
+;;; Comment this next line if you don't want to use my personal
+;;; settings (like specific directories or org variables)
 (require 'vedang-personal)
 
 ;; Name the default frame
