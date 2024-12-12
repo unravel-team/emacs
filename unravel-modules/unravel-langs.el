@@ -404,7 +404,8 @@ modifications."
   :ensure t
 ;;; Uncomment this if you want Eglot to start automatically. I don't
 ;;; recommend it, but that's just me.
-  :hook ((zig-mode . eglot-ensure)))
+  ;; :hook ((zig-mode . eglot-ensure))
+  )
 
 ;;; Configuration for Clojure programming
 (use-package clojure-mode
