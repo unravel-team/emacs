@@ -5283,23 +5283,25 @@ Prot is the developer of this package.
 
 The built-in Python mode for Emacs goes a long way. I use the following stack when programming Python:
 
-- =poetry= for package and venv management
+- =uv= for package and venv management
 - =pylsp= as the language server
 - =ruff= as the linting and formatting tool
 
 Run the following commands in every virtualenv environment to setup the necessary developer tooling:
 
-- =poetry add ruff python-lsp-server python-lsp-ruff --group dev=
+- =uv add ruff python-lsp-server python-lsp-ruff --group dev=
   + Ruff is an extremely fast Python linter, and code formatter, written in Rust. Ruff is also a langauge server, but it only provides functionality related to formating and linting. As it adds more over time (like go-to definition), I may make it my primary language server
   + Python LSP Server (provides the binary ~pylsp~) is the defacto language server for Python.
   + =python-lsp-ruff= provides tight integration between ~pylsp~ and ~ruff~, enabling the language server to use ruff for it's linting and formatting capabilities.
-- =poetry add pytest --group test=
+- =uv add pytest --group dev=
 
-Poetry takes care of setting up the venv properly, so if you replace the default commands with poetry versions, you are good to go. In practice, this means:
+Uv takes care of setting up the venv properly, so if you replace the default commands with uv versions, you are good to go. In practice, this means:
 
 - Use ~C-u C-c C-p~ command (=run-python=, with an argument) to start the Inferior Python Shell, instead of ~C-c C-p~.
-  - This will prompt you for a command, with the default value being =python3 -i=. Change it to =poetry run python3 -i=.
-- Modify the ~C-c C-v~ command (=python-check=) to =poetry run ruff check <filename>=
+  - This will prompt you for a command, with the default value being =python3 -i=. Change it to =uv run python3 -i=.
+- Modify the ~C-c C-v~ command (=python-check=) to =uv run ruff check <filename>=
+
+NOTE: Exactly the same instructions also work for Poetry, just replace ~uv~ with ~poetry~ in any of the commands above.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Configuration for Python Programming
