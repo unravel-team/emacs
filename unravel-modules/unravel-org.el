@@ -405,7 +405,7 @@ If WEEK-NUM is not provided, use the current week."
   (setq org-agenda-show-all-dates t)
   (setq org-agenda-show-outline-path nil)
   ;; Show me only the Agenda window when I ask for Agenda
-  (setq org-agenda-window-setup 'other-frame)
+  (setq org-agenda-window-setup 'only-window)
   (setq org-agenda-skip-comment-trees t)
   (setq org-agenda-menu-show-matcher t)
   (setq org-agenda-menu-two-columns nil)
