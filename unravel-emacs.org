@@ -1098,8 +1098,11 @@ technicalities.
 :CUSTOM_ID: h:D4517B67-0D90-417E-97D7-60A08EABB3DA
 :END:
 
+The ~PATH~ variable does not get set properly on Mac OSX and Windows machines, and due to this Emacs often does not find the right executables when calling external programs. ~exec-path-from-shell~ fixes this.
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   (use-package exec-path-from-shell
+    :if (memq (window-system) '(mac ns))
     :ensure t
     :demand t
     :config

@@ -19,6 +19,7 @@
   (setq debug-on-error t))
 
 (use-package exec-path-from-shell
+  :if (memq (window-system) '(mac ns))
   :ensure t
   :demand t
   :config
