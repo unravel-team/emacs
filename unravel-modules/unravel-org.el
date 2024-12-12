@@ -49,8 +49,9 @@
 (use-package org
   :ensure nil
   :init
-  (when (getenv "ORG_DIRECTORY")
-    (setq org-directory (expand-file-name (getenv "ORG_DIRECTORY"))))
+  (let ((dir (string-trim (shell-command-to-string "echo $ORG_DIRECTORY"))))
+    (when (not (string-empty-p dir))
+      (setq org-directory (expand-file-name dir))))
   (setq org-imenu-depth 7)
 
   (add-to-list 'safe-local-variable-values '(org-hide-leading-stars . t))
