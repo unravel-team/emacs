@@ -5263,6 +5263,9 @@ Prot is the developer and maintainer of this package.
       ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
       ("C-c d j" . denote-journal-extras-new-entry)
       ("C-c d s" . denote-sort-dired)
+      ;; Bindings to personal functions (defined below)
+      ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
+      ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry)
       :map text-mode-map
       ("C-c d B" . denote-backlinks)
       ("C-c d b" . denote-find-backlink)
@@ -5333,10 +5336,10 @@ Prot is the developer and maintainer of this package.
   ,#+filetags:   %3$s
   ,#+date:       %2$s
   ,#+identifier: %4$s
-  \n"))
+  \n")
 
-  (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
-    "Create a new blog entry.
+    (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
+      "Create a new blog entry.
 
     With optional DATE as a prefix argument, prompt for a date.  If
     `denote-date-prompt-use-org-read-date' is non-nil, use the Org
@@ -5345,18 +5348,18 @@ Prot is the developer and maintainer of this package.
     When called from Lisp DATE is a string and has the same format as
     that covered in the documentation of the `denote' function.  It
     is internally processed by `denote-parse-date'."
-    (interactive (list (when current-prefix-arg (denote-date-prompt))))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-title-prompt)
-       '("draft")
-       nil nil date
-       ;; See YASnippet
-       "fullblog")))
+      (interactive (list (when current-prefix-arg (denote-date-prompt))))
+      (let ((internal-date (denote-parse-date date))
+            (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+        (denote
+         (denote-title-prompt)
+         '("draft")
+         nil nil date
+         ;; See YASnippet
+         "fullblog")))
 
-  (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
-    "Create a new microblog entry.
+    (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
+      "Create a new microblog entry.
     Set the title of the new entry according to the value of the user option
     `denote-journal-extras-title-format'.
 
@@ -5367,18 +5370,18 @@ Prot is the developer and maintainer of this package.
     When called from Lisp DATE is a string and has the same format as
     that covered in the documentation of the `denote' function.  It
     is internally processed by `denote-parse-date'."
-    (interactive (list (when current-prefix-arg (denote-date-prompt))))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-journal-extras-daily--title-format internal-date)
-       '("draft" "microblog")
-       nil nil date
-       ;; See YASnippet
-       "microblog")))
+      (interactive (list (when current-prefix-arg (denote-date-prompt))))
+      (let ((internal-date (denote-parse-date date))
+            (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+        (denote
+         (denote-journal-extras-daily--title-format internal-date)
+         '("draft" "microblog")
+         nil nil date
+         ;; See YASnippet
+         "microblog")))
 
-  (defun vedang/denote-link-ol-get-id ()
-    "Get the CUSTOM_ID of the current entry.
+    (defun vedang/denote-link-ol-get-id ()
+      "Get the CUSTOM_ID of the current entry.
 
   If the entry already has a CUSTOM_ID, return it as-is, else create a new
   one.
@@ -5388,51 +5391,44 @@ Prot is the developer and maintainer of this package.
 
   This function is based on `denote-link-ol-get-id', with minor
   modifications."
-    (interactive)
-    (let* ((pos (point))
-           (id (org-entry-get pos "CUSTOM_ID"))
-           (created (org-entry-get pos "CREATED")))
-      (if (and (stringp id) (string-match-p "\\S-" id))
-          id
-        (setq id (org-id-new "h"))
-        (org-entry-put pos "CUSTOM_ID" id))
-      (when (not created)
-        (setq created (format-time-string (org-time-stamp-format t t) (current-time)))
-        (org-entry-put pos "CREATED" created))
-      id))
+      (interactive)
+      (let* ((pos (point))
+             (id (org-entry-get pos "CUSTOM_ID"))
+             (created (org-entry-get pos "CREATED")))
+        (if (and (stringp id) (string-match-p "\\S-" id))
+            id
+          (setq id (org-id-new "h"))
+          (org-entry-put pos "CUSTOM_ID" id))
+        (when (not created)
+          (setq created (format-time-string (org-time-stamp-format t t) (current-time)))
+          (org-entry-put pos "CREATED" created))
+        id))
 
-  (defun vedang/denote--split-luhman-sig (signature)
-    "Split numbers and letters in Luhmann-style SIGNATURE string."
-    (replace-regexp-in-string
-     "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
-     (replace-regexp-in-string
-      "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
-      signature)))
+    (defun vedang/denote--split-luhman-sig (signature)
+      "Split numbers and letters in Luhmann-style SIGNATURE string."
+      (replace-regexp-in-string
+       "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
+       (replace-regexp-in-string
+        "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
+        signature)))
 
-  (defun vedang/denote--pad-sig (signature)
-    "Create a new signature with padded spaces for all components"
-    (combine-and-quote-strings
-     (mapcar
-      (lambda (x)
-        (string-pad x 5 32 t))
-      (split-string (vedang/denote--split-luhman-sig signature) "=" t))
-     "="))
+    (defun vedang/denote--pad-sig (signature)
+      "Create a new signature with padded spaces for all components"
+      (combine-and-quote-strings
+       (mapcar
+        (lambda (x)
+          (string-pad x 5 32 t))
+        (split-string (vedang/denote--split-luhman-sig signature) "=" t))
+       "="))
 
-  (defun vedang/denote-sort-for-signatures (sig1 sig2)
-    "Return non-nil if SIG1 is smaller that SIG2.
+    (defun vedang/denote-sort-for-signatures (sig1 sig2)
+      "Return non-nil if SIG1 is smaller that SIG2.
 
     Perform the comparison with `string<'."
-    (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
+      (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
 
-  (use-package denote
-    :ensure t
-    :bind
-    ( :map global-map
-      ;; Bindings to personal functions (defined above)
-      ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
-      ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry))
-    :config
     (setq denote-sort-signature-comparison-function #'vedang/denote-sort-for-signatures))
+
 #+end_src
 
 *** The =unravel-study.el= integration between Consult and Denote (~consult-denote~)
