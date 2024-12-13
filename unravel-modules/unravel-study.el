@@ -269,10 +269,15 @@ modifications."
   (with-eval-after-load 'nov
     (org-remark-nov-mode +1)))
 
+;;; org-fc for flashcards and spaced repetition
 (use-package org-fc
   :ensure (:host github :repo "l3kn/org-fc" :branch "main")
   :ensure-system-package (gawk)
   :config
   (setq org-fc-directories `(,(concat org-directory "/notes/"))))
+
+;;; toc-org for automatic Table of Contents
+(use-package toc-org
+  :ensure t)
 
 (provide 'unravel-study)

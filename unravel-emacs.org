@@ -4,11 +4,26 @@
 #+language: en
 #+options: ':t toc:nil num:t author:t email:t
 
-This configuration is inspired from the work of [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][my hero Prot]]. I've copied straight from his config file, because I think the explanations he has created are worthwhile and should be read by everyone. Prot's files are all prefixed with =prot-emacs-*=. I have changed this to =unravel-*=. The reason for this is that I have picked up only what I need and changed it where needed. As such, any issues you face with this configuration are likely introduced by me.
+This configuration is inspired from the work of [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][my hero Prot]]. I've
+copied straight from his config file, because I think the explanations
+he has created are worthwhile and should be read by everyone. Prot's
+files are all prefixed with =prot-emacs-*=. I have changed this to
+=unravel-*=. The reason for this is that I have picked up only what I
+need and changed it based on my usage. As such, any issues you face
+with this configuration are likely introduced by me.
 
-I use emacs on Mac OSX as my primary development environment. I install the latest available pre-compiled Emacs (with native compilation), as provided by Jimeh here: [[https://github.com/jimeh/emacs-builds?tab=readme-ov-file][jimeh/emacs-builds]].
+I use emacs on Mac OSX as my primary development environment. I
+install the latest available pre-compiled Emacs (with native
+compilation), as provided by Jimeh here: [[https://github.com/jimeh/emacs-builds?tab=readme-ov-file][jimeh/emacs-builds]].
 
-Any quote without attribution is directly taken from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][Prot's org file]]. You should read through it if you want detailed explanations of things you find here.
+Any quote without attribution is directly taken from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs.org][Prot's org file]].
+Prot gives even more detailed explanations in his writing, I have only
+picked snippets. The interested reader should definitely go through
+Prot's notes.
+
+To make a change to this Emacs configuration, edit this file and then
+type =C-c C-v C-t= (=M-x org-babel-tangle=) to republish all the
+relevant files.
 
 #+begin_quote
 What you are now reading is not a common literate configuration of
@@ -41,9 +56,160 @@ be updated accordingly.
 (org-babel-tangle)
 #+end_src
 
-#+toc: headlines 2
-
-To make a change to this Emacs configuration, edit this file and then type =C-c C-v C-t= (=M-x org-babel-tangle=) to republish all the relevant files.
+* Table of Contents :TOC:
+- [[#the-early-initel-file][The =early-init.el= file]]
+  - [[#the-early-initel-basic-frame-settings][The =early-init.el= basic frame settings]]
+  - [[#the-early-initel-tweaks-to-startup-time-and-garbage-collection][The =early-init.el= tweaks to startup time and garbage collection]]
+  - [[#if-you-have-both-el-and-elc-files-load-the-newer-one][If you have both .el and .elc files, load the newer one]]
+  - [[#the-early-initel-package-cache-settings][The =early-init.el= package cache settings]]
+  - [[#finally-the-early-initel-local-variable-settings][Finally, the =early-init.el= local variable settings]]
+- [[#the-initel-file][The =init.el= file]]
+  - [[#the-initel-tweaks-to-make-native-compilation-silent][The =init.el= tweaks to make native compilation silent]]
+  - [[#the-initel-setting-to-send-custom-file-to-oblivion][The =init.el= setting to send ~custom-file~ to oblivion]]
+  - [[#the-initel-settings-to-enable-commands-disabled-by-default][The =init.el= settings to enable commands disabled by default]]
+  - [[#the-initel-settings-to-disable-unnecessary-commands-enabled-by-default][The =init.el= settings to disable unnecessary commands enabled by default]]
+  - [[#add-the-modules-folder-to-the-load-path][Add the modules folder to the load-path]]
+  - [[#the-initel-section-for-using-the-elpaca-package-manager][The =init.el= section for using the Elpaca package manager]]
+  - [[#the-initel-macro-to-do-nothing-with-elisp-code-prot-emacs-comment][The =init.el= macro to do nothing with Elisp code (~prot-emacs-comment~)]]
+  - [[#the-initel-macro-to-define-abbreviations-prot-emacs-abbrev][The =init.el= macro to define abbreviations (~prot-emacs-abbrev~)]]
+  - [[#the-initel-final-part-to-load-the-individual-modules][The =init.el= final part to load the individual modules]]
+  - [[#the-initel-section-to-name-to-the-default-frame][The =init.el= section to name to the default frame]]
+  - [[#finally-the-initel-section-for-local-variables][Finally, the =init.el= section for local variables]]
+- [[#the-unravel-themeel-module][The =unravel-theme.el= module]]
+  - [[#the-unravel-themeel-section-for-cool-modern-themes-ef-themes][The =unravel-theme.el= section for cool, modern themes (~ef-themes~)]]
+  - [[#the-unravel-themeel-section-for-lin][The =unravel-theme.el= section for ~lin~]]
+  - [[#the-unravel-themeel-section-for-spacious-padding][The =unravel-theme.el= section for ~spacious-padding~]]
+  - [[#the-unravel-themeel-section-for-rainbow-mode][The =unravel-theme.el= section for ~rainbow-mode~]]
+  - [[#the-unravel-themeel-section-for-cursory][The =unravel-theme.el= section for ~cursory~]]
+  - [[#the-unravel-themeel-section-for-theme-buffet][The =unravel-theme.el= section for ~theme-buffet~]]
+  - [[#the-unravel-themeel-section-about-fontaine][The =unravel-theme.el= section about ~fontaine~]]
+  - [[#the-unravel-themeel-section-about-show-font][The =unravel-theme.el= section about ~show-font~]]
+  - [[#the-unravel-themeel-section-about-variable-pitch-mode-and-font-resizing][The =unravel-theme.el= section about ~variable-pitch-mode~ and font resizing]]
+  - [[#finally-we-provide-the-unravel-themeel-module][Finally, we provide the =unravel-theme.el= module]]
+- [[#the-unravel-essentialsel-module][The =unravel-essentials.el= module]]
+  - [[#the-unravel-essentialsel-block-with-basic-configurations][The =unravel-essentials.el= block with basic configurations]]
+  - [[#the-unravel-essentialsel-section-for-fixing-path-on-osx-exec-path-from-shell][The =unravel-essentials.el= section for fixing PATH on OSX (~exec-path-from-shell~)]]
+  - [[#the-unravel-essentialsel-configuration-to-track-recently-visited-files-recentf][The =unravel-essentials.el= configuration to track recently visited files (~recentf~)]]
+  - [[#the-unravel-essentialsel-settings-for-bookmarks][The =unravel-essentials.el= settings for bookmarks]]
+  - [[#the-unravel-essentialsel-settings-for-registers][The =unravel-essentials.el= settings for registers]]
+  - [[#the-unravel-essentialsel-settings-for-files][The =unravel-essentials.el= settings for files]]
+  - [[#the-unravel-essentialsel-section-for-delete-selection-mode][The =unravel-essentials.el= section for ~delete-selection-mode~]]
+  - [[#the-unravel-essentialsel-settings-for-tooltips][The =unravel-essentials.el= settings for tooltips]]
+  - [[#the-unravel-essentialsel-arrangement-to-run-emacs-as-a-server][The =unravel-essentials.el= arrangement to run Emacs as a server]]
+  - [[#the-unravel-essentialsel-section-about-easy-kill][The =unravel-essentials.el= section about ~easy-kill~]]
+  - [[#the-unravel-essentialsel-section-about-treesit-auto][The =unravel-essentials.el= section about ~treesit-auto~]]
+  - [[#the-unravel-essentialsel-section-about-expreg-tree-sitter-mark-syntactically][The =unravel-essentials.el= section about ~expreg~ (tree-sitter mark syntactically)]]
+  - [[#the-unravel-essentialsel-section-for-battery-display][The =unravel-essentials.el= section for Battery display]]
+  - [[#the-unravel-essentialsel-section-for-osx-changes][The =unravel-essentials.el= section for OSX changes]]
+  - [[#the-unravel-essentialsel-section-for-simpleel-changes][The =unravel-essentials.el= section for ~simple.el~ changes]]
+  - [[#the-unravel-essentialsel-section-for-helpful][The =unravel-essentials.el= section for ~helpful~]]
+  - [[#finally-we-provide-the-unravel-essentialsel-module][Finally, we provide the =unravel-essentials.el= module]]
+- [[#the-unravel-completionel-module][The =unravel-completion.el= module]]
+  - [[#the-unravel-completionel-settings-for-completion-styles][The =unravel-completion.el= settings for completion styles]]
+  - [[#the-unravel-completionel-for-the-orderless-completion-style][The =unravel-completion.el= for the ~orderless~ completion style]]
+  - [[#the-unravel-completionel-settings-to-ignore-letter-casing][The =unravel-completion.el= settings to ignore letter casing]]
+  - [[#the-unravel-completionel-settings-for-recursive-minibuffers][The =unravel-completion.el= settings for recursive minibuffers]]
+  - [[#the-unravel-completionel-settings-for-default-values][The =unravel-completion.el= settings for default values]]
+  - [[#the-unravel-completionel-settings-for-common-interactions][The =unravel-completion.el= settings for common interactions]]
+  - [[#the-unravel-completionel-generic-minibuffer-ui-settings][The =unravel-completion.el= generic minibuffer UI settings]]
+  - [[#the-unravel-completionel-settings-for-saving-the-history-savehist-mode][The =unravel-completion.el= settings for saving the history (~savehist-mode~)]]
+  - [[#the-unravel-completionel-settings-for-dynamic-text-expansion-dabbrev][The =unravel-completion.el= settings for dynamic text expansion (~dabbrev~)]]
+  - [[#the-unravel-completionel-settings-for-dynamic-text-expansion-hippie][The =unravel-completion.el= settings for dynamic text expansion (~hippie~)]]
+  - [[#the-unravel-completionel-for-in-buffer-completion-popup-corfu][The =unravel-completion.el= for in-buffer completion popup (~corfu~)]]
+  - [[#the-unravel-completionel-settings-for-consult][The =unravel-completion.el= settings for ~consult~]]
+  - [[#the-unravel-completionel-section-about-embark][The =unravel-completion.el= section about ~embark~]]
+  - [[#the-unravel-completionel-section-to-configure-completion-annotations-marginalia][The =unravel-completion.el= section to configure completion annotations (~marginalia~)]]
+  - [[#the-unravel-completionel-section-for-vertico][The =unravel-completion.el= section for ~vertico~]]
+  - [[#finally-we-provide-the-unravel-completionel-module][Finally, we provide the ~unravel-completion.el~ module]]
+- [[#the-unravel-searchel-module][The =unravel-search.el= module]]
+  - [[#the-unravel-searchel-section-on-imenu][The =unravel-search.el= section on imenu]]
+  - [[#the-unravel-searchel-section-on-isearch-lax-space][The =unravel-search.el= section on isearch lax space]]
+  - [[#the-unravel-searchel-settings-for-isearch-highlighting][The =unravel-search.el= settings for isearch highlighting]]
+  - [[#the-unravel-searchel-section-on-isearch-match-counter][The =unravel-search.el= section on isearch match counter]]
+  - [[#the-unravel-searchel-tweaks-for-the-occur-buffer][The =unravel-search.el= tweaks for the occur buffer]]
+  - [[#the-unravel-searchel-modified-isearch-and-occur-key-bindings][The =unravel-search.el= modified isearch and occur key bindings]]
+  - [[#the-unravel-searchel-tweaks-to-xref-re-builder-and-grep][The =unravel-search.el= tweaks to ~xref~, ~re-builder~ and ~grep~]]
+  - [[#the-unravel-searchel-setup-for-editable-grep-buffers-grep-edit-mode-or-wgrep][The =unravel-search.el= setup for editable grep buffers (~grep-edit-mode~ or ~wgrep~)]]
+  - [[#the-unravel-searchel-settings-for-avy-jumping][The =unravel-search.el= settings for ~avy~ (jumping)]]
+  - [[#finally-we-provide-the-unravel-searchel-module][Finally, we provide the =unravel-search.el= module]]
+- [[#the-unravel-diredel-module][The =unravel-dired.el= module]]
+  - [[#the-unravel-diredel-settings-for-common-operations][The =unravel-dired.el= settings for common operations]]
+  - [[#the-unravel-diredel-switches-for-ls-how-files-are-listed][The =unravel-dired.el= switches for ~ls~ (how files are listed)]]
+  - [[#the-unravel-diredel-setting-for-dual-pane-dired][The =unravel-dired.el= setting for dual-pane Dired]]
+  - [[#the-unravel-diredel-miscellaneous-tweaks][The =unravel-dired.el= miscellaneous tweaks]]
+  - [[#the-unravel-diredel-section-about-various-conveniences][The =unravel-dired.el= section about various conveniences]]
+  - [[#the-unravel-diredel-section-about-dired-subtree][The =unravel-dired.el= section about ~dired-subtree~]]
+  - [[#the-unravel-diredel-section-about-wdired-writable-dired][The =unravel-dired.el= section about ~wdired~ (writable Dired)]]
+  - [[#the-unravel-diredel-section-about-trashed][The =unravel-dired.el= section about ~trashed~]]
+  - [[#finally-we-provide-the-unravel-diredel-module][Finally, we provide the =unravel-dired.el= module]]
+- [[#the-unravel-windowel-module][The =unravel-window.el= module]]
+  - [[#the-unravel-windowel-section-about-uniquifying-buffer-names][The =unravel-window.el= section about uniquifying buffer names]]
+  - [[#the-unravel-windowel-rules-for-displaying-buffers-display-buffer-alist][The =unravel-window.el= rules for displaying buffers (~display-buffer-alist~)]]
+  - [[#the-unravel-windowel-section-about-beframe][The =unravel-window.el= section about ~beframe~]]
+  - [[#the-unravel-windowel-configuration-of-undelete-frame-mode-and-winner-mode][The =unravel-window.el= configuration of ~undelete-frame-mode~ and ~winner-mode~]]
+  - [[#the-unravel-windowel-section-for-zone-zone][The =unravel-window.el= section for Zone (~zone~)]]
+  - [[#the-unravel-windowel-section-for-displaying-time][The =unravel-window.el= section for displaying time]]
+  - [[#finally-we-provide-the-unravel-windowel-module][Finally, we provide the =unravel-window.el= module]]
+- [[#the-unravel-gitel-module][The =unravel-git.el= module]]
+  - [[#the-unravel-gitel-section-about-ediff][The =unravel-git.el= section about ediff]]
+  - [[#the-unravel-gitel-section-about-projectel][The =unravel-git.el= section about =project.el=]]
+  - [[#the-unravel-gitel-section-about-diff-mode][The =unravel-git.el= section about ~diff-mode~]]
+  - [[#the-unravel-gitel-section-about-magit-great-git-client][The =unravel-git.el= section about ~magit~ (great Git client)]]
+  - [[#the-unravel-gitel-call-to-provide][The =unravel-git.el= call to ~provide~]]
+- [[#the-unravel-orgel-module][The =unravel-org.el= module]]
+  - [[#the-unravel-orgel-section-on-the-calendar][The =unravel-org.el= section on the ~calendar~]]
+  - [[#the-unravel-orgel-section-about-appointment-reminders-apptel][The =unravel-org.el= section about appointment reminders (=appt.el=)]]
+  - [[#the-unravel-orgel-section-on-paragraphs][The =unravel-org.el= section on paragraphs]]
+  - [[#the-unravel-orgel-section-with-basic-org-settings][The =unravel-org.el= section with basic Org settings]]
+  - [[#the-unravel-orgel-section-for-archival-settings][The =unravel-org.el= section for archival settings]]
+  - [[#the-unravel-orgel-section-for-narrowing-and-folding][The =unravel-org.el= section for narrowing and folding]]
+  - [[#the-unravel-orgel-org-to-do-and-refile-settings][The =unravel-org.el= Org to-do and refile settings]]
+  - [[#the-unravel-orgel-org-heading-tags][The =unravel-org.el= Org heading tags]]
+  - [[#the-unravel-orgel-org-priorities-settings][The =unravel-org.el= Org priorities settings]]
+  - [[#the-unravel-orgel-org-timestate-logging][The =unravel-org.el= Org time/state logging]]
+  - [[#the-unravel-orgel-org-link-settings][The =unravel-org.el= Org link settings]]
+  - [[#the-unravel-orgel-org-list-items-settings][The =unravel-org.el= Org list items settings]]
+  - [[#the-unravel-orgel-org-code-block-settings][The =unravel-org.el= Org code block settings]]
+  - [[#the-unravel-orgel-org-export-settings][The =unravel-org.el= Org export settings]]
+  - [[#the-unravel-orgel-org-capture-templates-org-capture][The =unravel-org.el= Org capture templates (~org-capture~)]]
+  - [[#the-unravel-orgel-section-on-yasnippet][The =unravel-org.el= section on YASnippet]]
+  - [[#the-unravel-orgel-org-agenda-settings][The =unravel-org.el= Org agenda settings]]
+  - [[#finally-we-provide-the-unravel-orgel-module][Finally, we provide the =unravel-org.el= module]]
+- [[#the-unravel-shellel-module][The =unravel-shell.el= module]]
+  - [[#the-unravel-shellel-section-for-vterm][The =unravel-shell.el= section for ~vterm~]]
+  - [[#the-unravel-shellel-section-for-zoxide][The =unravel-shell.el= section for ~zoxide~]]
+  - [[#the-unravel-shellel-section-for-fish-mode][The =unravel-shell.el= section for ~fish-mode~]]
+  - [[#finally-we-provide-the-unravel-shellel-module][Finally, we provide the =unravel-shell.el= module]]
+- [[#the-unravel-langsel-module][The =unravel-langs.el= module]]
+  - [[#the-unravel-langsel-settings-for-tab][The =unravel-langs.el= settings for TAB]]
+  - [[#the-unravel-langsel-settings-show-paren-mode][The =unravel-langs.el= settings ~show-paren-mode~]]
+  - [[#the-unravel-langsel-settings-for-eldoc][The =unravel-langs.el= settings for ~eldoc~]]
+  - [[#the-unravel-langsel-settings-for-eglot-lsp-client][The =unravel-langs.el= settings for ~eglot~ (LSP client)]]
+  - [[#the-unravel-langsel-settings-for-markdown-mode][The =unravel-langs.el= settings for ~markdown-mode~]]
+  - [[#the-unravel-langsel-settings-for-csv-mode][The =unravel-langs.el= settings for ~csv-mode~]]
+  - [[#the-unravel-langsel-settings-for-spell-checking-flyspell][The =unravel-langs.el= settings for spell checking (~flyspell~)]]
+  - [[#the-unravel-langsel-settings-for-code-linting-flymake][The =unravel-langs.el= settings for code linting (~flymake~)]]
+  - [[#the-unravel-langsel-settings-for-outline-minor-mode][The =unravel-langs.el= settings for ~outline-minor-mode~]]
+  - [[#the-unravel-langsel-settings-for-dictionary][The =unravel-langs.el= settings for ~dictionary~]]
+  - [[#the-unravel-langsel-settings-for-paredit-paren-matching][The =unravel-langs.el= settings for ~paredit~ (paren matching)]]
+  - [[#the-unravel-langsel-settings-for-apheleia-code-formatting][The =unravel-langs.el= settings for ~apheleia~ (code formatting)]]
+  - [[#the-unravel-langsel-section-for-python][The =unravel-langs.el= section for Python]]
+  - [[#the-unravel-langsel-section-for-ziglang][The =unravel-langs.el= section for Ziglang]]
+  - [[#the-unravel-langsel-section-for-clojure][The =unravel-langs.el= section for Clojure]]
+  - [[#the-unravel-langsel-section-for-emacs-lisp][The =unravel-langs.el= section for Emacs Lisp]]
+  - [[#finally-we-provide-the-unravel-langsel-module][Finally, we provide the =unravel-langs.el= module]]
+- [[#the-unravel-studyel-module][The =unravel-study.el= module]]
+  - [[#the-unravel-studyel-section-for-denote-notes-and-file-naming][The =unravel-study.el= section for ~denote~ (notes and file-naming)]]
+  - [[#the-unravel-studyel-section-for-pdf-tools-reading-and-annotation-of-pdfs][The =unravel-study.el= section for ~pdf-tools~ (reading and annotation of PDFs)]]
+  - [[#the-unravel-studyel-section-for-org-remark-annotation-of-org-and-eww-files][The =unravel-study.el= section for ~org-remark~ (annotation of org and eww files)]]
+  - [[#the-unravel-studyel-section-for-org-fc-flashcards][The =unravel-study.el= section for ~org-fc~ (flashcards)]]
+  - [[#the-unravel-studyel-section-for-toc-org-table-of-contents][The =unravel-study.el= section for ~toc-org~ (table of contents)]]
+  - [[#finally-we-provide-the-unravel-studyel-module][Finally, we provide the =unravel-study.el= module]]
+- [[#custom-libraries][Custom libraries]]
+  - [[#the-prot-commonel-library][The =prot-common.el= library]]
+  - [[#the-prot-embarkel-library][The =prot-embark.el= library]]
+  - [[#the-prot-windowel-library][The =prot-window.el= library]]
+  - [[#the-vedang-personalel-module][The =vedang-personal.el= module]]
 
 * The =early-init.el= file
 
@@ -5176,7 +5342,8 @@ Clojure is my favorite programming language, and it has been my bread and butter
 :CREATED:  [2024-12-12 Thu 21:27]
 :END:
 
-This file contains configuration for everything I use to make Emacs my go-to place for studying anything.
+This file contains configuration for everything I use to make Emacs my
+go-to place for studying anything.
 
 ** The =unravel-study.el= section for ~denote~ (notes and file-naming)
 :PROPERTIES:
@@ -5184,9 +5351,14 @@ This file contains configuration for everything I use to make Emacs my go-to pla
 :CREATED:  [2024-12-12 Thu 21:33]
 :END:
 
-Denote is my goto tool for any and all note-taking. This is what powers my brain forest, and where anything and everything I write starts from.
+Denote is my goto tool for any and all note-taking. This is what
+powers my brain forest, and where anything and everything I write
+starts from.
 
-By default, Denote looks for files in the =~/Documents/notes/= directory. If you want to use a location other than the default localtion for your ~denote~ files, set the environment variable ~DENOTE_DIRECTORY~.
+By default, Denote looks for files in the =~/Documents/notes/=
+directory. If you want to use a location other than the default
+localtion for your ~denote~ files, set the environment variable
+~DENOTE_DIRECTORY~.
 
 #+begin_quote
 This is another one of my packages and is extended by my
@@ -5471,7 +5643,8 @@ Prot is the developer of this package.
 :CREATED:  [2024-12-12 Thu 21:35]
 :END:
 
-PDF Tools is an absolute powerhouse for reading and annotating PDF files. It is my goto tool for reading any academic papers.
+PDF Tools is an absolute powerhouse for reading and annotating PDF
+files. It is my goto tool for reading any academic papers.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
   ;;; PDF Tools for reading and annotating PDF files
@@ -5543,11 +5716,28 @@ PDF Tools is an absolute powerhouse for reading and annotating PDF files. It is 
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  ;;; org-fc for flashcards and spaced repetition
   (use-package org-fc
     :ensure (:host github :repo "l3kn/org-fc" :branch "main")
     :ensure-system-package (gawk)
     :config
     (setq org-fc-directories `(,(concat org-directory "/notes/"))))
+#+end_src
+
+** The =unravel-study.el= section for ~toc-org~ (table of contents)
+:PROPERTIES:
+:CUSTOM_ID: h:478591ED-2CEF-4E15-A5DF-77198A34C86A
+:CREATED:  [2024-12-13 Fri 08:42]
+:END:
+
+~toc-org~ is a simple and nifty package for automatically creating a
+table of contents in any org-mode file. It works by creating/updating
+a table of contents under the first heading with the tag :TOC:.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  ;;; toc-org for automatic Table of Contents
+  (use-package toc-org
+    :ensure t)
 #+end_src
 
 ** Finally, we provide the =unravel-study.el= module
