@@ -207,6 +207,19 @@
     (corfu-history-mode 1)
     (add-to-list 'savehist-additional-variables 'corfu-history)))
 
+(use-package cape
+  :ensure t
+  :demand t
+  ;; Press C-c p ? to for help.
+  :bind ("C-c p" . cape-prefix-map)
+  :hook
+  (completion-at-point-functions . cape-dabbrev)
+  (completion-at-point-functions . cape-dict)
+  (completion-at-point-functions . cape-elisp-block)
+  (completion-at-point-functions . cape-elisp-symbol)
+  (completion-at-point-functions . cape-emoji)
+  (completion-at-point-functions . cape-file))
+
 ;;; Enhanced minibuffer commands (consult.el)
 (use-package consult
   :ensure t

@@ -115,7 +115,7 @@ be updated accordingly.
   - [[#the-unravel-completionel-settings-for-saving-the-history-savehist-mode][The =unravel-completion.el= settings for saving the history (~savehist-mode~)]]
   - [[#the-unravel-completionel-settings-for-dynamic-text-expansion-dabbrev][The =unravel-completion.el= settings for dynamic text expansion (~dabbrev~)]]
   - [[#the-unravel-completionel-settings-for-dynamic-text-expansion-hippie][The =unravel-completion.el= settings for dynamic text expansion (~hippie~)]]
-  - [[#the-unravel-completionel-for-in-buffer-completion-popup-corfu][The =unravel-completion.el= for in-buffer completion popup (~corfu~)]]
+  - [[#the-unravel-completionel-for-in-buffer-completion-popup-corfu-and-cape][The =unravel-completion.el= for in-buffer completion popup (~corfu~ and ~cape~)]]
   - [[#the-unravel-completionel-settings-for-consult][The =unravel-completion.el= settings for ~consult~]]
   - [[#the-unravel-completionel-section-about-embark][The =unravel-completion.el= section about ~embark~]]
   - [[#the-unravel-completionel-section-to-configure-completion-annotations-marginalia][The =unravel-completion.el= section to configure completion annotations (~marginalia~)]]
@@ -2056,7 +2056,7 @@ Hippie uses Dabbrev as one of the expansion sources, so all the dabbrev settings
     ("M-/" . hippie-expand))
 #+end_src
 
-** The =unravel-completion.el= for in-buffer completion popup (~corfu~)
+** The =unravel-completion.el= for in-buffer completion popup (~corfu~ and ~cape~)
 :PROPERTIES:
 :CUSTOM_ID: h:804b858f-7913-47ef-aaf4-8eef5b59ecb4
 :END:
@@ -2077,24 +2077,37 @@ Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][the =unravel-completion.el= 
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
-;;; Corfu (in-buffer completion popup)
-(use-package corfu
-  :ensure t
-  :hook (elpaca-after-init . global-corfu-mode)
-  ;; I also have (setq tab-always-indent 'complete) for TAB to complete
-  ;; when it does not need to perform an indentation change.
-  :bind (:map corfu-map ("<tab>" . corfu-complete))
-  :config
-  (setq corfu-preview-current nil)
-  (setq corfu-min-width 20)
+  ;;; Corfu (in-buffer completion popup)
+  (use-package corfu
+    :ensure t
+    :hook (elpaca-after-init . global-corfu-mode)
+    ;; I also have (setq tab-always-indent 'complete) for TAB to complete
+    ;; when it does not need to perform an indentation change.
+    :bind (:map corfu-map ("<tab>" . corfu-complete))
+    :config
+    (setq corfu-preview-current nil)
+    (setq corfu-min-width 20)
 
-  (setq corfu-popupinfo-delay '(1.25 . 0.5))
-  (corfu-popupinfo-mode 1) ; shows documentation after `corfu-popupinfo-delay'
+    (setq corfu-popupinfo-delay '(1.25 . 0.5))
+    (corfu-popupinfo-mode 1) ; shows documentation after `corfu-popupinfo-delay'
 
-  ;; Sort by input history (no need to modify `corfu-sort-function').
-  (with-eval-after-load 'savehist
-    (corfu-history-mode 1)
-    (add-to-list 'savehist-additional-variables 'corfu-history)))
+    ;; Sort by input history (no need to modify `corfu-sort-function').
+    (with-eval-after-load 'savehist
+      (corfu-history-mode 1)
+      (add-to-list 'savehist-additional-variables 'corfu-history)))
+
+  (use-package cape
+    :ensure t
+    :demand t
+    ;; Press C-c p ? to for help.
+    :bind ("C-c p" . cape-prefix-map)
+    :hook
+    (completion-at-point-functions . cape-dabbrev)
+    (completion-at-point-functions . cape-dict)
+    (completion-at-point-functions . cape-elisp-block)
+    (completion-at-point-functions . cape-elisp-symbol)
+    (completion-at-point-functions . cape-emoji)
+    (completion-at-point-functions . cape-file))
 #+end_src
 
 ** The =unravel-completion.el= settings for ~consult~
