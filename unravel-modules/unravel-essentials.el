@@ -68,7 +68,9 @@
   :ensure nil
   :config
   (setq confirm-kill-emacs #'y-or-n-p)
-  (setq require-final-newline t))
+  (setq require-final-newline t)
+  (setq backup-directory-alist ;; Put the ~ files in tmp
+        `(("." . ,(locate-user-emacs-file "temp-files/backups")))))
 
 ;;;; Delete selection
 (use-package delsel

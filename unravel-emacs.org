@@ -1360,7 +1360,9 @@ with ~savehist-mode~ ([[#h:25765797-27a5-431e-8aa4-cc890a6a913a][The =unravel-co
     :ensure nil
     :config
     (setq confirm-kill-emacs #'y-or-n-p)
-    (setq require-final-newline t))
+    (setq require-final-newline t)
+    (setq backup-directory-alist ;; Put the ~ files in tmp
+          `(("." . ,(locate-user-emacs-file "temp-files/backups")))))
 #+end_src
 
 ** The =unravel-essentials.el= section for ~delete-selection-mode~
