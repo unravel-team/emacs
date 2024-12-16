@@ -274,10 +274,18 @@
                 "-path */.git* -prune "
                 "-or -path */.cache* -prune )"))
   (setq consult-preview-key 'any)
-
-  (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring))
-  ;; the `imenu' extension is in its own file
-  (require 'consult-imenu))
+    ;; the `imenu' extension is in its own file
+  (require 'consult-imenu)
+  (dolist (clj '(clojure-mode clojure-ts-mode))
+    (add-to-list 'consult-imenu-config
+                 `(,clj :toplevel "Functions"
+                        :types
+                        ((?f "Functions" font-lock-function-name-face)
+                         (?m "Macros" font-lock-function-name-face)
+                         (?p "Packages" font-lock-constant-face)
+                         (?t "Types" font-lock-type-face)
+                         (?v "Variables" font-lock-variable-name-face)))))
+  (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring)))
 
 ;;; Extended minibuffer actions and more (embark.el and prot-embark.el)
 (use-package embark
