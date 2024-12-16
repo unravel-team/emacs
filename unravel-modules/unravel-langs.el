@@ -190,9 +190,21 @@
 (use-package clojure-mode
   :ensure t)
 
+;;; `clojure-ts-mode' is not stable enough right now. In particular,
+;;; it clashes with `paredit-mode' sometimes, leading to Paredit
+;;; throwing unbalanced-expression errorsand being unusable. So
+;;; keeping this disabled and experimenting with how to fix it, for
+;;; them moment.
+
+(defvar enable-clojure-ts-mode nil)
+
+(when (and (treesit-available-p) enable-clojure-ts-mode)
+  (use-package clojure-ts-mode
+    :ensure t))
+
 (use-package cider
   :ensure t
-  :after clojure-mode
+  :after (:any clojure-mode clojure-ts-mode)
   :config
   (defun cider-repl-prompt-on-newline (ns)
     "Return a prompt string with newline.
@@ -202,9 +214,10 @@ NS is the namespace information passed into the function by cider."
 
 (use-package clj-refactor
   :ensure t
-  :after clojure-mode
+  :after (:any clojure-mode clojure-ts-mode)
   :hook
-  ((clojure-mode . clj-refactor-mode))
+  ((clojure-mode . clj-refactor-mode)
+   (clojure-ts-mode . clj-refactor-mode))
   :config
   (cljr-add-keybindings-with-prefix "C-c m")
   ;; Don't magically add stuff to the namespace requires form (because

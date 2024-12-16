@@ -1450,12 +1450,13 @@ process.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   ;;; Install and use tree-sitter major modes where possible
-  (use-package treesit-auto
-    :ensure t
-    :config
-    (setq treesit-auto-install 'prompt)
-    (treesit-auto-add-to-auto-mode-alist 'all)
-    (global-treesit-auto-mode))
+  (when (treesit-available-p)
+    (use-package treesit-auto
+      :ensure t
+      :config
+      (setq treesit-auto-install 'prompt)
+      (treesit-auto-add-to-auto-mode-alist 'all)
+      (global-treesit-auto-mode)))
 #+end_src
 
 ** The =unravel-essentials.el= section about ~expreg~ (tree-sitter mark syntactically)
@@ -5268,9 +5269,21 @@ Clojure is my favorite programming language, and it has been my bread and butter
   (use-package clojure-mode
     :ensure t)
 
+  ;;; `clojure-ts-mode' is not stable enough right now. In particular,
+  ;;; it clashes with `paredit-mode' sometimes, leading to Paredit
+  ;;; throwing unbalanced-expression errorsand being unusable. So
+  ;;; keeping this disabled and experimenting with how to fix it, for
+  ;;; them moment.
+
+  (defvar enable-clojure-ts-mode nil)
+
+  (when (and (treesit-available-p) enable-clojure-ts-mode)
+    (use-package clojure-ts-mode
+      :ensure t))
+
   (use-package cider
     :ensure t
-    :after clojure-mode
+    :after (:any clojure-mode clojure-ts-mode)
     :config
     (defun cider-repl-prompt-on-newline (ns)
       "Return a prompt string with newline.
@@ -5280,9 +5293,10 @@ Clojure is my favorite programming language, and it has been my bread and butter
 
   (use-package clj-refactor
     :ensure t
-    :after clojure-mode
+    :after (:any clojure-mode clojure-ts-mode)
     :hook
-    ((clojure-mode . clj-refactor-mode))
+    ((clojure-mode . clj-refactor-mode)
+     (clojure-ts-mode . clj-refactor-mode))
     :config
     (cljr-add-keybindings-with-prefix "C-c m")
     ;; Don't magically add stuff to the namespace requires form (because

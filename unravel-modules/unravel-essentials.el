@@ -104,12 +104,13 @@
   ("M-w" . easy-kill)) ; re-map kill-ring-save
 
 ;;; Install and use tree-sitter major modes where possible
-(use-package treesit-auto
-  :ensure t
-  :config
-  (setq treesit-auto-install 'prompt)
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+(when (treesit-available-p)
+  (use-package treesit-auto
+    :ensure t
+    :config
+    (setq treesit-auto-install 'prompt)
+    (treesit-auto-add-to-auto-mode-alist 'all)
+    (global-treesit-auto-mode)))
 
 ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)
 (when (and (fboundp 'treesit-available-p)
