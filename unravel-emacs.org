@@ -179,6 +179,7 @@ be updated accordingly.
   - [[#the-unravel-shellel-section-for-vterm][The =unravel-shell.el= section for ~vterm~]]
   - [[#the-unravel-shellel-section-for-zoxide][The =unravel-shell.el= section for ~zoxide~]]
   - [[#the-unravel-shellel-section-for-fish-mode][The =unravel-shell.el= section for ~fish-mode~]]
+  - [[#the-unravel-shellel-section-for-dwim-shell-command][The =unravel-shell.el= section for ~dwim-shell-command~]]
   - [[#finally-we-provide-the-unravel-shellel-module][Finally, we provide the =unravel-shell.el= module]]
 - [[#the-unravel-langsel-module][The =unravel-langs.el= module]]
   - [[#the-unravel-langsel-settings-for-tab][The =unravel-langs.el= settings for TAB]]
@@ -4800,6 +4801,32 @@ I use ~fish~ as my primary shell, and want a mode for reading ~.fish~ files. Thi
     :ensure t)
 #+end_src
 
+** The =unravel-shell.el= section for ~dwim-shell-command~
+:PROPERTIES:
+:CUSTOM_ID: h:DDA419D2-AFDD-4CEA-B158-FB271BE8E17C
+:CREATED:  [2024-12-15 Sun 12:10]
+:END:
+
+~dwim-shell-command~ is a super powered replacement for the built-in
+~shell-command~, and makes life really easy, especially on a Mac. The
+usage is exactly as you would use ~shell-command~ (which, in my case,
+is primarily by marking files in Dired and running =!=
+(~dired-do-shell-command~) on the files.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-shell.el"
+  (use-package dwim-shell-command
+    :ensure t
+    :bind
+    ( :map global-map
+      ([remap shell-command] . dwim-shell-command)
+      :map dired-mode-map
+      ([remap dired-do-async-shell-command] . dwim-shell-command)
+      ([remap dired-do-shell-command] . dwim-shell-command)
+      ([remap dired-smart-shell-command] . dwim-shell-command))
+    :config
+    ;; Also make available all the utility functions provided by Xenodium
+    (require 'dwim-shell-commands))
+#+end_src
 ** Finally, we provide the =unravel-shell.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:83F2ADFB-D72B-4F8C-8B01-BA1A9CA4939C
