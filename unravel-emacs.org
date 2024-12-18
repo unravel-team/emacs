@@ -455,9 +455,28 @@ package archives, pinning packages, and setting priorities:
 :CREATED:  [2024-12-10 Tue 14:43]
 :END:
 
-I use ~elpaca~ for package management, and ~use-package~ for configuration management. This means that ~elpaca~ replaces the built-in ~package.el~ functionality.
+I use ~elpaca~ for package management, and ~use-package~ for
+configuration management. This means that ~elpaca~ replaces the
+built-in ~package.el~ functionality.
 
-I do it this way because it simplifies my developement workflow for the emacs-lisp packages I want to contribute to. The built-in ~package.el~ is just fine, and if you prefer that, you should just COMMENT this section, uncomment [[#h:424340cc-f3d7-4083-93c9-d852d40dfd40][The =init.el= settings for packages (=package.el=)]] and re-export all the code-blocks.
+I do it this way because it simplifies my developement workflow for
+the emacs-lisp packages I want to contribute to, by letting me use
+code directly from git forges.
+
+When using ~elpaca~, here are some gotchas you should be aware of
+(Note: these only apply for =:ensure t= cases):
+
+1. Use ~elpaca-after-init-hook~ instead of ~after-init-hook~ or
+   ~emacs-startup-hook~. Elpaca runs in the background and does not
+   guarantee order. Using this special hook ensures that config is
+   loaded in the expected order.
+2. Prefer ~:demand~ or ~:wait~ over ~:defer~, especially when
+   deferring for a certain number of seconds. Do not make any
+   assumptions about order of execution.
+
+The built-in ~package.el~ is just fine, and if you prefer that, you
+should just COMMENT this section, uncomment [[#h:424340cc-f3d7-4083-93c9-d852d40dfd40][The =init.el= settings for
+packages (=package.el=)]] and re-export all the code-blocks.
 
 #+begin_src emacs-lisp :tangle "init.el"
   ;;; Install Elpaca
@@ -1443,13 +1462,18 @@ process.
     ("M-w" . easy-kill)) ; re-map kill-ring-save
 #+end_src
 
+
 ** The =unravel-essentials.el= section about ~treesit-auto~
 :PROPERTIES:
 :CUSTOM_ID: h:C9748AB2-AEFB-46E7-A3AD-0910D9CB153A
 :CREATED:  [2024-12-10 Tue 13:45]
 :END:
 
-~treesit-auto~ automatically downloads and installs tree-sitter modules. Tree-sitter is amazing new tech that is built into Emacs from v29 onwards, and enables much better syntax highlighting and code-navigation. I'll write more about tree-sitter in this section at a later date.
+~treesit-auto~ automatically downloads and installs tree-sitter
+modules. Tree-sitter is amazing new tech that is built into Emacs from
+v29 onwards, and enables much better syntax highlighting and
+code-navigation. I'll write more about tree-sitter in this section at
+a later date.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
   ;;; Install and use tree-sitter major modes where possible
