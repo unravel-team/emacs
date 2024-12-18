@@ -2090,9 +2090,7 @@ Hippie uses Dabbrev as one of the expansion sources, so all the dabbrev settings
 :END:
 
 #+begin_quote
-I generally do not rely on in-buffer text completion. I feel it slows
-me down and distracts me. When I do, however, need to rely on it, I
-have the ~corfu~ package by Daniel Mendler: it handles the task
+... the ~corfu~ package by Daniel Mendler: it handles the task
 splendidly as it works with Emacs' underlying infrastructure for
 ~completion-at-point-functions~.
 
@@ -2116,7 +2114,7 @@ Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][the =unravel-completion.el= 
     (setq corfu-preview-current nil)
     (setq corfu-min-width 20)
 
-    (setq corfu-popupinfo-delay '(1.25 . 0.5))
+    (setq corfu-popupinfo-delay '(2.0 . 1.0))
     (corfu-popupinfo-mode 1) ; shows documentation after `corfu-popupinfo-delay'
 
     ;; Sort by input history (no need to modify `corfu-sort-function').
@@ -2136,6 +2134,28 @@ Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][the =unravel-completion.el= 
     (completion-at-point-functions . cape-elisp-symbol)
     (completion-at-point-functions . cape-emoji)
     (completion-at-point-functions . cape-file))
+#+end_src
+
+** The =unravel-completion.el= for in-buffer completion using TAB (~smart-tab~)
+:PROPERTIES:
+:CUSTOM_ID: h:240488D1-B225-4877-86EE-40D5318B0A7E
+:CREATED:  [2024-12-18 Wed 14:59]
+:END:
+
+~smart-tab~ is an old but extremely reliable package that gets TAB to
+"do the right thing". Other packages somehow fail to replicate this
+functionality correctly.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; smart-tab (TAB to do completion reliably)
+  (use-package smart-tab
+    :ensure (:repo "https://git.genehack.net/genehack/smart-tab.git" :branch "main")
+    :after corfu
+    :config
+    (setq smart-tab-using-hippie-expand t)
+    (setq smart-tab-expand-eolp nil)
+    (setq smart-tab-user-provided-completion-function 'corfu-complete)
+    (global-smart-tab-mode 1))
 #+end_src
 
 ** The =unravel-completion.el= settings for ~consult~
@@ -4902,7 +4922,7 @@ is primarily by marking files in Dired and running =!=
     :demand t
     :config
     (setq tab-always-indent 'complete)
-    (setq tab-first-completion 'word-or-paren-or-punct) ; Emacs 27
+    (setq tab-first-completion nil)
     (setq-default tab-width 4
                   indent-tabs-mode nil))
 #+end_src

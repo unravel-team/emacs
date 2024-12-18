@@ -4,7 +4,7 @@
   :demand t
   :config
   (setq tab-always-indent 'complete)
-  (setq tab-first-completion 'word-or-paren-or-punct) ; Emacs 27
+  (setq tab-first-completion nil)
   (setq-default tab-width 4
                 indent-tabs-mode nil))
 

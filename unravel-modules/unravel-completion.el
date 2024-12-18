@@ -199,7 +199,7 @@
   (setq corfu-preview-current nil)
   (setq corfu-min-width 20)
 
-  (setq corfu-popupinfo-delay '(1.25 . 0.5))
+  (setq corfu-popupinfo-delay '(2.0 . 1.0))
   (corfu-popupinfo-mode 1) ; shows documentation after `corfu-popupinfo-delay'
 
   ;; Sort by input history (no need to modify `corfu-sort-function').
@@ -219,6 +219,16 @@
   (completion-at-point-functions . cape-elisp-symbol)
   (completion-at-point-functions . cape-emoji)
   (completion-at-point-functions . cape-file))
+
+;;; smart-tab (TAB to do completion reliably)
+(use-package smart-tab
+  :ensure (:repo "https://git.genehack.net/genehack/smart-tab.git" :branch "main")
+  :after corfu
+  :config
+  (setq smart-tab-using-hippie-expand t)
+  (setq smart-tab-expand-eolp nil)
+  (setq smart-tab-user-provided-completion-function 'corfu-complete)
+  (global-smart-tab-mode 1))
 
 ;;; Enhanced minibuffer commands (consult.el)
 (use-package consult
