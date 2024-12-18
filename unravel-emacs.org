@@ -2136,7 +2136,7 @@ Also see [[#h:567bb00f-1d82-4746-93e5-e0f60721728a][the =unravel-completion.el= 
     (completion-at-point-functions . cape-file))
 #+end_src
 
-** The =unravel-completion.el= for in-buffer completion using TAB (~smart-tab~)
+** COMMENT The =unravel-completion.el= for in-buffer completion using TAB (~smart-tab~)
 :PROPERTIES:
 :CUSTOM_ID: h:240488D1-B225-4877-86EE-40D5318B0A7E
 :CREATED:  [2024-12-18 Wed 14:59]
@@ -2154,7 +2154,8 @@ functionality correctly.
     :config
     (setq smart-tab-using-hippie-expand t)
     (setq smart-tab-expand-eolp nil)
-    (setq smart-tab-user-provided-completion-function 'corfu-complete)
+    ;; (setq smart-tab-user-provided-completion-function #'corfu-complete)
+    (setq smart-tab-user-provided-completion-function nil)
     (global-smart-tab-mode 1))
 #+end_src
 

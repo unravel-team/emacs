@@ -220,16 +220,6 @@
   (completion-at-point-functions . cape-emoji)
   (completion-at-point-functions . cape-file))
 
-;;; smart-tab (TAB to do completion reliably)
-(use-package smart-tab
-  :ensure (:repo "https://git.genehack.net/genehack/smart-tab.git" :branch "main")
-  :after corfu
-  :config
-  (setq smart-tab-using-hippie-expand t)
-  (setq smart-tab-expand-eolp nil)
-  (setq smart-tab-user-provided-completion-function 'corfu-complete)
-  (global-smart-tab-mode 1))
-
 ;;; Enhanced minibuffer commands (consult.el)
 (use-package consult
   :ensure t
