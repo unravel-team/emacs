@@ -205,6 +205,7 @@ be updated accordingly.
   - [[#the-unravel-studyel-section-for-org-remark-annotation-of-org-and-eww-files][The =unravel-study.el= section for ~org-remark~ (annotation of org and eww files)]]
   - [[#the-unravel-studyel-section-for-org-fc-flashcards][The =unravel-study.el= section for ~org-fc~ (flashcards)]]
   - [[#the-unravel-studyel-section-for-toc-org-table-of-contents][The =unravel-study.el= section for ~toc-org~ (table of contents)]]
+  - [[#the-unravel-studyel-section-for-org-board-archiving-web-content][The =unravel-study.el= section for ~org-board~ (archiving web content)]]
   - [[#finally-we-provide-the-unravel-studyel-module][Finally, we provide the =unravel-study.el= module]]
 - [[#custom-libraries][Custom libraries]]
   - [[#the-prot-commonel-library][The =prot-common.el= library]]
@@ -5825,6 +5826,24 @@ a table of contents under the first heading with the tag :TOC:.
   ;;; toc-org for automatic Table of Contents
   (use-package toc-org
     :ensure t)
+#+end_src
+
+** The =unravel-study.el= section for ~org-board~ (archiving web content)
+
+~org-board~ is a fantastic tool that lets me download content directly
+from various webpages, and store it locally. I use this to download
+every blogpost I enjoy, and this lets me reliably highlight the page
+([[#h:814EC9C8-3182-4B86-ADD9-123096D144D4][The =unravel-study.el= section for ~org-remark~ (annotation of org
+and eww files)]]) and extract flashcards from it ([[#h:C63AE939-4082-4763-B0A4-A736869B7B41][The =unravel-study.el=
+section for ~org-fc~ (flashcards)]]).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  ;;; Downloading and archiving webpages
+  (use-package org-board
+    :ensure t
+    :bind
+    ( :map org-mode-map
+      ("C-c o" . org-board-keymap)))
 #+end_src
 
 ** Finally, we provide the =unravel-study.el= module
