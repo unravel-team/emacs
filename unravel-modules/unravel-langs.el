@@ -208,6 +208,7 @@
   (use-package clojure-ts-mode
     :ensure t))
 
+;;;; Cider provides tooling over nREPL for Clojure programming
 (use-package cider
   :ensure t
   :after (:any clojure-mode clojure-ts-mode)
@@ -218,6 +219,7 @@ NS is the namespace information passed into the function by cider."
     (concat ns ">\n"))
   (setq cider-repl-prompt-function #'cider-repl-prompt-on-newline))
 
+;;;; clj-refactor enables smart refactoring of Clojure code
 (use-package clj-refactor
   :ensure t
   :after (:any clojure-mode clojure-ts-mode)
@@ -232,10 +234,22 @@ NS is the namespace information passed into the function by cider."
   ;; wanted to.
   (setq cljr-magic-requires nil))
 
+;;;; flymake-kondor integrates flymake with clj-kondo, so that we get
+;;;; great linting without needing to start a REPL or LSP server.
+(use-package flymake-kondor
+  :ensure t
+  :after (:any clojure-mode clojure-ts-mode flymake)
+  :ensure-system-package (clj-kondo)
+  :hook
+  ((clojure-mode . flymake-kondor-setup)
+   (clojure-ts-mode . flymake-kondor-setup)))
+
+;;;; clojure-snippets are handy yasnippets for fast coding
 (use-package clojure-snippets
   :ensure t
   :after clojure-mode)
 
+;;;; jet is an external tool to convert between json, transit and edn
 (use-package jet
   :ensure t
   :config

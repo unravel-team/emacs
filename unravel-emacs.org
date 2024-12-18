@@ -5361,7 +5361,16 @@ Clojure is my favorite programming language, and it has been my bread and butter
   (when (and (treesit-available-p) enable-clojure-ts-mode)
     (use-package clojure-ts-mode
       :ensure t))
+#+end_src
 
+*** The =unravel-langs.el= Clojure section for ~cider~
+:PROPERTIES:
+:CUSTOM_ID: h:92A8163E-68DA-49D2-A40F-69853FD7E68A
+:CREATED:  [2024-12-18 Wed 13:55]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Cider provides tooling over nREPL for Clojure programming
   (use-package cider
     :ensure t
     :after (:any clojure-mode clojure-ts-mode)
@@ -5371,7 +5380,16 @@ Clojure is my favorite programming language, and it has been my bread and butter
   NS is the namespace information passed into the function by cider."
       (concat ns ">\n"))
     (setq cider-repl-prompt-function #'cider-repl-prompt-on-newline))
+#+end_src
 
+*** The =unravel-langs.el= Clojure section for ~clj-refactor~
+:PROPERTIES:
+:CUSTOM_ID: h:DCA5B96F-E543-4CB9-8ECC-F73A6531CCEA
+:CREATED:  [2024-12-18 Wed 13:59]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; clj-refactor enables smart refactoring of Clojure code
   (use-package clj-refactor
     :ensure t
     :after (:any clojure-mode clojure-ts-mode)
@@ -5385,11 +5403,39 @@ Clojure is my favorite programming language, and it has been my bread and butter
     ;; by hand (=add-missing= operation) after you've typed out what you
     ;; wanted to.
     (setq cljr-magic-requires nil))
+#+end_src
 
+*** The =unravel-langs.el= Clojure section for ~flymake-kondor~
+:PROPERTIES:
+:CUSTOM_ID: h:22939449-DC0E-4551-800D-396D5076C406
+:CREATED:  [2024-12-18 Wed 14:03]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; flymake-kondor integrates flymake with clj-kondo, so that we get
+  ;;;; great linting without needing to start a REPL or LSP server.
+  (use-package flymake-kondor
+    :ensure t
+    :after (:any clojure-mode clojure-ts-mode flymake)
+    :ensure-system-package (clj-kondo)
+    :hook
+    ((clojure-mode . flymake-kondor-setup)
+     (clojure-ts-mode . flymake-kondor-setup)))
+#+end_src
+
+*** The =unravel-langs.el= Clojure section for ~clojure-snippets~ and ~jet~
+:PROPERTIES:
+:CUSTOM_ID: h:413C1A9A-BFC7-43B8-A062-3A81259DD794
+:CREATED:  [2024-12-18 Wed 14:05]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; clojure-snippets are handy yasnippets for fast coding
   (use-package clojure-snippets
     :ensure t
     :after clojure-mode)
 
+  ;;;; jet is an external tool to convert between json, transit and edn
   (use-package jet
     :ensure t
     :config
