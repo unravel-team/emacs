@@ -82,7 +82,10 @@
     ("C-c ! L" . flymake-show-project-diagnostics) ; Emacs28
     ("C-c ! n" . flymake-goto-next-error)
     ("C-c ! p" . flymake-goto-prev-error))
+  :hook
+  (prog-mode . turn-on-flymake)
   :config
+  (defun turn-on-flymake () (flymake-mode t))
   (setq flymake-fringe-indicator-position 'left-fringe)
   (setq flymake-suppress-zero-counters t)
   (setq flymake-no-changes-timeout nil)
@@ -96,13 +99,16 @@
         '("" flymake-mode-line-error-counter
           flymake-mode-line-warning-counter
           flymake-mode-line-note-counter ""))
-  (setq flymake-show-diagnostics-at-end-of-line nil)) ; Emacs 30
+  (setq flymake-show-diagnostics-at-end-of-line nil) ; Emacs 30
+  (remove-hook 'flymake-diagnostic-functions #'flymake-proc-legacy-flymake))
 
 ;;; Elisp packaging requirements
 (use-package package-lint-flymake
   :ensure t
   :after flymake
   :config
+  ;; We can't use `use-package' :hook because the hookname does not
+  ;; end in -hook.
   (add-hook 'flymake-diagnostic-functions #'package-lint-flymake))
 
 ;;; General configurations for prose/writing
