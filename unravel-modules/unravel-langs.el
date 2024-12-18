@@ -154,6 +154,13 @@
   (with-eval-after-load 'apheleia-formatters
     (push '(zprint . ("zprint")) apheleia-formatters)))
 
+(use-package multiple-cursors
+  :ensure t
+  :bind
+  ("C->" . mc/mark-next-like-this)
+  ("C-<" . mc/mark-previous-like-this)
+  ("C-c C->" . mc/mark-all-like-this))
+
 ;;;; Configuration for Python Programming
 
 (use-package python

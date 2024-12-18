@@ -194,6 +194,7 @@ be updated accordingly.
   - [[#the-unravel-langsel-settings-for-dictionary][The =unravel-langs.el= settings for ~dictionary~]]
   - [[#the-unravel-langsel-settings-for-paredit-paren-matching][The =unravel-langs.el= settings for ~paredit~ (paren matching)]]
   - [[#the-unravel-langsel-settings-for-apheleia-code-formatting][The =unravel-langs.el= settings for ~apheleia~ (code formatting)]]
+  - [[#the-unravel-langsel-settings-for-multiple-cursors][The =unravel-langs.el= settings for ~multiple-cursors~]]
   - [[#the-unravel-langsel-section-for-python][The =unravel-langs.el= section for Python]]
   - [[#the-unravel-langsel-section-for-ziglang][The =unravel-langs.el= section for Ziglang]]
   - [[#the-unravel-langsel-section-for-clojure][The =unravel-langs.el= section for Clojure]]
@@ -5228,6 +5229,21 @@ Use the entry point ~M-x dictionary-search~
     (apheleia-global-mode +1)
     (with-eval-after-load 'apheleia-formatters
       (push '(zprint . ("zprint")) apheleia-formatters)))
+#+end_src
+
+** The =unravel-langs.el= settings for ~multiple-cursors~
+:PROPERTIES:
+:CUSTOM_ID: h:07712014-B63C-429E-8D81-2D0E21E04ECC
+:CREATED:  [2024-12-18 Wed 14:13]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package multiple-cursors
+    :ensure t
+    :bind
+    ("C->" . mc/mark-next-like-this)
+    ("C-<" . mc/mark-previous-like-this)
+    ("C-c C->" . mc/mark-all-like-this))
 #+end_src
 
 ** The =unravel-langs.el= section for Python
