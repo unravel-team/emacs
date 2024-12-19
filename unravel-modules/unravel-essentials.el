@@ -38,6 +38,12 @@
   (setq recentf-filename-handlers nil)
   (setq recentf-show-file-shortcuts-flag nil))
 
+(use-package saveplace
+  :ensure nil
+  :hook (elpaca-after-init . save-place-mode)
+  :config
+  (setq save-place-file (locate-user-emacs-file "saveplace")))
+
 ;;;; Built-in bookmarking framework (bookmark.el)
 (use-package bookmark
   :ensure nil

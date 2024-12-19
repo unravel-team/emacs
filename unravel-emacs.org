@@ -1305,6 +1305,20 @@ The ~PATH~ variable does not get set properly on Mac OSX and Windows machines, a
   (setq recentf-show-file-shortcuts-flag nil))
 #+end_src
 
+** The =unravel-essentials.el= configuration to track my place in visited files (~saveplace~)
+:PROPERTIES:
+:CUSTOM_ID: h:01DD3C5F-B871-408F-98F6-6B845921C541
+:CREATED:  [2024-12-19 Thu 11:35]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  (use-package saveplace
+    :ensure nil
+    :hook (elpaca-after-init . save-place-mode)
+    :config
+    (setq save-place-file (locate-user-emacs-file "saveplace")))
+#+end_src
+
 ** The =unravel-essentials.el= settings for bookmarks
 :PROPERTIES:
 :CUSTOM_ID: h:581aa0ff-b136-4099-a321-3b86edbfbccb
@@ -2024,16 +2038,16 @@ basis.
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
-;;;; `savehist' (minibuffer and related histories)
-(use-package savehist
-  :ensure nil
-  :hook (elpaca-after-init . savehist-mode)
-  :config
-  (setq savehist-file (locate-user-emacs-file "savehist"))
-  (setq history-length 100)
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history t)
-  (add-to-list 'savehist-additional-variables 'kill-ring))
+  ;;;; `savehist' (minibuffer and related histories)
+  (use-package savehist
+    :ensure nil
+    :hook (elpaca-after-init . savehist-mode)
+    :config
+    (setq savehist-file (locate-user-emacs-file "savehist"))
+    (setq history-length 100)
+    (setq history-delete-duplicates t)
+    (setq savehist-save-minibuffer-history t)
+    (add-to-list 'savehist-additional-variables 'kill-ring))
 #+end_src
 
 ** The =unravel-completion.el= settings for dynamic text expansion (~dabbrev~)
