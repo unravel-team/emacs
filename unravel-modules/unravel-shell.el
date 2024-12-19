@@ -10,9 +10,10 @@
 (when (executable-find "zoxide")
   (use-package zoxide
     :ensure t
-    :config
-    (add-hook 'find-file-hook #'zoxide-add)
-    (add-hook 'dired-mode-hook #'zoxide-add)))
+    :hook
+    (consult-after-jump-hook . zoxide-add)
+    (find-file-hook . zoxide-add)
+    (dired-mode-hook . zoxide-add)))
 
 ;; Mode to read/write fish functions and files
 (use-package fish-mode
