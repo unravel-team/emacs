@@ -6872,6 +6872,10 @@ I want this section to contain all the personal configuration that anyone using 
           (expand-file-name "brain/daily.org" org-directory))
     (setq org-blogpost-file
           (expand-file-name "brain/projects/blogposts.org" org-directory))
+    (setq org-crm-file
+          (expand-file-name "brain/projects/crm.org" org-directory))
+    (setq org-sales-file
+          (expand-file-name "brain/projects/sales.org" org-directory))
     (setq org-company-file
           (expand-file-name "brain/daily.org" org-directory))
     (setq org-agenda-files
@@ -7200,6 +7204,67 @@ I want this section to contain all the personal configuration that anyone using 
             :immediate-finish t)
           org-capture-templates))
 #+end_src
+
+*** Sales and CRM settings for ~org-capture~
+:PROPERTIES:
+:CUSTOM_ID: h:B1F1472D-7D4A-4620-973C-08FAE263A9F1
+:CREATED:  [2024-12-24 Tue 12:40]
+:END:
+
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  ;;;; Sales and CRM capture templates
+  (use-package org-capture
+    :ensure nil
+    :config
+  ;;; Default definitions for variables used in capture templates
+    (when (not (boundp 'org-crm-file))
+      (defvar org-crm-file org-default-notes-file
+        "File in which CRM data is stored."))
+    (when (not (boundp 'org-sales-file))
+      (defvar org-sales-file org-default-notes-file
+        "File in which Sales Deal data is stored."))
+
+  ;;; *CRITICAL NOTE* Read before modifying the push stack below:
+    ;; Pushing to capture templates is a stack. What goes in first shows
+    ;; up at the bottom of the capture templates list.
+
+    (push '("s" "Sales and CRM templates") org-capture-templates)
+    (push `("sl" "New Sales Lead" entry
+            (file+headline org-sales-file "Leads to be Refiled")
+            (file ,(expand-file-name "capture-templates/sales.newlead.org" user-emacs-directory))
+            :prepend t
+            :kill-buffer t
+            :empty-lines-after 1
+            :clock-in t
+            :clock-resume t)
+          org-capture-templates)
+    (push `("sc" "New Company in CRM" entry
+            (file org-crm-file)
+            (file ,(expand-file-name "capture-templates/crm.newcompany.org" user-emacs-directory))
+            :prepend t
+            :clock-in t
+            :clock-resume t
+            :kill-buffer t
+            :empty-lines-after 1)
+          org-capture-templates)
+    (push `("sp" "New Person in CRM" entry
+            (file+headline org-crm-file "CRM to be Refiled")
+            (file ,(expand-file-name "capture-templates/crm.newperson.org" user-emacs-directory))
+            :prepend nil
+            :clock-in t
+            :clock-resume t
+            :empty-lines 1)
+          org-capture-templates)
+    (push `("sm" "Sales Related Meeting" entry
+            (file+headline org-sales-file "Sales to be Refiled")
+            (file ,(expand-file-name "capture-templates/sales.newmeeting.org" user-emacs-directory))
+            :prepend nil
+            :clock-in t
+            :clock-resume t
+            :empty-lines 1)
+          org-capture-templates))
+#+end_src
+
 
 *** My personal settings for Ledger management
 :PROPERTIES:
