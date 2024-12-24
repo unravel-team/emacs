@@ -283,8 +283,7 @@ modifications."
 ;;; Downloading and archiving webpages
 (use-package org-board
   :ensure t
-  :bind
-  ( :map org-mode-map
-    ("C-c o" . org-board-keymap)))
+  :bind-keymap
+  ("C-c o" . org-board-keymap))
 
 (provide 'unravel-study)
