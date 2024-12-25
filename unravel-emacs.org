@@ -4903,9 +4903,9 @@ of different paths inside Zoxide. This is how to do it:
     (use-package zoxide
       :ensure t
       :hook
-      (consult-after-jump-hook . zoxide-add)
-      (find-file-hook . zoxide-add)
-      (dired-mode-hook . zoxide-add)))
+      (consult-after-jump . zoxide-add)
+      (find-file . zoxide-add)
+      (dired-mode . zoxide-add)))
 #+end_src
 
 ** The =unravel-shell.el= section for writing fish configuration (~fish-mode~)

@@ -11,9 +11,9 @@
   (use-package zoxide
     :ensure t
     :hook
-    (consult-after-jump-hook . zoxide-add)
-    (find-file-hook . zoxide-add)
-    (dired-mode-hook . zoxide-add)))
+    (consult-after-jump . zoxide-add)
+    (find-file . zoxide-add)
+    (dired-mode . zoxide-add)))
 
 ;; Mode to read/write fish functions and files
 (use-package fish-mode
