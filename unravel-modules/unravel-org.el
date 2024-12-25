@@ -146,7 +146,8 @@
   (setq org-reverse-note-order nil)
   (setq org-todo-keywords
         '((sequence "TODO(t!)" "WORKING(w!)" "|" "CANCEL(c@)" "DONE(d!)")
-          (sequence "PROJECT(p!)" "FOLLOWUP(f!)" "WAITING(a@/!)" "DELEGATED(e@/!)")))
+          (sequence "PROJECT(p!)" "FOLLOWUP(f!)" "WAITING(a@/!)" "DELEGATED(e@/!)")
+          (sequence "PROSPECT(P!)" "QUAL(q!)" "PROPOSAL(o!)" "WAITING(a@/!)" "NEGOTIATION(n!)" "CONTRACT(c!)" "|" "WON(W!)" "LOST(l@/!)")))
 
   (defface prot/org-bold-done
     '((t :inherit (bold org-done)))
