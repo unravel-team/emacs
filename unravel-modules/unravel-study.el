@@ -72,7 +72,8 @@
   ;; Remember to check the doc strings of those variables.
   (let ((dir (string-trim (shell-command-to-string "echo $DENOTE_DIRECTORY"))))
     (when (not (string-empty-p dir))
-      (setq denote-directory (expand-file-name dir))))
+      (setq denote-directory (expand-file-name dir))
+      (setq denote-journal-extras-directory (expand-file-name "journal" denote-directory))))
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
   (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)
