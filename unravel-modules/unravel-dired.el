@@ -39,6 +39,19 @@
   ;; problem as j calls `dired-goto-file', which I often use.
   (define-key dired-jump-map (kbd "j") nil))
 
+;;; Multi-occur in project and dired!
+(use-package dired
+  :ensure nil
+  :bind
+  ( :map dired-mode-map
+    ("M-s a m" . noccur-dired))
+  :config
+  (defun noccur-dired (regexp &optional nlines)
+    "Perform `multi-occur' with REGEXP in all dired marked files.
+When called with a prefix argument NLINES, display NLINES lines before and after."
+    (interactive (occur-read-primary-args))
+    (multi-occur (mapcar #'find-file (dired-get-marked-files)) regexp nlines)))
+
 (use-package dired-aux
   :ensure nil
   :after dired

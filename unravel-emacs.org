@@ -86,7 +86,7 @@
   - [[#the-unravel-completionel-settings-for-dynamic-text-expansion-hippie][The =unravel-completion.el= settings for dynamic text expansion (~hippie~)]]
   - [[#the-unravel-completionel-for-in-buffer-completion-popup-corfu-and-cape][The =unravel-completion.el= for in-buffer completion popup (~corfu~ and ~cape~)]]
   - [[#the-unravel-completionel-settings-for-filtering-previewing-candidates-consult][The =unravel-completion.el= settings for filtering, previewing candidates (~consult~)]]
-  - [[#the-unravel-completionel-section-for-performaing-actions-in-context-embark][The =unravel-completion.el= section for performaing actions in context (~embark~)]]
+  - [[#the-unravel-completionel-section-for-performing-actions-in-context-embark][The =unravel-completion.el= section for performing actions in context (~embark~)]]
   - [[#the-unravel-completionel-section-to-configure-completion-annotations-marginalia][The =unravel-completion.el= section to configure completion annotations (~marginalia~)]]
   - [[#the-unravel-completionel-section-for-vertical-minibuffer-layout-vertico][The =unravel-completion.el= section for vertical minibuffer layout (~vertico~)]]
   - [[#finally-we-provide-the-unravel-completionel-module][Finally, we provide the ~unravel-completion.el~ module]]
@@ -106,6 +106,7 @@
   - [[#the-unravel-diredel-switches-for-how-files-are-listed-ls][The =unravel-dired.el= switches for how files are listed (~ls~)]]
   - [[#the-unravel-diredel-setting-for-dual-pane-dired][The =unravel-dired.el= setting for dual-pane Dired]]
   - [[#the-unravel-diredel-miscellaneous-tweaks][The =unravel-dired.el= miscellaneous tweaks]]
+  - [[#the-unravel-diredel-section-for-using-multi-occur-noccur][The =unravel-dired.el= section for using multi-occur (~noccur~)]]
   - [[#the-unravel-diredel-section-about-various-conveniences][The =unravel-dired.el= section about various conveniences]]
   - [[#the-unravel-diredel-section-about-subdirectory-contents-dired-subtree][The =unravel-dired.el= section about subdirectory contents (~dired-subtree~)]]
   - [[#the-unravel-diredel-section-about-writable-dired-wdired][The =unravel-dired.el= section about writable Dired (~wdired~)]]
@@ -2318,7 +2319,7 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
     (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring)))
 #+end_src
 
-** The =unravel-completion.el= section for performaing actions in context (~embark~)
+** The =unravel-completion.el= section for performing actions in context (~embark~)
 :PROPERTIES:
 :CUSTOM_ID: h:61863da4-8739-42ae-a30f-6e9d686e1995
 :END:
@@ -3082,6 +3083,37 @@ I disable the repetition of the =j= key as I do use ~repeat-mode~
   ;; problem as j calls `dired-goto-file', which I often use.
   (define-key dired-jump-map (kbd "j") nil))
 #+end_src
+
+** The =unravel-dired.el= section for using multi-occur (~noccur~)
+:PROPERTIES:
+:CUSTOM_ID: h:6EA8DE69-4FA3-48CE-BAF7-066680675AD7
+:CREATED:  [2024-12-29 Sun 20:51]
+:END:
+
+~multi-occur~ is brilliant. But most of the times, I do not have all
+the buffers I want to run open. The fastest way to search a small
+subset of my Denote notes is to narrow down what I want in a ~dired~
+buffer using ~denote-sort~, and then use ~noccur-dired~ on it. This
+tiny function is super-handy, and it's taken from the ~noccur~ package
+(because that's all I need from that package)
+
+(see: [[#h:e86a66dc-7ef9-4f09-ad7e-946de2034e8d][The =unravel-study.el= section for notes and file-naming (~denote~)]])
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-dired.el"
+  ;;; Multi-occur in project and dired!
+  (use-package dired
+    :ensure nil
+    :bind
+    ( :map dired-mode-map
+      ("M-s a m" . noccur-dired))
+    :config
+    (defun noccur-dired (regexp &optional nlines)
+      "Perform `multi-occur' with REGEXP in all dired marked files.
+  When called with a prefix argument NLINES, display NLINES lines before and after."
+      (interactive (occur-read-primary-args))
+      (multi-occur (mapcar #'find-file (dired-get-marked-files)) regexp nlines)))
+#+end_src
+
 
 ** The =unravel-dired.el= section about various conveniences
 :PROPERTIES:
