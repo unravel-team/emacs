@@ -6011,8 +6011,21 @@ files. It is my goto tool for reading any academic papers.
 :END:
 
 ~toc-org~ is a simple and nifty package for automatically creating a
-table of contents in any org-mode file. It works by creating/updating
-a table of contents under the first heading with the tag :TOC:.
+table of contents in any ~org-mode~ file. It works by
+creating/updating a table of contents under the first heading with the
+tag =:TOC:=.
+
+By default, it creates a version of links which export according to
+the format expected by Github (so that the links work correctly for
+someone reading on Github). But these links don't work in standard
+~org-mode~ (without ~toc-org~ enabled).
+
+Enabling ~toc-org-mode~ in the org file means that anytime I save the
+buffer, the TOC will automatically be updated. Also, the links created
+in the TOC will be navigable using standard ~org-mode~ shortcuts.
+
+To enable ~toc-org~, run =M-x toc-org-mode= in your ~org-mode~ file
+and create a heading with the tag =:TOC:= added to it.
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
   ;;; toc-org for automatic Table of Contents
