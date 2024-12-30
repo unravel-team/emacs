@@ -7322,3 +7322,14 @@ I use the incredible ledger-mode for all my personal finance tracking
 #+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
   (provide 'vedang-personal)
 #+end_src
+
+** COMMENT Local Variables
+
+We use ~toc-org-mode~ in this file, to generate titles which are
+compliant with GitHub. Here, we enable ~toc-org-mode~ for this file
+specifically, so that others who open the file in Emacs Org-mode can
+navigate the TOC properly.
+
+# Local Variables:
+# eval: (toc-org-mode 1)
+# End:
