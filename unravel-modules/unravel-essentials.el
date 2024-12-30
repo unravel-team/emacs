@@ -117,7 +117,7 @@
     :ensure t
     :config
     (setq treesit-auto-install 'prompt)
-    (treesit-auto-add-to-auto-mode-alist 'all)
+    (treesit-auto-add-to-auto-mode-alist)
     (global-treesit-auto-mode)))
 
 ;;; Mark syntactic constructs efficiently if tree-sitter is available (expreg)
