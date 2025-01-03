@@ -2,7 +2,7 @@
 #+author: Vedang Manerikar
 #+email: vedang@unravel.tech
 #+language: en
-#+options: ':t toc:nil num:t author:t email:t
+#+options: ':t toc:nil num:nil author:t email:t
 
 * Quick Start
 :PROPERTIES:
