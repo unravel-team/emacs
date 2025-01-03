@@ -276,6 +276,7 @@
   (setq consult-preview-key 'any)
     ;; the `imenu' extension is in its own file
   (require 'consult-imenu)
+  (consult-customize consult-imenu :initial (thing-at-point 'symbol))
   (dolist (clj '(clojure-mode clojure-ts-mode))
     (add-to-list 'consult-imenu-config
                  `(,clj :toplevel "Functions"

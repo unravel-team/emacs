@@ -177,6 +177,7 @@
   - [[#the-unravel-studyel-section-for-flashcards-org-fc][The =unravel-study.el= section for flashcards (~org-fc~)]]
   - [[#the-unravel-studyel-section-for-table-of-contents-toc-org][The =unravel-study.el= section for table of contents (~toc-org~)]]
   - [[#the-unravel-studyel-section-for-archiving-web-content-org-board][The =unravel-study.el= section for archiving web content (~org-board~)]]
+  - [[#the-unravel-studeel-section-for-publishing-org-mode-content-ox-gfm][The =unravel-stude.el= section for publishing org-mode content (~ox-gfm~)]]
   - [[#finally-we-provide-the-unravel-studyel-module][Finally, we provide the =unravel-study.el= module]]
 - [[#custom-libraries][Custom libraries]]
   - [[#the-prot-commonel-library][The =prot-common.el= library]]
@@ -2307,6 +2308,7 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
     (setq consult-preview-key 'any)
       ;; the `imenu' extension is in its own file
     (require 'consult-imenu)
+    (consult-customize consult-imenu :initial (thing-at-point 'symbol))
     (dolist (clj '(clojure-mode clojure-ts-mode))
       (add-to-list 'consult-imenu-config
                    `(,clj :toplevel "Functions"
