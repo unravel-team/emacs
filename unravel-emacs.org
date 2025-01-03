@@ -6050,6 +6050,18 @@ section for ~org-fc~ (flashcards)]]).
     ("C-c o" . org-board-keymap))
 #+end_src
 
+** The =unravel-stude.el= section for publishing org-mode content (~ox-gfm~)
+:PROPERTIES:
+:CUSTOM_ID: h:85D2A18F-9F3A-423E-9CBC-E09693E192D9
+:CREATED:  [2025-01-01 Wed 21:20]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  ;;; Publishing org-mode content
+  (use-package ox-gfm
+    :ensure (:host github :repo "vedang/ox-gfm" :branch "master"))
+#+end_src
+
 ** Finally, we provide the =unravel-study.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:13AF346B-1721-47FC-87A9-16EEB7818521
