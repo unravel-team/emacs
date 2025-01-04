@@ -5719,6 +5719,7 @@ Prot is the developer and maintainer of this package.
       ;; Bindings to personal functions (defined below)
       ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
       ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry)
+      ("C-c d p l" . vedang/denote-publishing-extras-new-linklog-entry)
       :map text-mode-map
       ("C-c d B" . denote-backlinks)
       ("C-c d b" . denote-find-backlink)
@@ -5833,6 +5834,27 @@ Prot is the developer and maintainer of this package.
          nil nil date
          ;; See YASnippet
          "microblog")))
+
+    (defun vedang/denote-publishing-extras-new-linklog-entry (date)
+      "Create a new microblog entry.
+    Set the title of the new entry according to the value of the user option
+    `denote-journal-extras-title-format'.
+
+    Prompt for a DATE. If `denote-date-prompt-use-org-read-date' is
+    non-nil, use the Org date selection module.
+
+    When called from Lisp DATE is a string and has the same format as
+    that covered in the documentation of the `denote' function.  It
+    is internally processed by `denote-parse-date'."
+      (interactive (list (denote-date-prompt)))
+      (let ((internal-date (denote-parse-date date))
+            (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+        (denote
+         (denote-journal-extras-daily--title-format internal-date)
+         '("draft" "linklog")
+         nil nil date
+         ;; See YASnippet
+         "linklog")))
 
     (defun vedang/denote-link-ol-get-id ()
       "Get the CUSTOM_ID of the current entry.
