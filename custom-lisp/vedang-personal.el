@@ -391,4 +391,36 @@
 (use-package ledger-mode
   :ensure t)
 
+;;; Publishing org-mode content
+
+;;;; Explicit dependency on ox-gfm, because I use my fork of it.
+(use-package ox-gfm
+  :ensure (:host github :repo "vedang/ox-gfm" :branch "master"))
+
+;;;; From Denote to Markdown, with front-matter intact
+(use-package denote-publish
+  :ensure (:host github :repo "vedang/denote-publish" :branch "main")
+  :config
+  ;; ## Project-specific directories
+  (defvar vm-base-dir)
+  (defvar vm-publishing-dir)
+
+  ;; ## Convert the Front-Matter from org to md format.
+
+  (setq vm-base-dir (expand-file-name "~/Tresors/Documents/diary/notes/published"))
+  (setq vm-publishing-dir (expand-file-name "~/src/prototypes/vedang.me/v7/components/content/resources/content"))
+
+  (setq org-publish-project-alist
+        `(("vedangme" .
+           (:base-directory ,vm-base-dir
+                            :publishing-directory ,vm-publishing-dir
+                            :publishing-function denote-publish-to-md
+                            :recursive nil
+                            :exclude-tags ("noexport" "draft" "private")
+                            :section-numbers nil
+                            :with-creator nil
+                            :with-toc nil
+                            :auto-sitemap t
+                            :makeindex t)))))
+
 (provide 'vedang-personal)

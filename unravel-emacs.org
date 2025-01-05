@@ -177,7 +177,6 @@
   - [[#the-unravel-studyel-section-for-flashcards-org-fc][The =unravel-study.el= section for flashcards (~org-fc~)]]
   - [[#the-unravel-studyel-section-for-table-of-contents-toc-org][The =unravel-study.el= section for table of contents (~toc-org~)]]
   - [[#the-unravel-studyel-section-for-archiving-web-content-org-board][The =unravel-study.el= section for archiving web content (~org-board~)]]
-  - [[#the-unravel-studeel-section-for-publishing-org-mode-content-ox-gfm][The =unravel-stude.el= section for publishing org-mode content (~ox-gfm~)]]
   - [[#finally-we-provide-the-unravel-studyel-module][Finally, we provide the =unravel-study.el= module]]
 - [[#custom-libraries][Custom libraries]]
   - [[#the-prot-commonel-library][The =prot-common.el= library]]
@@ -6074,18 +6073,6 @@ section for ~org-fc~ (flashcards)]]).
     ("C-c o" . org-board-keymap))
 #+end_src
 
-** The =unravel-stude.el= section for publishing org-mode content (~ox-gfm~)
-:PROPERTIES:
-:CUSTOM_ID: h:85D2A18F-9F3A-423E-9CBC-E09693E192D9
-:CREATED:  [2025-01-01 Wed 21:20]
-:END:
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
-  ;;; Publishing org-mode content
-  (use-package ox-gfm
-    :ensure (:host github :repo "vedang/ox-gfm" :branch "master"))
-#+end_src
-
 ** Finally, we provide the =unravel-study.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:13AF346B-1721-47FC-87A9-16EEB7818521
@@ -7360,6 +7347,46 @@ I use the incredible ledger-mode for all my personal finance tracking
   ;;; Ledger for personal finance management, plain-text accounting
   (use-package ledger-mode
     :ensure t)
+#+end_src
+
+*** My personal settings for publishing org-mode content (~ox-gfm~ and ~denote-publish~)
+:PROPERTIES:
+:CUSTOM_ID: h:85D2A18F-9F3A-423E-9CBC-E09693E192D9
+:CREATED:  [2025-01-01 Wed 21:20]
+:END:
+
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  ;;; Publishing org-mode content
+
+  ;;;; Explicit dependency on ox-gfm, because I use my fork of it.
+  (use-package ox-gfm
+    :ensure (:host github :repo "vedang/ox-gfm" :branch "master"))
+
+  ;;;; From Denote to Markdown, with front-matter intact
+  (use-package denote-publish
+    :ensure (:host github :repo "vedang/denote-publish" :branch "main")
+    :config
+    ;; ## Project-specific directories
+    (defvar vm-base-dir)
+    (defvar vm-publishing-dir)
+
+    ;; ## Convert the Front-Matter from org to md format.
+
+    (setq vm-base-dir (expand-file-name "~/Tresors/Documents/diary/notes/published"))
+    (setq vm-publishing-dir (expand-file-name "~/src/prototypes/vedang.me/v7/components/content/resources/content"))
+
+    (setq org-publish-project-alist
+          `(("vedangme" .
+             (:base-directory ,vm-base-dir
+                              :publishing-directory ,vm-publishing-dir
+                              :publishing-function denote-publish-to-md
+                              :recursive nil
+                              :exclude-tags ("noexport" "draft" "private")
+                              :section-numbers nil
+                              :with-creator nil
+                              :with-toc nil
+                              :auto-sitemap t
+                              :makeindex t)))))
 #+end_src
 
 *** Finally, we provide the =vedang-personal.el= module

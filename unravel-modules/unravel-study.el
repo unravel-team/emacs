@@ -309,8 +309,4 @@ modifications."
   :bind-keymap
   ("C-c o" . org-board-keymap))
 
-;;; Publishing org-mode content
-(use-package ox-gfm
-  :ensure (:host github :repo "vedang/ox-gfm" :branch "master"))
-
 (provide 'unravel-study)
