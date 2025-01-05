@@ -5939,6 +5939,50 @@ Prot is the developer of this package.
     (consult-denote-mode 1))
 #+end_src
 
+*** The =unravel-study.el= section for exploring my Zettelkasten (~denote-explore~)
+:PROPERTIES:
+:CUSTOM_ID: h:A6E672ED-BE45-4DC8-B0AE-97CDB46E53D0
+:CREATED:  [2025-01-05 Sun 11:58]
+:END:
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  (use-package denote-explore
+    :ensure t
+    :after denote
+    :config
+    (setq denote-explore-network-directory (expand-file-name "denote-explore-network" denote-directory))
+    (setq denote-explore-network-filename "denote-network")
+    (setq denote-explore-network-format 'd3.js)
+    (setq denote-explore-network-d3-colours 'SchemeObservable10)
+    (setq denote-explore-network-d3-js "https://d3js.org/d3.v7.min.js")
+    (setq denote-explore-network-graphviz-filetype 'svg)
+    :bind
+    (;; Statistics
+     ("C-c d e s n" . denote-explore-count-notes)
+     ("C-c d e s k" . denote-explore-count-keywords)
+     ("C-c d e s e" . denote-explore-barchart-filetypes)
+     ("C-c d e s w" . denote-explore-barchart-keywords)
+     ("C-c d e s t" . denote-explore-barchart-timeline)
+     ;; Random walks
+     ("C-c d e w n" . denote-explore-random-note)
+     ("C-c d e w r" . denote-explore-random-regex)
+     ("C-c d e w l" . denote-explore-random-link)
+     ("C-c d e w k" . denote-explore-random-keyword)
+     ;; Denote Janitor
+     ("C-c d e j d" . denote-explore-duplicate-notes)
+     ("C-c d e j D" . denote-explore-duplicate-notes-dired)
+     ("C-c d e j l" . denote-explore-dead-links)
+     ("C-c d e j z" . denote-explore-zero-keywords)
+     ("C-c d e j s" . denote-explore-single-keywords)
+     ("C-c d e j r" . denote-explore-rename-keywords)
+     ("C-c d e j y" . denote-explore-sync-metadata)
+     ("C-c d e j i" . denote-explore-isolated-files)
+     ;; Visualise denote
+     ("C-c d e n" . denote-explore-network)
+     ("C-c d e r" . denote-explore-network-regenerate)
+     ("C-c d e d" . denote-explore-barchart-degree)
+     ("C-c d e b" . denote-explore-barchart-backlinks)))
+#+end_src
 
 ** The =unravel-study.el= section for reading and annotation of PDFs (~pdf-tools~)
 :PROPERTIES:
