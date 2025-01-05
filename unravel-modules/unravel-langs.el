@@ -61,6 +61,9 @@
 ;;; Flyspell
 (use-package flyspell
   :ensure nil
+  :hook
+  (text-mode . flyspell-mode)
+  (prog-mode . flyspell-prog-mode)
   :bind
   ( :map flyspell-mode-map
     ("C-;" . nil)
