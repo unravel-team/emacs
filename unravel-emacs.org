@@ -168,8 +168,9 @@
   - [[#the-unravel-langsel-section-for-editing-comments-or-docstrings-better-separedit][The =unravel-langs.el= section for editing comments or docstrings better (~separedit~)]]
   - [[#the-unravel-langsel-section-for-python][The =unravel-langs.el= section for Python]]
   - [[#the-unravel-langsel-section-for-ziglang-zig-mode][The =unravel-langs.el= section for Ziglang (~zig-mode~)]]
-  - [[#the-unravel-langsel-section-for-clojure-programming][The =unravel-langs.el= section for Clojure programming]]
+  - [[#the-unravel-langsel-section-for-clojure][The =unravel-langs.el= section for Clojure]]
   - [[#the-unravel-langsel-section-for-emacs-lisp][The =unravel-langs.el= section for Emacs Lisp]]
+  - [[#the-unravel-langsel-section-for-typescript][The =unravel-langs.el= section for Typescript]]
   - [[#finally-we-provide-the-unravel-langsel-module][Finally, we provide the =unravel-langs.el= module]]
 - [[#the-unravel-studyel-module][The =unravel-study.el= module]]
   - [[#the-unravel-studyel-section-for-notes-and-file-naming-denote][The =unravel-study.el= section for notes and file-naming (~denote~)]]
@@ -5510,7 +5511,7 @@ To install ~zig~ and ~zls~ on MacOS:
     )
 #+end_src
 
-** The =unravel-langs.el= section for Clojure programming
+** The =unravel-langs.el= section for Clojure
 :PROPERTIES:
 :CUSTOM_ID: h:705CEAA5-00C4-4691-9425-7529981A8B18
 :CREATED:  [2024-12-02 Mon 08:34]
@@ -5642,6 +5643,22 @@ for this to continue.
     ( :map ielm-map
       ("C-j" . newline-and-indent)))
 #+end_src
+** The =unravel-langs.el= section for Typescript
+:PROPERTIES:
+:CUSTOM_ID: h:531FC2E4-DA65-4D8B-B02B-46D7A0457449
+:CREATED:  [2025-01-06 Mon 09:14]
+:END:
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Configuration for Typescript Programming
+
+  (use-package typescript-ts-mode
+    :ensure nil
+  ;;; Uncomment this if you want Eglot to start automatically. I don't
+  ;;; recommend it, but that's just me.
+    ;; :hook ((typescript-base-mode . eglot-ensure))
+  )
+#+end_src
+
 ** Finally, we provide the =unravel-langs.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:924224F1-61A0-4CCD-A3C3-4F230D3CF0A0

@@ -297,4 +297,13 @@ NS is the namespace information passed into the function by cider."
   ( :map ielm-map
     ("C-j" . newline-and-indent)))
 
+;;;; Configuration for Typescript Programming
+
+(use-package typescript-ts-mode
+  :ensure nil
+;;; Uncomment this if you want Eglot to start automatically. I don't
+;;; recommend it, but that's just me.
+  ;; :hook ((typescript-base-mode . eglot-ensure))
+)
+
 (provide 'unravel-langs)
