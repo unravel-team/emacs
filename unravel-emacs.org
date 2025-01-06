@@ -153,18 +153,19 @@
   - [[#finally-we-provide-the-unravel-shellel-module][Finally, we provide the =unravel-shell.el= module]]
 - [[#the-unravel-langsel-module][The =unravel-langs.el= module]]
   - [[#the-unravel-langsel-settings-for-tab][The =unravel-langs.el= settings for TAB]]
-  - [[#the-unravel-langsel-settings-highlighting-parens-show-paren-mode][The =unravel-langs.el= settings highlighting parens (~show-paren-mode~)]]
-  - [[#the-unravel-langsel-settings-for-showing-relevant-documentation-eldoc][The =unravel-langs.el= settings for showing relevant documentation (~eldoc~)]]
-  - [[#the-unravel-langsel-settings-for-connecting-to-lsp-servers-eglot][The =unravel-langs.el= settings for connecting to LSP servers (~eglot~)]]
-  - [[#the-unravel-langsel-settings-for-writing-markdown-markdown-mode][The =unravel-langs.el= settings for writing Markdown (~markdown-mode~)]]
-  - [[#the-unravel-langsel-settings-for-dealing-with-csv-files-csv-mode][The =unravel-langs.el= settings for dealing with CSV files (~csv-mode~)]]
-  - [[#the-unravel-langsel-settings-for-spell-checking-flyspell][The =unravel-langs.el= settings for spell checking (~flyspell~)]]
-  - [[#the-unravel-langsel-settings-for-code-linting-flymake][The =unravel-langs.el= settings for code linting (~flymake~)]]
-  - [[#the-unravel-langsel-settings-for-quick-outlines-outline-minor-mode][The =unravel-langs.el= settings for quick outlines (~outline-minor-mode~)]]
-  - [[#the-unravel-langsel-settings-for-definitions-dictionary][The =unravel-langs.el= settings for definitions (~dictionary~)]]
-  - [[#the-unravel-langsel-settings-for-paren-matching-paredit][The =unravel-langs.el= settings for paren matching (~paredit~)]]
-  - [[#the-unravel-langsel-settings-for-code-formatting-apheleia][The =unravel-langs.el= settings for code formatting (~apheleia~)]]
-  - [[#the-unravel-langsel-settings-for-changing-many-things-multiple-cursors][The =unravel-langs.el= settings for changing many things (~multiple-cursors~)]]
+  - [[#the-unravel-langsel-section-highlighting-parens-show-paren-mode][The =unravel-langs.el= section highlighting parens (~show-paren-mode~)]]
+  - [[#the-unravel-langsel-section-for-showing-relevant-documentation-eldoc][The =unravel-langs.el= section for showing relevant documentation (~eldoc~)]]
+  - [[#the-unravel-langsel-section-for-connecting-to-lsp-servers-eglot][The =unravel-langs.el= section for connecting to LSP servers (~eglot~)]]
+  - [[#the-unravel-langsel-section-for-writing-markdown-markdown-mode][The =unravel-langs.el= section for writing Markdown (~markdown-mode~)]]
+  - [[#the-unravel-langsel-section-for-dealing-with-csv-files-csv-mode][The =unravel-langs.el= section for dealing with CSV files (~csv-mode~)]]
+  - [[#the-unravel-langsel-section-for-spell-checking-flyspell][The =unravel-langs.el= section for spell checking (~flyspell~)]]
+  - [[#the-unravel-langsel-section-for-code-linting-flymake][The =unravel-langs.el= section for code linting (~flymake~)]]
+  - [[#the-unravel-langsel-section-for-quick-outlines-outline-minor-mode][The =unravel-langs.el= section for quick outlines (~outline-minor-mode~)]]
+  - [[#the-unravel-langsel-section-for-definitions-dictionary][The =unravel-langs.el= section for definitions (~dictionary~)]]
+  - [[#the-unravel-langsel-section-for-paren-matching-paredit][The =unravel-langs.el= section for paren matching (~paredit~)]]
+  - [[#the-unravel-langsel-section-for-code-formatting-apheleia][The =unravel-langs.el= section for code formatting (~apheleia~)]]
+  - [[#the-unravel-langsel-section-for-changing-many-things-multiple-cursors][The =unravel-langs.el= section for changing many things (~multiple-cursors~)]]
+  - [[#the-unravel-langsel-section-for-editing-comments-or-docstrings-better-separedit][The =unravel-langs.el= section for editing comments or docstrings better (~separedit~)]]
   - [[#the-unravel-langsel-section-for-python][The =unravel-langs.el= section for Python]]
   - [[#the-unravel-langsel-section-for-ziglang-zig-mode][The =unravel-langs.el= section for Ziglang (~zig-mode~)]]
   - [[#the-unravel-langsel-section-for-clojure-programming][The =unravel-langs.el= section for Clojure programming]]
@@ -5013,7 +5014,7 @@ is primarily by marking files in Dired and running =!=
                   indent-tabs-mode nil))
 #+end_src
 
-** The =unravel-langs.el= settings highlighting parens (~show-paren-mode~)
+** The =unravel-langs.el= section highlighting parens (~show-paren-mode~)
 :PROPERTIES:
 :CUSTOM_ID: h:7cd21ea6-c5d8-4258-999d-ad94cac2d8bf
 :END:
@@ -5039,7 +5040,7 @@ and I use it globally. Simple and effective!
     (setq show-paren-context-when-offscreen 'overlay)) ; Emacs 29
 #+end_src
 
-** The =unravel-langs.el= settings for showing relevant documentation (~eldoc~)
+** The =unravel-langs.el= section for showing relevant documentation (~eldoc~)
 :PROPERTIES:
 :CUSTOM_ID: h:a5773a39-a78f-43fa-8feb-669492c1d5a9
 :END:
@@ -5064,7 +5065,7 @@ puts the first line of their documentation string in the echo area.
   (setq eldoc-message-function #'message)) ; don't use mode line for M-x eval-expression, etc.
 #+end_src
 
-** The =unravel-langs.el= settings for connecting to LSP servers (~eglot~)
+** The =unravel-langs.el= section for connecting to LSP servers (~eglot~)
 :PROPERTIES:
 :CUSTOM_ID: h:92258aa8-0d8c-4c12-91b4-5f44420435ce
 :END:
@@ -5129,7 +5130,7 @@ Note that demanding ~eglot~ is not a mistake. I want it loaded so that I can adv
     (setq eglot-extend-to-xref t))
 #+end_src
 
-** The =unravel-langs.el= settings for writing Markdown (~markdown-mode~)
+** The =unravel-langs.el= section for writing Markdown (~markdown-mode~)
 :PROPERTIES:
 :CUSTOM_ID: h:c9063898-07ae-4635-8853-bb5f4bbab421
 :END:
@@ -5152,7 +5153,7 @@ basic text editing.
   (setq markdown-fontify-code-blocks-natively t))
 #+end_src
 
-** The =unravel-langs.el= settings for dealing with CSV files (~csv-mode~)
+** The =unravel-langs.el= section for dealing with CSV files (~csv-mode~)
 :PROPERTIES:
 :CUSTOM_ID: h:bae58479-86c1-410f-867e-c548def65b1c
 :END:
@@ -5172,7 +5173,7 @@ or space) and shows a tab stop in its stead.
   :commands (csv-align-mode))
 #+end_src
 
-** The =unravel-langs.el= settings for spell checking (~flyspell~)
+** The =unravel-langs.el= section for spell checking (~flyspell~)
 :PROPERTIES:
 :CUSTOM_ID: h:115806c4-88b0-43c1-8db2-d9d8d20a5c17
 :END:
@@ -5196,7 +5197,7 @@ or space) and shows a tab stop in its stead.
     (setq ispell-dictionary "en_GB"))
 #+end_src
 
-** The =unravel-langs.el= settings for code linting (~flymake~)
+** The =unravel-langs.el= section for code linting (~flymake~)
 :PROPERTIES:
 :CUSTOM_ID: h:df6d1b52-0306-4ace-9099-17dded11fbed
 :END:
@@ -5266,7 +5267,7 @@ of packaging. I use it whenever I work on my numerous Emacs packages.
     (add-hook 'flymake-diagnostic-functions #'package-lint-flymake))
 #+end_src
 
-** The =unravel-langs.el= settings for quick outlines (~outline-minor-mode~)
+** The =unravel-langs.el= section for quick outlines (~outline-minor-mode~)
 :PROPERTIES:
 :CUSTOM_ID: h:ffff5f7b-a62b-4d4a-ae29-af75402e5c35
 :END:
@@ -5286,7 +5287,7 @@ of packaging. I use it whenever I work on my numerous Emacs packages.
   (setq outline-minor-mode-use-margins nil)) ; as above
 #+end_src
 
-** The =unravel-langs.el= settings for definitions (~dictionary~)
+** The =unravel-langs.el= section for definitions (~dictionary~)
 :PROPERTIES:
 :CUSTOM_ID: h:f91563d8-f176-4555-b45b-ece56de03279
 :END:
@@ -5305,7 +5306,7 @@ Use the entry point ~M-x dictionary-search~
         dictionary-use-single-buffer t))
 #+end_src
 
-** The =unravel-langs.el= settings for paren matching (~paredit~)
+** The =unravel-langs.el= section for paren matching (~paredit~)
 :PROPERTIES:
 :CUSTOM_ID: h:885F9DED-E9C9-4B5B-9FE0-1A33CBD23126
 :END:
@@ -5325,7 +5326,7 @@ Use the entry point ~M-x dictionary-search~
     :hook ((lisp-data-mode lisp-mode clojure-mode clojure-ts-mode cider-repl-mode inferior-emacs-lisp-mode) . paredit-mode))
 #+end_src
 
-** The =unravel-langs.el= settings for code formatting (~apheleia~)
+** The =unravel-langs.el= section for code formatting (~apheleia~)
 :PROPERTIES:
 :CUSTOM_ID: h:07B0E6F4-050E-4A7D-B489-E919E4887FF5
 :END:
@@ -5340,7 +5341,7 @@ Use the entry point ~M-x dictionary-search~
       (push '(zprint . ("zprint")) apheleia-formatters)))
 #+end_src
 
-** The =unravel-langs.el= settings for changing many things (~multiple-cursors~)
+** The =unravel-langs.el= section for changing many things (~multiple-cursors~)
 :PROPERTIES:
 :CUSTOM_ID: h:07712014-B63C-429E-8D81-2D0E21E04ECC
 :CREATED:  [2024-12-18 Wed 14:13]
