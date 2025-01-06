@@ -286,6 +286,7 @@
                          (?p "Packages" font-lock-constant-face)
                          (?t "Types" font-lock-type-face)
                          (?v "Variables" font-lock-variable-name-face)))))
+  (consult-customize consult-ripgrep :initial (thing-at-point 'symbol))
   (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring)))
 
 ;;; Extended minibuffer actions and more (embark.el and prot-embark.el)

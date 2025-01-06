@@ -2318,6 +2318,7 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
                            (?p "Packages" font-lock-constant-face)
                            (?t "Types" font-lock-type-face)
                            (?v "Variables" font-lock-variable-name-face)))))
+    (consult-customize consult-ripgrep :initial (thing-at-point 'symbol))
     (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring)))
 #+end_src
 
