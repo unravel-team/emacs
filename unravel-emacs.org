@@ -5357,6 +5357,36 @@ Use the entry point ~M-x dictionary-search~
     ("C-c C->" . mc/mark-all-like-this))
 #+end_src
 
+** The =unravel-langs.el= section for editing comments or docstrings better (~separedit~)
+:PROPERTIES:
+:CUSTOM_ID: h:65A6A1FB-03C1-4F41-8C71-942D500C4D8D
+:CREATED:  [2025-01-05 Sun 15:32]
+:END:
+
+=separedit.el= is amazing. It lets me write docstrings properly in
+Org-mode or Markdown-mode in a separate buffer, which means I write
+better and more detailed docstrings in my code. It also makes
+maintaining and editing documentation a breeze! Highly recommended!
+
+Add the prefix arg (=C-u C-c '=) when calling separedit if you want to
+change the mode to something else (like markdown).
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package separedit
+    :ensure t
+    :bind
+    ( :map prog-mode-map
+      ("C-c '" .  separedit)
+      :map help-mode-map
+      ("C-c '" .  separedit)
+      :map helpful-mode-map
+      ("C-c '" .  separedit))
+    :config
+    ;; Add prefix arg when calling separedit if you want to change the
+    ;; mode to something else, like markdown.
+    (setq separedit-default-mode 'org-mode))
+#+end_src
+
 ** The =unravel-langs.el= section for Python
 :PROPERTIES:
 :CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618

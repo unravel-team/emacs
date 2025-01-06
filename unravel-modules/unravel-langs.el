@@ -164,6 +164,20 @@
   ("C-<" . mc/mark-previous-like-this)
   ("C-c C->" . mc/mark-all-like-this))
 
+(use-package separedit
+  :ensure t
+  :bind
+  ( :map prog-mode-map
+    ("C-c '" .  separedit)
+    :map help-mode-map
+    ("C-c '" .  separedit)
+    :map helpful-mode-map
+    ("C-c '" .  separedit))
+  :config
+  ;; Add prefix arg when calling separedit if you want to change the
+  ;; mode to something else, like markdown.
+  (setq separedit-default-mode 'org-mode))
+
 ;;;; Configuration for Python Programming
 
 (use-package python
