@@ -29,12 +29,12 @@
   :ensure nil
   :hook (elpaca-after-init . recentf-mode)
   :config
-  (setq recentf-max-saved-items 100)
+  (setq recentf-max-saved-items 10000)
   (setq recentf-max-menu-items 25) ; I don't use the `menu-bar-mode', but this is good to know
   (setq recentf-save-file-modes nil)
   (setq recentf-keep nil)
-  (setq recentf-auto-cleanup nil)
-  (setq recentf-initialize-file-name-history nil)
+  (setq recentf-auto-cleanup 'never)
+  (setq recentf-initialize-file-name-history t)
   (setq recentf-filename-handlers nil)
   (setq recentf-show-file-shortcuts-flag nil))
 
