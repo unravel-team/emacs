@@ -162,6 +162,7 @@ word.  Fall back to regular `expreg-expand'."
 (when (eq system-type 'darwin)
   (use-package ns-win
     :ensure nil
+    :demand t
     :config
     (defun copy-from-osx ()
       "Make cut and paste work with the OS X clipboard"
@@ -182,8 +183,8 @@ word.  Fall back to regular `expreg-expand'."
     ;; domain name
     (setq system-name (car (split-string system-name "\\.")))
 ;;; Binaries
-    (setq vc-git-program (or (executable-find "git") "/usr/local/bin/git"))
-    (setq epg-gpg-program (or (executable-find "gpg") "/usr/local/bin/gpg"))
+    (setq vc-git-program (executable-find "git"))
+    (setq epg-gpg-program (executable-find "gpg"))
 ;;; Source dirs
     ;; Note: These are hard-coded to my machine.
     (setq source-directory (expand-file-name "~/src/emacs/src/"))

@@ -1530,6 +1530,7 @@ These are modifications to basic configuration I use on my Mac OSX machine.
   (when (eq system-type 'darwin)
     (use-package ns-win
       :ensure nil
+      :demand t
       :config
       (defun copy-from-osx ()
         "Make cut and paste work with the OS X clipboard"
@@ -1550,8 +1551,8 @@ These are modifications to basic configuration I use on my Mac OSX machine.
       ;; domain name
       (setq system-name (car (split-string system-name "\\.")))
   ;;; Binaries
-      (setq vc-git-program (or (executable-find "git") "/usr/local/bin/git"))
-      (setq epg-gpg-program (or (executable-find "gpg") "/usr/local/bin/gpg"))
+      (setq vc-git-program (executable-find "git"))
+      (setq epg-gpg-program (executable-find "gpg"))
   ;;; Source dirs
       ;; Note: These are hard-coded to my machine.
       (setq source-directory (expand-file-name "~/src/emacs/src/"))
@@ -2941,8 +2942,7 @@ for the ~ls~ manpage to learn about what I have here. In short:
     :ensure nil
     :commands (dired)
     :config
-    (setq insert-directory-program
-          (or (executable-find "gls") "/opt/homebrew/bin/gls"))
+    (setq insert-directory-program (executable-find "gls"))
     (setq dired-listing-switches
           "-AGFhlv --group-directories-first --time-style=long-iso"))
 #+end_src
@@ -4842,7 +4842,7 @@ I use ~vterm~ for my shell inside Emacs, and at the moment, this section is abou
     :bind
     ("C-x m" . vterm)
     :config
-    (setq vterm-shell (or (executable-find "fish") "/opt/homebrew/bin/fish")))
+    (setq vterm-shell (executable-find "fish")))
 #+end_src
 
 ** The =unravel-shell.el= section for keeping track of visited directories (~zoxide~)

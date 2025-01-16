@@ -4,7 +4,7 @@
   :bind
   ("C-x m" . vterm)
   :config
-  (setq vterm-shell (or (executable-find "fish") "/opt/homebrew/bin/fish")))
+  (setq vterm-shell (executable-find "fish")))
 
 ;;; Enrich zoxide db based on everything I open in Emacs
 (when (executable-find "zoxide")
