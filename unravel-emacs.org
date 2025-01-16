@@ -40,6 +40,7 @@
   - [[#the-initel-section-for-using-the-elpaca-package-manager-elpaca][The =init.el= section for using the Elpaca package manager (~elpaca~)]]
   - [[#the-initel-macro-to-do-nothing-with-elisp-code-prot-emacs-comment][The =init.el= macro to do nothing with Elisp code (~prot-emacs-comment~)]]
   - [[#the-initel-macro-to-define-abbreviations-prot-emacs-abbrev][The =init.el= macro to define abbreviations (~prot-emacs-abbrev~)]]
+  - [[#the-initel-section-for-fixing-path-on-osx-exec-path-from-shell][The =init.el= section for fixing PATH on OSX (~exec-path-from-shell~)]]
   - [[#the-initel-section-to-load-the-individual-modules][The =init.el= section to load the individual modules]]
   - [[#the-initel-section-to-name-to-the-default-frame][The =init.el= section to name to the default frame]]
   - [[#finally-the-initel-section-for-local-variables][Finally, the =init.el= section for local variables]]
@@ -56,7 +57,6 @@
   - [[#finally-we-provide-the-unravel-themeel-module][Finally, we provide the =unravel-theme.el= module]]
 - [[#the-unravel-essentialsel-module][The =unravel-essentials.el= module]]
   - [[#the-unravel-essentialsel-block-with-basic-configurations][The =unravel-essentials.el= block with basic configurations]]
-  - [[#the-unravel-essentialsel-section-for-fixing-path-on-osx-exec-path-from-shell][The =unravel-essentials.el= section for fixing PATH on OSX (~exec-path-from-shell~)]]
   - [[#the-unravel-essentialsel-configuration-to-track-recently-visited-files-recentf][The =unravel-essentials.el= configuration to track recently visited files (~recentf~)]]
   - [[#the-unravel-essentialsel-configuration-to-track-my-place-in-visited-files-saveplace][The =unravel-essentials.el= configuration to track my place in visited files (~saveplace~)]]
   - [[#the-unravel-essentialsel-settings-for-bookmarks][The =unravel-essentials.el= settings for bookmarks]]
@@ -637,6 +637,28 @@ making an abbreviation to a function."
             (seq-split definitions 2)))
      (error "%s is not an abbrev table" ,table)))
 #+end_src
+
+** The =init.el= section for fixing PATH on OSX (~exec-path-from-shell~)
+:PROPERTIES:
+:CUSTOM_ID: h:D4517B67-0D90-417E-97D7-60A08EABB3DA
+:END:
+
+The ~PATH~ variable does not get set properly on Mac OSX and Windows
+machines, and due to this Emacs often does not find the right
+executables when calling external programs. ~exec-path-from-shell~
+fixes this. We add this section here to be absolutely sure that the
+path is fixed before we do anything else on the system (like install
+packages or configuration which depends on external functions).
+
+#+begin_src emacs-lisp :tangle "init.el"
+  (use-package exec-path-from-shell
+    :if (memq (window-system) '(mac ns))
+    :ensure (:wait t)
+    :demand t
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+
 
 ** COMMENT The =init.el= section for when I need to test on Emacs 28
 :PROPERTIES:
@@ -1221,22 +1243,6 @@ technicalities.
     (setq echo-keystrokes-help t) ; Emacs 30
     (setq epa-keys-select-method 'minibuffer) ; Emacs 30
     (setq debug-on-error t))
-#+end_src
-
-** The =unravel-essentials.el= section for fixing PATH on OSX (~exec-path-from-shell~)
-:PROPERTIES:
-:CUSTOM_ID: h:D4517B67-0D90-417E-97D7-60A08EABB3DA
-:END:
-
-The ~PATH~ variable does not get set properly on Mac OSX and Windows machines, and due to this Emacs often does not find the right executables when calling external programs. ~exec-path-from-shell~ fixes this.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
-  (use-package exec-path-from-shell
-    :if (memq (window-system) '(mac ns))
-    :ensure t
-    :demand t
-    :config
-    (exec-path-from-shell-initialize))
 #+end_src
 
 ** The =unravel-essentials.el= configuration to track recently visited files (~recentf~)

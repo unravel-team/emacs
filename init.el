@@ -110,6 +110,13 @@ making an abbreviation to a function."
             (seq-split definitions 2)))
      (error "%s is not an abbrev table" ,table)))
 
+(use-package exec-path-from-shell
+  :if (memq (window-system) '(mac ns))
+  :ensure (:wait t)
+  :demand t
+  :config
+  (exec-path-from-shell-initialize))
+
 (require 'unravel-theme)
 (require 'unravel-essentials)
 (require 'unravel-completion)

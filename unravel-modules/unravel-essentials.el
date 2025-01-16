@@ -18,13 +18,6 @@
   (setq epa-keys-select-method 'minibuffer) ; Emacs 30
   (setq debug-on-error t))
 
-(use-package exec-path-from-shell
-  :if (memq (window-system) '(mac ns))
-  :ensure t
-  :demand t
-  :config
-  (exec-path-from-shell-initialize))
-
 (use-package recentf
   :ensure nil
   :hook (elpaca-after-init . recentf-mode)
