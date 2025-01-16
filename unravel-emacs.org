@@ -1011,15 +1011,6 @@ Another section defines some complementary functionality
   (use-package fontaine
     :ensure t
     :if (display-graphic-p)
-    :hook
-    ;; Persist the latest font preset when closing/starting Emacs and
-    ;; while switching between themes.
-    ((elpaca-after-init . fontaine-mode)
-     (elpaca-after-init . (lambda ()
-                     ;; Set last preset or fall back to desired style from `fontaine-presets'.
-                     (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))))
-     (enable-theme-functions . fontaine-apply-current-preset)
-     (ef-themes-post-load . fontaine-apply-current-preset))
     :config
     ;; This is defined in Emacs C code: it belongs to font settings.
     (setq x-underline-at-descent-line nil)
@@ -1033,7 +1024,6 @@ Another section defines some complementary functionality
 
     (setq fontaine-presets
           '((small
-             :default-family "Iosevka"
              :default-height 130)
             (regular
              :default-height 150)
@@ -1051,82 +1041,15 @@ Another section defines some complementary functionality
              :inherit medium
              :default-height 330)
             (t
-             ;; I keep all properties for didactic purposes, but most can be
-             ;; omitted.  See the fontaine manual for the technicalities:
+             ;; See the fontaine manual for the technicalities:
              ;; <https://protesilaos.com/emacs/fontaine>.
              :default-family "Iosevka"
-             :default-weight regular
-             :default-slant normal
-             :default-width normal
-             :default-height 150
-
-             :fixed-pitch-family nil ; falls back to :default-family
-             :fixed-pitch-weight nil ; falls back to :default-weight
-             :fixed-pitch-slant nil
-             :fixed-pitch-width nil
-             :fixed-pitch-height 1.0
-
-             :fixed-pitch-serif-family nil
-             :fixed-pitch-serif-weight nil
-             :fixed-pitch-serif-slant nil
-             :fixed-pitch-serif-width nil
-             :fixed-pitch-serif-height 1.0
-
+             :default-weight normal
              :variable-pitch-family "Iosevka"
-             :variable-pitch-weight nil
-             :variable-pitch-slant nil
-             :variable-pitch-width nil
-             :variable-pitch-height 1.0
+             :variable-pitch-height 1.05)))
 
-             :mode-line-active-family nil
-             :mode-line-active-weight nil
-             :mode-line-active-slant nil
-             :mode-line-active-width nil
-             :mode-line-active-height 1.0
-
-             :mode-line-inactive-family nil
-             :mode-line-inactive-weight nil
-             :mode-line-inactive-slant nil
-             :mode-line-inactive-width nil
-             :mode-line-inactive-height 1.0
-
-             :header-line-family nil
-             :header-line-weight nil
-             :header-line-slant nil
-             :header-line-width nil
-             :header-line-height 1.0
-
-             :line-number-family nil
-             :line-number-weight nil
-             :line-number-slant nil
-             :line-number-width nil
-             :line-number-height 1.0
-
-             :tab-bar-family nil
-             :tab-bar-weight nil
-             :tab-bar-slant nil
-             :tab-bar-width nil
-             :tab-bar-height 1.0
-
-             :tab-line-family nil
-             :tab-line-weight nil
-             :tab-line-slant nil
-             :tab-line-width nil
-             :tab-line-height 1.0
-
-             :bold-family nil
-             :bold-slant nil
-             :bold-weight bold
-             :bold-width nil
-             :bold-height 1.0
-
-             :italic-family nil
-             :italic-weight nil
-             :italic-slant italic
-             :italic-width nil
-             :italic-height 1.0
-
-             :line-spacing nil))))
+    (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
+    (fontaine-mode 1))
 #+end_src
 
 ** The =unravel-theme.el= section for font previews (~show-font~)
