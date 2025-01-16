@@ -20,3 +20,5 @@ elpaca/
 tree-sitter/
 .mc-lists.el
 backups/
+capture-templates/
+snippets/
