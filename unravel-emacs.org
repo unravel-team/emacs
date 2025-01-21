@@ -5510,7 +5510,7 @@ for this to continue.
     (setq cljr-magic-requires nil))
 #+end_src
 
-*** The =unravel-langs.el= section for linting Clojure code (~flymake-kondor~)
+*** COMMENT The =unravel-langs.el= section for linting Clojure code (~flymake-kondor~)
 :PROPERTIES:
 :CUSTOM_ID: h:22939449-DC0E-4551-800D-396D5076C406
 :CREATED:  [2024-12-18 Wed 14:03]
