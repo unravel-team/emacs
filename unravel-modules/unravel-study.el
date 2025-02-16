@@ -303,7 +303,7 @@ modifications."
     ("C-c r v" . org-remark-view))
   :config
   (defun vm/org-remark-notes ()
-    (expand-file-name "brain/marginalia.org" org-directory))
+    (expand-file-name "marginalia.org" org-directory))
   (setq org-remark-notes-file-name #'vm/org-remark-notes)
   ;; Create a pen set for specific kinds of highlights. NOTE: This
   ;; pen-set has been made for dark themes.
