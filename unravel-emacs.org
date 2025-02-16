@@ -696,9 +696,11 @@ Now we are ready to load our per-module configuration files:
   (require 'unravel-shell)
   (require 'unravel-langs)
   (require 'unravel-study)
-  ;;; Comment this next line if you don't want to use my personal
-  ;;; settings (like specific directories or org variables)
-  (require 'vedang-personal)
+  ;;; Uncomment this next line if you want to use my personal settings
+  ;;; (like specific directories or org variables). These are not
+  ;;; guaranteed to work without understanding the configuration.
+  ;; (require 'vedang-personal)
+
 #+end_src
 
 ** The =init.el= section to name to the default frame

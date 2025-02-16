@@ -128,9 +128,10 @@ making an abbreviation to a function."
 (require 'unravel-shell)
 (require 'unravel-langs)
 (require 'unravel-study)
-;;; Comment this next line if you don't want to use my personal
-;;; settings (like specific directories or org variables)
-(require 'vedang-personal)
+;;; Uncomment this next line if you want to use my personal settings
+;;; (like specific directories or org variables). These are not
+;;; guaranteed to work without understanding the configuration.
+;; (require 'vedang-personal)
 
 ;; Name the default frame
 ;; You can select a frame with M-x select-frame-by-name
