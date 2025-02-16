@@ -7414,6 +7414,15 @@ I use the incredible ledger-mode for all my personal finance tracking
                               :makeindex t)))))
 #+end_src
 
+*** My personal use of ~org-contrib~ files
+
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  (use-package org-contrib
+    :ensure t
+    :after org
+    :config
+    (require 'org-checklist))
+#+end_src
 *** Finally, we provide the =vedang-personal.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:29100A9B-3142-4458-8CE1-43798EB9AA13

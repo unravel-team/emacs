@@ -423,4 +423,10 @@
                             :auto-sitemap t
                             :makeindex t)))))
 
+(use-package org-contrib
+  :ensure t
+  :after org
+  :config
+  (require 'org-checklist))
+
 (provide 'vedang-personal)
