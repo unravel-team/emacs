@@ -22,3 +22,4 @@ tree-sitter/
 backups/
 capture-templates/
 snippets/
+.aider*

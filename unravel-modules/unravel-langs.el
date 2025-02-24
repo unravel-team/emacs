@@ -29,7 +29,7 @@
 (use-package eglot
   :ensure nil
   :demand t ;; Not a mistake, we need to load Eglot elisp code before
-            ;; we open any Python file.
+  ;; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind
@@ -184,7 +184,7 @@
   :ensure nil
 ;;; Uncomment this if you want Eglot to start automatically. I prefer
 ;;; calling `M-x eglot' myself.
-;;  :hook ((python-base-mode . eglot-ensure))
+  ;;  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project)
   ;; Apheleia is an Emacs package for formatting code as you save
@@ -218,15 +218,76 @@
 
 ;;; Configuration for Clojure programming
 (use-package clojure-mode
-  :ensure t)
+  :ensure t
+  :bind
+  ( :map clojure-mode
+    ;; [ref: helper_functions_for_jumping_between_clojure_code_and_test]
+    ("C-c t" . kr--jump-between-tests-and-code))
+  :config
+;;; [tag: helper_functions_for_jumping_between_clojure_code_and_test]
+  ;; Hat-tip : Kapil Reddy , https://github.com/kapilreddy/dotemacs/blob/5d6cfc2215b8f1eb2dd0ca14d871478fee053db3/configurations/clojure-config.el#L42 (from June, 2012!)
+  ;; (with some minor changes over time by me)
 
-;;; `clojure-ts-mode' is not stable enough right now. In particular,
-;;; it clashes with `paredit-mode' sometimes, leading to Paredit
-;;; throwing unbalanced-expression errorsand being unusable. So
-;;; keeping this disabled and experimenting with how to fix it, for
-;;; them moment.
+  (defun kr--jump-between-tests-and-code ()
+    (interactive)
+    (if (kr--clojure-in-tests-p)
+        (kr--jump-to-implementation)
+      (kr--jump-to-test)))
 
-(defvar enable-clojure-ts-mode nil)
+  (defun kr--clojure-in-tests-p ()
+    "Check whether the current file is a test file.
+  Two checks are made - whether the namespace of the file has the
+  word test in it and whether the file lives under the test/
+  directory."
+    (or (string-match-p "test\." (clojure-find-ns))
+        (string-match-p "/test" (buffer-file-name))))
+
+  (defun kr--jump-to-implementation ()
+    "Jump from Clojure test file to implementation."
+    (interactive)
+    (let* ((filename (format "%s/src/%s"
+                             (locate-dominating-file buffer-file-name "test/")
+                             (kr--implementation-for (clojure-find-ns))))
+           (extensions '(".clj" ".cljc" ".cljs" ".cljd" ".bb"))))
+    ;; // try filename.ext one by one for each extension. If any file
+    ;; // exists, jump to it. Else create a new file with the .clj
+    ;; // extension. ai!
+    (find-file (format "%s%s" filename (car extensions))))
+
+  (defun kr--implementation-for (namespace)
+    (let* ((namespace (kr--clojure-underscores-for-hyphens namespace))
+           (segments (split-string (replace-regexp-in-string "_test"
+                                                             ""
+                                                             namespace)
+                                   "\\.")))
+      (mapconcat 'identity segments "/")))
+
+  (defun kr--clojure-underscores-for-hyphens (namespace)
+    "Replace all hyphens in NAMESPACE with underscores."
+    (replace-regexp-in-string "-" "_" namespace))
+
+  (defun kr--jump-to-test ()
+    "Jump from Clojure implementation file to test."
+    (interactive)
+    (find-file (format "%s/%s_test.clj"
+                       (file-name-as-directory
+                        (locate-dominating-file buffer-file-name "src/"))
+                       (kr--test-for (clojure-find-ns)))))
+
+  (defun kr--test-for (namespace)
+    (let* ((namespace (kr--clojure-underscores-for-hyphens namespace))
+           (segments (split-string namespace "\\."))
+           (test-segments (append (list "test") segments)))
+      (mapconcat 'identity test-segments "/"))))
+
+;;; [tag: clojure_ts_mode_is_unstable]
+;; `clojure-ts-mode' is not stable enough right now. In particular,
+;; it clashes with `paredit-mode' sometimes, leading to Paredit
+;; throwing unbalanced-expression errorsand being unusable. So
+;; keeping this disabled and experimenting with how to fix it, for
+;; them moment.
+
+(defvar enable-clojure-ts-mode nil) ;; [ref: clojure_ts_mode_is_unstable]
 
 (when (and (treesit-available-p) enable-clojure-ts-mode)
   (use-package clojure-ts-mode
@@ -294,6 +355,6 @@ NS is the namespace information passed into the function by cider."
 ;;; Uncomment this if you want Eglot to start automatically. I don't
 ;;; recommend it, but that's just me.
   ;; :hook ((typescript-base-mode . eglot-ensure))
-)
+  )
 
 (provide 'unravel-langs)
