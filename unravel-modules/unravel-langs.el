@@ -243,16 +243,17 @@
         (string-match-p "/test" (buffer-file-name))))
 
   (defun kr--jump-to-implementation ()
-    "Jump from Clojure test file to implementation."
+    "Jump from Clojure test file to implementation.
+Try each known extension in order. If no file exists, create one with .clj extension."
     (interactive)
     (let* ((filename (format "%s/src/%s"
                              (locate-dominating-file buffer-file-name "test/")
                              (kr--implementation-for (clojure-find-ns))))
-           (extensions '(".clj" ".cljc" ".cljs" ".cljd" ".bb"))))
-    ;; // try filename.ext one by one for each extension. If any file
-    ;; // exists, jump to it. Else create a new file with the .clj
-    ;; // extension. ai!
-    (find-file (format "%s%s" filename (car extensions))))
+           (extensions '(".clj" ".cljc" ".cljs" ".cljd" ".bb"))
+           (existing-file (seq-find (lambda (ext)
+                                      (file-exists-p (concat filename ext)))
+                                    extensions)))
+      (find-file (concat filename (or existing-file ".clj")))))
 
   (defun kr--implementation-for (namespace)
     (let* ((namespace (kr--clojure-underscores-for-hyphens namespace))
