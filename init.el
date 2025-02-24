@@ -128,10 +128,11 @@ making an abbreviation to a function."
 (require 'unravel-shell)
 (require 'unravel-langs)
 (require 'unravel-study)
-;;; Uncomment this next line if you want to use my personal settings
+;;; Define this ENV var to true if you want to use my personal settings
 ;;; (like specific directories or org variables). These are not
 ;;; guaranteed to work without understanding the configuration.
-;; (require 'vedang-personal)
+(when (getenv "UNRAVEL_EMACS_VEDANG")
+  (require 'vedang-personal))
 
 ;; Name the default frame
 ;; You can select a frame with M-x select-frame-by-name
