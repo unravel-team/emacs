@@ -29,7 +29,7 @@
 (use-package eglot
   :ensure nil
   :demand t ;; Not a mistake, we need to load Eglot elisp code before
-  ;; we open any Python file.
+            ;; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind
@@ -184,7 +184,7 @@
   :ensure nil
 ;;; Uncomment this if you want Eglot to start automatically. I prefer
 ;;; calling `M-x eglot' myself.
-  ;;  :hook ((python-base-mode . eglot-ensure))
+;;  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project)
   ;; Apheleia is an Emacs package for formatting code as you save
@@ -247,12 +247,12 @@
 Try each known extension in order. If no file exists, create one with .clj extension."
     (interactive)
     (let* ((filename (format "%s/src/%s"
-                             (locate-dominating-file buffer-file-name "test/")
-                             (kr--implementation-for (clojure-find-ns))))
+                            (locate-dominating-file buffer-file-name "test/")
+                            (kr--implementation-for (clojure-find-ns))))
            (extensions '(".clj" ".cljc" ".cljs" ".cljd" ".bb"))
            (existing-file (seq-find (lambda (ext)
-                                      (file-exists-p (concat filename ext)))
-                                    extensions)))
+                                    (file-exists-p (concat filename ext)))
+                                  extensions)))
       (find-file (concat filename (or existing-file ".clj")))))
 
   (defun kr--implementation-for (namespace)
@@ -356,6 +356,6 @@ NS is the namespace information passed into the function by cider."
 ;;; Uncomment this if you want Eglot to start automatically. I don't
 ;;; recommend it, but that's just me.
   ;; :hook ((typescript-base-mode . eglot-ensure))
-  )
+)
 
 (provide 'unravel-langs)
