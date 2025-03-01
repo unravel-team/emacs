@@ -5349,6 +5349,13 @@ the necessary developer tooling:
     and formatting capabilities.
 - =uv add pytest --group dev=
 
+If you want to setup this tooling globally, so that ~M-x eglot~ just
+works in any Python project you clone, then run the following commands:
+
+- =uv tool install ruff=
+- =uv tool install python-lsp-server=
+- =uv tool install python-lsp-ruff=
+
 Uv takes care of setting up the venv properly, so if you replace the
 default commands with uv versions, you are good to go. In practice,
 this means:
