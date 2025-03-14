@@ -7488,6 +7488,10 @@ I use the incredible ledger-mode for all my personal finance tracking
 #+end_src
 
 *** My personal use of ~org-contrib~ files
+:PROPERTIES:
+:CUSTOM_ID: h:A706D204-5D48-4079-AF6E-F0102AA5C5E6
+:CREATED:  [2025-02-16 Sun 15:56]
+:END:
 
 #+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
   (use-package org-contrib
@@ -7496,6 +7500,37 @@ I use the incredible ledger-mode for all my personal finance tracking
     :config
     (require 'org-checklist))
 #+end_src
+
+*** COMMENT My custom functions for better aider integration
+:PROPERTIES:
+:CUSTOM_ID: h:16856EC0-3191-4BEB-B94D-558E7F1B7F32
+:CREATED:  [2025-03-02 Sun 15:56]
+:END:
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  (defun aider-copy-region-to-temp-file (start end)
+    "Copy the selected region to a temporary file in project-root/temp/ directory.
+
+  The temp file will have a random name and the same extension as the original file."
+    (interactive "r")
+    (let* ((p-root (project-root (project-current)))
+           (temp-dir (concat p-root "/temp/"))
+           (original-file (buffer-file-name))
+           (file-ext (if original-file
+                         (file-name-extension original-file)
+                       "txt"))
+           (random-str (format "%08x" (random #xffffffff)))
+           (temp-file (concat temp-dir random-str "." file-ext)))
+
+      ;; Create temp directory if it doesn't exist
+      (unless (file-exists-p temp-dir)
+        (make-directory temp-dir t))
+
+      ;; Write region to temp file
+      (write-region start end temp-file nil 'quiet)
+
+      (message "Region copied to %s" temp-file)))
+#+end_src
+
 *** Finally, we provide the =vedang-personal.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:29100A9B-3142-4458-8CE1-43798EB9AA13
