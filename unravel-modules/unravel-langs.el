@@ -220,7 +220,7 @@
 (use-package clojure-mode
   :ensure t
   :bind
-  ( :map clojure-mode
+  ( :map clojure-mode-map
     ;; [ref: helper_functions_for_jumping_between_clojure_code_and_test]
     ("C-c t" . kr--jump-between-tests-and-code))
   :config
