@@ -656,7 +656,8 @@ packages or configuration which depends on external functions).
     :ensure (:wait t)
     :demand t
     :config
-    (exec-path-from-shell-initialize))
+    (exec-path-from-shell-initialize)
+    (exec-path-from-shell-copy-env "UNRAVEL_EMACS_VEDANG"))
 #+end_src
 
 

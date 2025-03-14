@@ -115,7 +115,8 @@ making an abbreviation to a function."
   :ensure (:wait t)
   :demand t
   :config
-  (exec-path-from-shell-initialize))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "UNRAVEL_EMACS_VEDANG"))
 
 (require 'unravel-theme)
 (require 'unravel-essentials)
