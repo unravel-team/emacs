@@ -106,6 +106,7 @@
   (add-to-list 'denote-templates '(weekly_intentions . "weekint"))
   (add-to-list 'denote-templates '(weekly_report . "weekrpt"))
   (add-to-list 'denote-templates '(sketch . "sketch"))
+  (add-to-list 'denote-templates '(dayplan . "dayplan"))
 
   ;; Front-matter for Org files
   (setq denote-org-front-matter
