@@ -71,7 +71,7 @@
   (require 'denote-org-extras)
 
   ;; Remember to check the doc strings of those variables.
-  (let ((dir (string-trim (shell-command-to-string "echo $DENOTE_DIRECTORY"))))
+  (let ((dir (getenv "DENOTE_DIRECTORY")))
     (when (not (string-empty-p dir))
       (setq denote-directory (expand-file-name dir))
       (setq denote-journal-extras-directory (expand-file-name "journal" denote-directory))))

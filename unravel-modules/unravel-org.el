@@ -49,7 +49,7 @@
 (use-package org
   :ensure nil
   :init
-  (let ((dir (string-trim (shell-command-to-string "echo $ORG_DIRECTORY"))))
+  (let ((dir (getenv "ORG_DIRECTORY")))
     (when (not (string-empty-p dir))
       (setq org-directory (expand-file-name dir))))
   (setq org-imenu-depth 7)
