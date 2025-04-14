@@ -137,4 +137,10 @@
 
     (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)))
 
+;;; For excellent UX when searching, use deadgrep
+(when (or (executable-find "rg")
+          (executable-find "ripgrep"))
+  (use-package deadgrep
+    :ensure t))
+
 (provide 'unravel-search)

@@ -100,6 +100,7 @@
   - [[#the-unravel-searchel-tweaks-to-xref-re-builder-and-grep][The =unravel-search.el= tweaks to (~xref~), (~re-builder~) and (~grep~)]]
   - [[#the-unravel-searchel-setup-for-editable-grep-buffers-grep-edit-mode-or-wgrep][The =unravel-search.el= setup for editable grep buffers (~grep-edit-mode~ or ~wgrep~)]]
   - [[#the-unravel-searchel-settings-for-jumping-avy][The =unravel-search.el= settings for jumping (~avy~)]]
+  - [[#the-unravel-searchel-settings-for-long-search-sessions-deadgrep][The =unravel-search.el= settings for long search sessions (~deadgrep~)]]
   - [[#finally-we-provide-the-unravel-searchel-module][Finally, we provide the =unravel-search.el= module]]
 - [[#the-unravel-diredel-module][The =unravel-dired.el= module]]
   - [[#the-unravel-diredel-settings-for-common-operations][The =unravel-dired.el= settings for common operations]]
@@ -2836,6 +2837,28 @@ section binds my primary entry-point to Avy (~avy-goto-char-timer~) to
 
       (setf (alist-get ?. avy-dispatch-alist) 'avy-action-embark)))
 #+end_src
+** The =unravel-search.el= settings for long search sessions (~deadgrep~)
+:PROPERTIES:
+:CUSTOM_ID: h:35782CBA-3191-4617-8958-3ECA235469E4
+:CREATED:  [2025-04-14 Mon 21:54]
+:END:
+Sometimes, I want long search sessions where I'm hunting for
+occurrences across a repository (or multiple repos) and making
+changes. In such scenarios, I've found ~deadgrep~ to have the best UX.
+
+Be sure to read through the deadgrep README:
+https://github.com/Wilfred/deadgrep/blob/master/README.md for
+information on all the key-bindings it provides out of the box, and
+some excellent features focused on search.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+  ;;; For excellent UX when searching, use deadgrep
+  (when (or (executable-find "rg")
+            (executable-find "ripgrep"))
+    (use-package deadgrep
+      :ensure t))
+#+end_src
+
 ** Finally, we provide the =unravel-search.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:c8b2f021-fe5a-4f6b-944c-20340f764fb2
