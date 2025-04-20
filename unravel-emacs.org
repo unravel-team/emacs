@@ -5794,9 +5794,9 @@ Prot is the developer and maintainer of this package.
       ("C-c d j" . denote-journal-extras-new-entry)
       ("C-c d s" . denote-sort-dired)
       ;; Bindings to personal functions (defined below)
-      ("C-c d p m" . vedang/denote-publishing-extras-new-microblog-entry)
-      ("C-c d p b" . vedang/denote-publishing-extras-new-blog-entry)
-      ("C-c d p l" . vedang/denote-publishing-extras-new-linklog-entry)
+      ("C-c d p m" . denote-publish--new-microblog-entry)
+      ("C-c d p b" . denote-publish--new-blog-entry)
+      ("C-c d p l" . denote-publish--new-linklog-entry)
       :map text-mode-map
       ("C-c d B" . denote-backlinks)
       ("C-c d b" . denote-find-backlink)
@@ -5871,7 +5871,7 @@ Prot is the developer and maintainer of this package.
   ,#+identifier: %4$s
   \n")
 
-    (defun vedang/denote-publishing-extras-new-blog-entry (&optional date)
+    (defun denote-publish--new-blog-entry (&optional date)
       "Create a new blog entry.
 
     With optional DATE as a prefix argument, prompt for a date.  If
@@ -5891,7 +5891,7 @@ Prot is the developer and maintainer of this package.
          ;; See YASnippet
          "fullblog")))
 
-    (defun vedang/denote-publishing-extras-new-microblog-entry (&optional date)
+    (defun denote-publish--new-microblog-entry (&optional date)
       "Create a new microblog entry.
     Set the title of the new entry according to the value of the user option
     `denote-journal-extras-title-format'.
@@ -5913,7 +5913,7 @@ Prot is the developer and maintainer of this package.
          ;; See YASnippet
          "microblog")))
 
-    (defun vedang/denote-publishing-extras-new-linklog-entry (date)
+    (defun denote-publish--new-linklog-entry (date)
       "Create a new microblog entry.
     Set the title of the new entry according to the value of the user option
     `denote-journal-extras-title-format'.
@@ -5934,7 +5934,7 @@ Prot is the developer and maintainer of this package.
          ;; See YASnippet
          "linklog")))
 
-    (defun vedang/denote-link-ol-get-id ()
+    (defun denote--link-ol-get-id ()
       "Get the CUSTOM_ID of the current entry.
 
   If the entry already has a CUSTOM_ID, return it as-is, else create a new
@@ -5958,7 +5958,7 @@ Prot is the developer and maintainer of this package.
           (org-entry-put pos "CREATED" created))
         id))
 
-    (defun vedang/denote--split-luhman-sig (signature)
+    (defun denote-signature--split-luhman-sig (signature)
       "Split numbers and letters in Luhmann-style SIGNATURE string."
       (replace-regexp-in-string
        "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
@@ -5966,22 +5966,22 @@ Prot is the developer and maintainer of this package.
         "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
         signature)))
 
-    (defun vedang/denote--pad-sig (signature)
+    (defun denote-signature--pad-sig (signature)
       "Create a new signature with padded spaces for all components"
       (combine-and-quote-strings
        (mapcar
         (lambda (x)
           (string-pad x 5 32 t))
-        (split-string (vedang/denote--split-luhman-sig signature) "=" t))
+        (split-string (denote-signature--split-luhman-sig signature) "=" t))
        "="))
 
-    (defun vedang/denote-sort-for-signatures (sig1 sig2)
+    (defun denote-signature--sort (sig1 sig2)
       "Return non-nil if SIG1 is smaller that SIG2.
 
     Perform the comparison with `string<'."
-      (string< (vedang/denote--pad-sig sig1) (vedang/denote--pad-sig sig2)))
+      (string< (denote-signature--pad-sig sig1) (denote-signature--pad-sig sig2)))
 
-    (setq denote-sort-signature-comparison-function #'vedang/denote-sort-for-signatures))
+    (setq denote-sort-signature-comparison-function #'denote-signature--sort))
 
 #+end_src
 
