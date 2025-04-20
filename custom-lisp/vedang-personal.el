@@ -462,7 +462,6 @@ list with overruling parameters for `org-list-to-generic'."
             :istart make-heading-list-prefix
             :icount make-heading-list-prefix
             :isep (if blank "\n\n" "\n")
-            :iend "\n"
             :dtstart " "
             :dtend " "
             :cbon "[X] "
@@ -473,10 +472,14 @@ list with overruling parameters for `org-list-to-generic'."
 (defun vedang-personal--org-list-make-top-level-subtree ()
   "Convert the plain list at point into a subtree."
   (interactive)
-  (if (not (ignore-errors (goto-char (org-in-item-p))))
-      (error "Not in a list")
-    (let ((list (org-list-to-lisp t)))
-      (save-excursion (insert (vedang-personal--org-list-top-level-to-subtree list))))))
+  (let ((origin (point))) ; Store original point
+    (if (ignore-errors (goto-char (org-in-item-p))) ; Check if in item and move point to item start
+        (let ((list-data (org-list-to-lisp t))) ; Parse and delete list + trailing newline. Point is now where list was.
+          (insert (vedang-personal--org-list-top-level-to-subtree list-data)) ; Insert converted list
+          (insert "\n")) ; Explicitly insert the extra newline for separation
+      ;; If not in an item, restore point and signal error
+      (goto-char origin)
+      (error "Not in a list"))))
 
 (define-key org-mode-map (kbd "C-c C-*")
             'vedang-personal--org-list-make-top-level-subtree)
