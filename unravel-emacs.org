@@ -1172,43 +1172,6 @@ in the function ~prot/enable-variable-pitch~.
    ("C-x C-0" . global-text-scale-adjust)))
 #+end_src
 
-*** Information about the Iosevka Comfy fonts
-:PROPERTIES:
-:CUSTOM_ID: h:3b989679-7e3f-4f03-b4bb-611006ea01ce
-:END:
-
-/Iosevka Comfy/ is a customised build of the Iosevka typeface, with a
-consistent rounded style and overrides for almost all individual
-glyphs in both roman (upright) and italic (slanted) variants. Many
-font families are available, covering a broad range of typographic
-weights. The README file in the git repository covers all the
-technicalities.
-
-  | Family                          | Shapes | Spacing | Style      | Ligatures |
-  |---------------------------------+--------+---------+------------+-----------|
-  | Iosevka Comfy                   | Sans   | Compact | Monospaced | Yes       |
-  | Iosevka Comfy Fixed             | Sans   | Compact | Monospaced | No        |
-  | Iosevka Comfy Duo               | Sans   | Compact | Duospaced  | Yes       |
-  |---------------------------------+--------+---------+------------+-----------|
-  | Iosevka Comfy Motion            | Slab   | Compact | Monospaced | Yes       |
-  | Iosevka Comfy Motion Fixed      | Slab   | Compact | Monospaced | No        |
-  | Iosevka Comfy Motion Duo        | Slab   | Compact | Duospaced  | Yes       |
-  |---------------------------------+--------+---------+------------+-----------|
-  | Iosevka Comfy Wide              | Sans   | Wide    | Monospaced | Yes       |
-  | Iosevka Comfy Wide Fixed        | Sans   | Wide    | Monospaced | No        |
-  | Iosevka Comfy Wide Duo          | Sans   | Wide    | Duospaced  | Yes       |
-  |---------------------------------+--------+---------+------------+-----------|
-  | Iosevka Comfy Wide Motion       | Slab   | Wide    | Monospaced | Yes       |
-  | Iosevka Comfy Wide Motion Fixed | Slab   | Wide    | Monospaced | No        |
-  | Iosevka Comfy Wide Motion Duo   | Slab   | Wide    | Duospaced  | Yes       |
-
-+ Git repositories:
-  - GitHub: <https://github.com/protesilaos/iosevka-comfy>
-  - GitLab: <https://gitlab.com/protesilaos/iosevka-comfy>
-+ Sample pictures: <https://protesilaos.com/emacs/iosevka-comfy-pictures>
-+ Backronym: Iosevka ... Could Only Modify a Font, Yes
-
-
 ** Finally, we provide the =unravel-theme.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:bac0ce0a-db68-42e7-ba2c-f350f91f80ef
