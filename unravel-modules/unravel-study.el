@@ -1,8 +1,6 @@
 ;;; Denote (simple note-taking and file-naming)
 
-;; Read the manual: <https://protesilaos.com/emacs/denote>.  This does
-;; not include all the useful features of Denote.  I have a separate
-;; private setup for those, as I need to test everything is in order.
+;; Read the manual: <https://protesilaos.com/emacs/denote>.
 (use-package denote
   :ensure t
   :hook
@@ -25,9 +23,7 @@
   ;; decide.  Here I only have a subset of what Denote offers.
   ( :map global-map
     ("C-c d n" . denote-create-note)
-    ("C-c d N" . denote-silo-extras-select-silo-then-command)
     ("C-c d o" . denote-open-or-create)
-    ("C-c d O" . denote-silo-extras-open-or-create)
     ("C-c d l" . denote-link-or-create)
     ("C-c d L" . denote-link-after-creating-with-command)
     ;; Note that `denote-rename-file' can work from any context, not
@@ -40,7 +36,6 @@
     ;; easier to bind the link-related commands to the `global-map', as
     ;; shown here.  Otherwise follow the same pattern for
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
-    ("C-c d j" . denote-journal-extras-new-entry)
     ("C-c d s" . denote-sort-dired)
     ;; Bindings to personal functions (defined below)
     ("C-c d p m" . denote-publish--new-microblog-entry)
@@ -52,11 +47,6 @@
     ;; Also see `denote-rename-file' further above.
     ("C-c d R" . denote-rename-file-using-front-matter)
     ("C-c d k" . denote-rename-file-keywords)
-    :map org-mode-map
-    ("C-c d h" . denote-org-extras-link-to-heading)
-    ("C-c d d l" . denote-org-extras-dblock-insert-links)
-    ("C-c d d b" . denote-org-extras-dblock-insert-backlinks)
-    ("C-c d d m" . denote-org-extras-dblock-insert-missing-links)
     ;; Key bindings specifically for Dired.
     :map dired-mode-map
     ("C-c C-d C-i" . denote-dired-link-marked-notes)
@@ -66,15 +56,11 @@
     ("C-c C-d C-K" . denote-dired-rename-marked-files-remove-keywords)
     ("C-c C-d C-f" . denote-dired-rename-marked-files-using-front-matter))
   :config
-  (require 'denote-silo-extras)
-  (require 'denote-journal-extras)
-  (require 'denote-org-extras)
 
   ;; Remember to check the doc strings of those variables.
   (let ((dir (getenv "DENOTE_DIRECTORY")))
     (when (not (string-empty-p dir))
-      (setq denote-directory (expand-file-name dir))
-      (setq denote-journal-extras-directory (expand-file-name "journal" denote-directory))))
+      (setq denote-directory (expand-file-name dir))))
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
   (setq denote-excluded-directories-regexp "data") ; external data related to headings is stored in these directories (web archives)
@@ -92,11 +78,6 @@
   (denote-rename-buffer-mode 1)
 
   (setq denote-buffer-has-backlinks-string " (<--->)")
-  (setq denote-backlinks-show-context t)
-  (setq denote-org-store-link-to-heading t)
-
-  ;; Journal settings
-  (setq denote-journal-extras-keyword "")
 
   ;; I use Yasnippet to expand these into a better template.
   (add-to-list 'denote-templates '(reference-note . "reference"))
@@ -107,18 +88,6 @@
   (add-to-list 'denote-templates '(weekly_report . "weekrpt"))
   (add-to-list 'denote-templates '(sketch . "sketch"))
   (add-to-list 'denote-templates '(dayplan . "dayplan"))
-
-  ;; Front-matter for Org files
-  (setq denote-org-front-matter
-        ":PROPERTIES:
-:ID: %4$s
-:CREATED: %2$s
-:END:
-#+title:      %1$s
-#+filetags:   %3$s
-#+date:       %2$s
-#+identifier: %4$s
-\n")
 
   (defun denote-publish--new-blog-entry (&optional date)
     "Create a new blog entry.
@@ -139,49 +108,6 @@
        nil nil date
        ;; See YASnippet
        "fullblog")))
-
-  (defun denote-publish--new-microblog-entry (&optional date)
-    "Create a new microblog entry.
-  Set the title of the new entry according to the value of the user option
-  `denote-journal-extras-title-format'.
-
-  With optional DATE as a prefix argument, prompt for a date.  If
-  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
-  date selection module.
-
-  When called from Lisp DATE is a string and has the same format as
-  that covered in the documentation of the `denote' function.  It
-  is internally processed by `denote-parse-date'."
-    (interactive (list (when current-prefix-arg (denote-date-prompt))))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-journal-extras-daily--title-format internal-date)
-       '("draft" "microblog")
-       nil nil date
-       ;; See YASnippet
-       "microblog")))
-
-  (defun denote-publish--new-linklog-entry (date)
-    "Create a new microblog entry.
-  Set the title of the new entry according to the value of the user option
-  `denote-journal-extras-title-format'.
-
-  Prompt for a DATE. If `denote-date-prompt-use-org-read-date' is
-  non-nil, use the Org date selection module.
-
-  When called from Lisp DATE is a string and has the same format as
-  that covered in the documentation of the `denote' function.  It
-  is internally processed by `denote-parse-date'."
-    (interactive (list (denote-date-prompt)))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-journal-extras-daily--title-format internal-date)
-       '("draft" "linklog")
-       nil nil date
-       ;; See YASnippet
-       "linklog")))
 
   (defun denote--link-ol-get-id ()
     "Get the CUSTOM_ID of the current entry.
@@ -231,6 +157,97 @@ modifications."
     (string< (denote-signature--pad-sig sig1) (denote-signature--pad-sig sig2)))
 
   (setq denote-sort-signature-comparison-function #'denote-signature--sort))
+
+(use-package denote-silo
+  :ensure t
+  :bind
+  ( :map global-map
+    ("C-c d N" . denote-silo-select-silo-then-command)
+    ("C-c d O" . denote-silo-open-or-create)))
+
+(use-package denote-org
+  :ensure t
+  :bind
+  ( :map org-mode-map
+    ("C-c d h" . denote-org-link-to-heading)
+    ("C-c d d l" . denote-org-dblock-insert-links)
+    ("C-c d d b" . denote-org-dblock-insert-backlinks)
+    ("C-c d d m" . denote-org-dblock-insert-missing-links))
+  :config
+  (setq denote-org-store-link-to-heading 'id)
+  ;; Front-matter for Org files
+  (setq denote-org-front-matter
+        ":PROPERTIES:
+:ID: %4$s
+:CREATED: %2$s
+:END:
+#+title:      %1$s
+#+filetags:   %3$s
+#+date:       %2$s
+#+identifier: %4$s
+#+signature:  %5$s
+\n"))
+
+(use-package denote-journal
+  :ensure t
+  :bind
+  ( :map global-map
+    ("C-c d j" . denote-journal-new-entry))
+  :config
+  (let ((dir (getenv "DENOTE_DIRECTORY")))
+    (when (not (string-empty-p dir))
+      (setq denote-journal-directory (expand-file-name "journal" denote-directory))))
+  ;; Journal settings
+  (setq denote-journal-keyword "")
+
+  (defun denote-publish--new-microblog-entry (&optional date)
+    "Create a new microblog entry.
+  Set the title of the new entry according to the value of the user option
+  `denote-journal-title-format'.
+
+  With optional DATE as a prefix argument, prompt for a date.  If
+  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
+  date selection module.
+
+  When called from Lisp DATE is a string and has the same format as
+  that covered in the documentation of the `denote' function.  It
+  is internally processed by `denote-parse-date'."
+    (interactive (list (when current-prefix-arg (denote-date-prompt))))
+    (let ((internal-date (denote-parse-date date))
+          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+      (denote
+       (denote-journal-daily--title-format internal-date)
+       '("draft" "microblog")
+       nil nil date
+       ;; See YASnippet
+       "microblog")))
+
+  (defun denote-publish--new-linklog-entry (date)
+    "Create a new microblog entry.
+  Set the title of the new entry according to the value of the user option
+  `denote-journal-title-format'.
+
+  Prompt for a DATE. If `denote-date-prompt-use-org-read-date' is
+  non-nil, use the Org date selection module.
+
+  When called from Lisp DATE is a string and has the same format as
+  that covered in the documentation of the `denote' function.  It
+  is internally processed by `denote-parse-date'."
+    (interactive (list (denote-date-prompt)))
+    (let ((internal-date (denote-parse-date date))
+          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+      (denote
+       (denote-journal-daily--title-format internal-date)
+       '("draft" "linklog")
+       nil nil date
+       ;; See YASnippet
+       "linklog"))))
+
+;; (use-package denote-markdown
+;;   :ensure t)
+
+(use-package denote-sequence
+  :ensure t)
 
 (use-package consult-denote
   :ensure t
