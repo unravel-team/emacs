@@ -484,4 +484,18 @@ list with overruling parameters for `org-list-to-generic'."
 (define-key org-mode-map (kbd "C-c C-*")
             'vedang-personal--org-list-make-top-level-subtree)
 
+(use-package org-tree-slide
+  :ensure t
+  :bind
+  ( :map org-mode-map
+    ("<f8>" . org-tree-slide-mode)
+    ("<f7>" . org-tree-slide-move-previous-tree)
+    ("<f9>" . org-tree-slide-move-next-tree)
+    ("<f6>" . org-tree-slide-content))
+  :config
+  (setq org-tree-slide-header t)
+  (setq org-tree-slide-slide-in-blank-lines 10)
+  (setq org-tree-slide-skip-comments 'inherit)
+  (setq org-tree-slide-skip-outline-level 2))
+
 (provide 'vedang-personal)

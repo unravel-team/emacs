@@ -7571,6 +7571,26 @@ I use the incredible ledger-mode for all my personal finance tracking
               'vedang-personal--org-list-make-top-level-subtree)
 #+end_src
 
+*** My personal settings for Emacs-based presentations (~org-tree-slide~)
+:PROPERTIES:
+:CUSTOM_ID: h:B6449CD3-2D29-46EB-8366-7E4E70EA71CE
+:CREATED:  [2025-05-02 Fri 21:16]
+:END:
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  (use-package org-tree-slide
+    :ensure t
+    :bind
+    ( :map org-mode-map
+      ("<f8>" . org-tree-slide-mode)
+      ("<f7>" . org-tree-slide-move-previous-tree)
+      ("<f9>" . org-tree-slide-move-next-tree)
+      ("<f6>" . org-tree-slide-content))
+    :config
+    (setq org-tree-slide-header t)
+    (setq org-tree-slide-slide-in-blank-lines 10)
+    (setq org-tree-slide-skip-comments 'inherit)
+    (setq org-tree-slide-skip-outline-level 2))
+#+end_src
 *** Finally, we provide the =vedang-personal.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:29100A9B-3142-4458-8CE1-43798EB9AA13
