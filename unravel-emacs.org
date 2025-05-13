@@ -5066,12 +5066,13 @@ basic text editing.
 #+end_quote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-;;; Markdown (markdown-mode)
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :config
-  (setq markdown-fontify-code-blocks-natively t))
+  ;;; Markdown (markdown-mode)
+  (use-package markdown-mode
+    :ensure t
+    :defer t
+    :mode ("\\.mdx\\'" . markdown-mode)
+    :config
+    (setq markdown-fontify-code-blocks-natively t))
 #+end_src
 
 ** The =unravel-langs.el= section for dealing with CSV files (~csv-mode~)

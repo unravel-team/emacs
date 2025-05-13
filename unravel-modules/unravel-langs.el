@@ -50,6 +50,7 @@
 (use-package markdown-mode
   :ensure t
   :defer t
+  :mode ("\\.mdx\\'" . markdown-mode)
   :config
   (setq markdown-fontify-code-blocks-natively t))
 
