@@ -1657,7 +1657,7 @@ soon as I type a space after some characters I am using ~orderless~.
   :ensure nil
   :config
 ;;;; Completion styles
-  (setq completion-styles '(basic substring initials flex orderless)) ; also see `completion-category-overrides'
+  (setq completion-styles '(orderless basic substring initials flex)) ; also see `completion-category-overrides'
   (setq completion-pcm-leading-wildcard t) ; Emacs 31: make `partial-completion' behave like `substring'
 
   ;; Reset all the per-category defaults so that (i) we use the
@@ -1780,12 +1780,12 @@ minibuffer. Let's have everything ignore casing by default.
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
-(use-package mb-depth
-  :ensure nil
-  :hook (elpaca-after-init . minibuffer-depth-indicate-mode)
-  :config
-  (setq read-minibuffer-restore-windows nil) ; Emacs 28
-  (setq enable-recursive-minibuffers t))
+  (use-package mb-depth
+    :ensure nil
+    :hook (elpaca-after-init . minibuffer-depth-indicate-mode)
+    :config
+    (setq read-minibuffer-restore-windows nil) ; Emacs 28
+    (setq enable-recursive-minibuffers t))
 #+end_src
 
 ** The =unravel-completion.el= settings for default values
@@ -2414,6 +2414,7 @@ The ~vertico~ package by Daniel Mendler displays the minibuffer in a
 vertical layout. Under the hood, it takes care to be responsive and to
 handle even massive completion tables gracefully.
 #+end_quote
+
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Vertical completion layout (vertico)

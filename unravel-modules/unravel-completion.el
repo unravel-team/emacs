@@ -3,7 +3,7 @@
   :ensure nil
   :config
 ;;;; Completion styles
-  (setq completion-styles '(basic substring initials flex orderless)) ; also see `completion-category-overrides'
+  (setq completion-styles '(orderless basic substring initials flex)) ; also see `completion-category-overrides'
   (setq completion-pcm-leading-wildcard t) ; Emacs 31: make `partial-completion' behave like `substring'
 
   ;; Reset all the per-category defaults so that (i) we use the
