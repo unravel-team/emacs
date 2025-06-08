@@ -615,4 +615,7 @@ If WEEK-NUM is not provided, use the current week."
   (setq org-habit-preceding-days 9)
   (setq org-habit-show-all-today t))
 
+(use-package org-cliplink
+  :ensure t)
+
 (provide 'unravel-org)

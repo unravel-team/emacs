@@ -145,6 +145,7 @@
   - [[#the-unravel-orgel-org-capture-templates-org-capture][The =unravel-org.el= Org capture templates (~org-capture~)]]
   - [[#the-unravel-orgel-section-on-yasnippet][The =unravel-org.el= section on YASnippet]]
   - [[#the-unravel-orgel-org-agenda-settings][The =unravel-org.el= Org agenda settings]]
+  - [[#the-unravel-orgel-section-on-cliplink-org-cliplink][The =unravel-org.el= section on Cliplink (~org-cliplink~)]]
   - [[#finally-we-provide-the-unravel-orgel-module][Finally, we provide the =unravel-org.el= module]]
 - [[#the-unravel-shellel-module][The =unravel-shell.el= module]]
   - [[#the-unravel-shellel-section-for-using-a-terminal-inside-emacs-vterm][The =unravel-shell.el= section for using a terminal inside Emacs (~vterm~)]]
@@ -4826,6 +4827,19 @@ title of the task, and the like. The documentation string of
     (setq org-habit-show-all-today t))
 #+end_src
 
+** The =unravel-org.el= section on Cliplink (~org-cliplink~)
+:PROPERTIES:
+:CUSTOM_ID: h:EA27A5E2-9243-42DE-8B96-AB1DD2021368
+:CREATED:  [2025-06-08 Sun 12:24]
+:END:
+~org-cliplink~ is a small and convenient library for copying links to
+various websites into org-mode. It takes the link from the clipboard
+and converts it to Org-mode syntax (with the link/description)
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-org.el"
+  (use-package org-cliplink
+    :ensure t)
+#+end_src
 ** Finally, we provide the =unravel-org.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:62eb7ca3-2f79-45a6-a018-38238b486e98
