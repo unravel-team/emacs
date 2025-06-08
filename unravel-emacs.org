@@ -5713,9 +5713,6 @@ localtion for your ~denote~ files, set the environment variable
 ~DENOTE_DIRECTORY~.
 
 #+begin_quote
-This is another one of my packages and is extended by my
-~consult-denote~ package ([[#h:ee82e629-fb05-4c75-9175-48a760a25691][The =unravel-study.el= integration between Consult and Denote (~consult-denote~)]]).
-
 Denote is a simple note-taking tool for Emacs. It is based on the idea
 that notes should follow a predictable and descriptive file-naming
 scheme. The file name must offer a clear indication of what the note is
@@ -5782,6 +5779,7 @@ Prot is the developer and maintainer of this package.
       ;; shown here.  Otherwise follow the same pattern for
       ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
       ("C-c d S" . denote-sort-dired)
+      ("C-c d g" . denote-grep)
       :map text-mode-map
       ("C-c d B" . denote-backlinks)
       ("C-c d b" . denote-find-backlink)
@@ -6025,39 +6023,6 @@ Prot is the developer of this package.
       ("C-c d s r" . denote-sequence-reparent))
     :config
     (setq denote-sequence-scheme 'numeric))
-#+end_src
-
-*** The =unravel-study.el= integration between Consult and Denote (~consult-denote~)
-:PROPERTIES:
-:CUSTOM_ID: h:ee82e629-fb05-4c75-9175-48a760a25691
-:END:
-
-#+begin_quote
-This is another package of mine which extends my ~denote~ package
-([[#h:e86a66dc-7ef9-4f09-ad7e-946de2034e8d][The =unravel-study.el= settings for ~denote~ (notes and file-naming)]]).
-
-This is glue code to integrate ~denote~ with Daniel Mendler's
-~consult~ ([[#h:22e97b4c-d88d-4deb-9ab3-f80631f9ff1d][The =unravel-completion.el= settings for ~consult~]]). The
-idea is to enhance minibuffer interactions, such as by providing a
-preview of the file-to-linked/opened and by adding more sources to the
-~consult-buffer~ command.
-#+end_quote
-
-Prot is the developer of this package.
-
-+ Package name (GNU ELPA): ~consult-denote~
-+ Official manual:  https://protesilaos.com/emacs/consult-denote
-+ Git repositories:
-  + GitHub: https://github.com/protesilaos/consult-denote
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
-  (use-package consult-denote
-    :ensure t
-    :bind
-    (("C-c d f" . consult-denote-find)
-     ("C-c d g" . consult-denote-grep))
-    :config
-    (consult-denote-mode 1))
 #+end_src
 
 *** The =unravel-study.el= section for exploring my Zettelkasten (~denote-explore~)

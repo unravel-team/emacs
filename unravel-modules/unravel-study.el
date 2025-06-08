@@ -37,6 +37,7 @@
     ;; shown here.  Otherwise follow the same pattern for
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
     ("C-c d S" . denote-sort-dired)
+    ("C-c d g" . denote-grep)
     :map text-mode-map
     ("C-c d B" . denote-backlinks)
     ("C-c d b" . denote-find-backlink)
@@ -240,14 +241,6 @@ modifications."
     ("C-c d s r" . denote-sequence-reparent))
   :config
   (setq denote-sequence-scheme 'numeric))
-
-(use-package consult-denote
-  :ensure t
-  :bind
-  (("C-c d f" . consult-denote-find)
-   ("C-c d g" . consult-denote-grep))
-  :config
-  (consult-denote-mode 1))
 
 (use-package denote-explore
   :ensure t
