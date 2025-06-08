@@ -5854,13 +5854,6 @@ Prot is the developer and maintainer of this package.
           (org-entry-put pos "CREATED" created))
         id)))
 
-  (use-package denote-silo
-    :ensure t
-    :bind
-    ( :map global-map
-      ("C-c d N" . denote-silo-select-silo-then-command)
-      ("C-c d O" . denote-silo-open-or-create)))
-
   (use-package denote-org
     :ensure t
     :bind
@@ -5885,6 +5878,34 @@ Prot is the developer and maintainer of this package.
   \n"))
 #+end_src
 *** The =unravel-study.el= denote section for silos  (~denote-silo~)
+:PROPERTIES:
+:CUSTOM_ID: h:F4F20B9B-16DA-487A-AB30-8D750936EB23
+:CREATED:  [2025-06-08 Sun 15:33]
+:END:
+
++ Package name (GNU ELPA): denote-silo
++ Official manual: https://protesilaos.com/emacs/denote-silo
++ Git repository: https://github.com/protesilaos/denote-silo
++ Backronym: Denote… Silos Insulate Localised Objects.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  (use-package denote-silo
+    :ensure t
+    :bind
+    ( :map global-map
+      ("C-c d N" . denote-silo-select-silo-then-command)
+      ("C-c d O" . denote-silo-open-or-create))
+    :commands ( denote-silo-dired
+                denote-silo-cd )
+    :config
+    ;; Add your silos to this list.  By default, it only includes the
+    ;; value of the variable `denote-directory'.
+    (setq denote-silo-directories
+          (list denote-directory
+                "~/Documents/personal/"
+                "~/Documents/work/")))
+#+end_src
+
 *** The =unravel-study.el= denote section for working with org  (~denote-org~)
 *** The =unravel-study.el= denote section for journaling  (~denote-journal~)
 :PROPERTIES:

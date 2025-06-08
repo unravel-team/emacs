@@ -109,13 +109,6 @@ modifications."
         (org-entry-put pos "CREATED" created))
       id)))
 
-(use-package denote-silo
-  :ensure t
-  :bind
-  ( :map global-map
-    ("C-c d N" . denote-silo-select-silo-then-command)
-    ("C-c d O" . denote-silo-open-or-create)))
-
 (use-package denote-org
   :ensure t
   :bind
@@ -138,6 +131,22 @@ modifications."
 #+identifier: %4$s
 #+signature:  %5$s
 \n"))
+
+(use-package denote-silo
+  :ensure t
+  :bind
+  ( :map global-map
+    ("C-c d N" . denote-silo-select-silo-then-command)
+    ("C-c d O" . denote-silo-open-or-create))
+  :commands ( denote-silo-dired
+              denote-silo-cd )
+  :config
+  ;; Add your silos to this list.  By default, it only includes the
+  ;; value of the variable `denote-directory'.
+  (setq denote-silo-directories
+        (list denote-directory
+              "~/Documents/personal/"
+              "~/Documents/work/")))
 
 (use-package denote-journal
   :ensure t
