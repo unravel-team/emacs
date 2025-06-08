@@ -239,7 +239,7 @@ modifications."
     ("C-c d s p" . denote-sequence-new-parent)
     ("C-c d s c" . denote-sequence-new-child-of-current)
     ("C-c d s s" . denote-sequence-new-sibling-of-current)
-    ("C-c n s d" . denote-sequence-dired)
+    ("C-c d s d" . denote-sequence-dired)
     ("C-c d s f" . denote-sequence-find-dired)
     ("C-c d s r" . denote-sequence-reparent))
   :config
