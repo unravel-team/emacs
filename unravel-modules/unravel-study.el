@@ -38,9 +38,9 @@
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
     ("C-c d s" . denote-sort-dired)
     ;; Bindings to personal functions (defined below)
-    ("C-c d p m" . denote-publish--new-microblog-entry)
-    ("C-c d p b" . denote-publish--new-blog-entry)
-    ("C-c d p l" . denote-publish--new-linklog-entry)
+    ("C-c d p m" . denote-publish-new-microblog-entry)
+    ("C-c d p b" . denote-publish-new-blog-entry)
+    ("C-c d p l" . denote-publish-new-linklog-entry)
     :map text-mode-map
     ("C-c d B" . denote-backlinks)
     ("C-c d b" . denote-find-backlink)
@@ -89,7 +89,7 @@
   (add-to-list 'denote-templates '(sketch . "sketch"))
   (add-to-list 'denote-templates '(dayplan . "dayplan"))
 
-  (defun denote-publish--new-blog-entry (&optional date)
+  (defun denote-publish-new-blog-entry (&optional date)
     "Create a new blog entry.
 
   With optional DATE as a prefix argument, prompt for a date.  If
@@ -200,7 +200,7 @@ modifications."
   ;; Journal settings
   (setq denote-journal-keyword "")
 
-  (defun denote-publish--new-microblog-entry (&optional date)
+  (defun denote-publish-new-microblog-entry (&optional date)
     "Create a new microblog entry.
   Set the title of the new entry according to the value of the user option
   `denote-journal-title-format'.
@@ -222,7 +222,7 @@ modifications."
        ;; See YASnippet
        "microblog")))
 
-  (defun denote-publish--new-linklog-entry (date)
+  (defun denote-publish-new-linklog-entry (date)
     "Create a new microblog entry.
   Set the title of the new entry according to the value of the user option
   `denote-journal-title-format'.
