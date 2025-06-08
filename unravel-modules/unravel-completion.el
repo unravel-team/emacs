@@ -378,6 +378,10 @@
 (use-package vertico
   :ensure t
   :hook (elpaca-after-init . vertico-mode)
+  :bind
+  ( :map vertico-map
+    ("]" . vertico-next-group)
+    ("[" . vertico-previous-group))
   :config
   (setq vertico-scroll-margin 0)
   (setq vertico-count 5)

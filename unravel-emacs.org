@@ -2408,13 +2408,15 @@ vertical layout. Under the hood, it takes care to be responsive and to
 handle even massive completion tables gracefully.
 #+end_quote
 
-I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provide. The configuration for that is also part of this section.
-
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   ;;; Vertical completion layout (vertico)
   (use-package vertico
     :ensure t
     :hook (elpaca-after-init . vertico-mode)
+    :bind
+    ( :map vertico-map
+      ("]" . vertico-next-group)
+      ("[" . vertico-previous-group))
     :config
     (setq vertico-scroll-margin 0)
     (setq vertico-count 5)
@@ -2427,7 +2429,16 @@ I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provi
       ;; or root '/' directory, Vertico will clear the old path to keep
       ;; only your current input.
       (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)))
+#+end_src
 
+*** Attempts to get back ~helm-resume~ functionality (~vertico-repeat~, ~vertico-suspend~)
+:PROPERTIES:
+:CUSTOM_ID: h:28B5DE20-67DC-40A6-992C-0883BF0CAF2C
+:CREATED:  [2025-06-08 Sun 11:53]
+:END:
+I use ~vertico-repeat~ and ~vertico-suspend~ to mimic the functionality that ~helm-resume~ would provide. Neither of them work well, and this is a poor substitute. Even so, beggars choosers etc.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
   (use-package vertico-repeat
     :after vertico
     :bind ( :map global-map
@@ -2444,7 +2455,6 @@ I use ~vertico-repeat~ to mimic the functionality that ~helm-resume~ would provi
             ("M-S" . vertico-suspend)
             ("C-x c b" . vertico-suspend)))
 #+end_src
-
 ** Finally, we provide the ~unravel-completion.el~ module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
