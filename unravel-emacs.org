@@ -2218,6 +2218,12 @@ Also check: [[#h:e0f9c30e-3a98-4479-b709-7008277749e4][The =unravel-search.el= m
                            (?t "Types" font-lock-type-face)
                            (?v "Variables" font-lock-variable-name-face)))))
     (consult-customize consult-ripgrep :initial (thing-at-point 'symbol))
+    (consult-customize
+     consult-ripgrep consult-git-grep consult-grep consult-man
+     consult-bookmark consult-recent-file consult-xref
+     consult--source-bookmark consult--source-file-register
+     consult--source-recent-file consult--source-project-recent-file
+     :preview-key (list :debounce 0.5 "M-."))
     (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring)))
 #+end_src
 

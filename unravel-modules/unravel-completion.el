@@ -287,6 +287,12 @@
                          (?t "Types" font-lock-type-face)
                          (?v "Variables" font-lock-variable-name-face)))))
   (consult-customize consult-ripgrep :initial (thing-at-point 'symbol))
+  (consult-customize
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   :preview-key (list :debounce 0.5 "M-."))
   (add-to-list 'consult-mode-histories '(vc-git-log-edit-mode . log-edit-comment-ring)))
 
 ;;; Extended minibuffer actions and more (embark.el and prot-embark.el)
