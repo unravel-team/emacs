@@ -24,3 +24,4 @@ capture-templates/
 snippets/
 .aider*
 .envrc
+private.el

@@ -498,4 +498,8 @@ list with overruling parameters for `org-list-to-generic'."
   (setq org-tree-slide-skip-comments 'inherit)
   (setq org-tree-slide-skip-outline-level 2))
 
+(let ((config-file (getenv "VEDANG_PRIVATE_CONFIG_FILE")))
+  (when (not (string-empty-p config-file))
+    (load-file (expand-file-name config-file))))
+
 (provide 'vedang-personal)

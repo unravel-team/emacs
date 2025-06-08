@@ -659,7 +659,7 @@ packages or configuration which depends on external functions).
     :demand t
     :config
     (exec-path-from-shell-initialize)
-    (exec-path-from-shell-copy-envs '("UNRAVEL_EMACS_VEDANG" "DENOTE_DIRECTORY" "ORG_DIRECTORY")))
+    (exec-path-from-shell-copy-envs '("UNRAVEL_EMACS_VEDANG" "DENOTE_DIRECTORY" "ORG_DIRECTORY" "VEDANG_PRIVATE_CONFIG_FILE")))
 #+end_src
 
 
@@ -7478,7 +7478,6 @@ I want this section to contain all the personal configuration that anyone using 
           org-capture-templates))
 #+end_src
 
-
 *** My personal settings for Ledger management
 :PROPERTIES:
 :CUSTOM_ID: h:D9F36A31-49C6-4481-9CE0-CF4A1616A4CF
@@ -7629,6 +7628,18 @@ I use the incredible ledger-mode for all my personal finance tracking
     (setq org-tree-slide-skip-comments 'inherit)
     (setq org-tree-slide-skip-outline-level 2))
 #+end_src
+*** My private configuration
+:PROPERTIES:
+:CUSTOM_ID: h:413A6D1D-2630-4D9E-A568-0A30C65FF26C
+:CREATED:  [2025-06-08 Sun 15:46]
+:END:
+
+#+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
+  (let ((config-file (getenv "VEDANG_PRIVATE_CONFIG_FILE")))
+    (when (not (string-empty-p config-file))
+      (load-file (expand-file-name config-file))))
+#+end_src
+
 *** Finally, we provide the =vedang-personal.el= module
 :PROPERTIES:
 :CUSTOM_ID: h:29100A9B-3142-4458-8CE1-43798EB9AA13
