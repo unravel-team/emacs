@@ -218,9 +218,6 @@ modifications."
        ;; See YASnippet
        "linklog"))))
 
-;; (use-package denote-markdown
-;;   :ensure t)
-
 (use-package denote-sequence
   :ensure t
   :bind

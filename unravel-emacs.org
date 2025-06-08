@@ -5966,7 +5966,6 @@ Prot is the developer and maintainer of this package.
 *** The =unravel-study.el= denote section for silos  (~denote-silo~)
 *** The =unravel-study.el= denote section for working with org  (~denote-org~)
 *** The =unravel-study.el= denote section for journaling  (~denote-journal~)
-*** The =unravel-study.el= denote section for working with markdown (~denote-markdown~)
 *** The =unravel-study.el= denote section on signatures (~denote-sequence~)
 :PROPERTIES:
 :CUSTOM_ID: h:8514E702-BAC9-400F-A462-D87CE17EB912
@@ -6015,9 +6014,9 @@ preview of the file-to-linked/opened and by adding more sources to the
 Prot is the developer of this package.
 
 + Package name (GNU ELPA): ~consult-denote~
-+ Official manual: not available yet.
++ Official manual:  https://protesilaos.com/emacs/consult-denote
 + Git repositories:
-  + GitHub: <https://github.com/protesilaos/consult-denote>
+  + GitHub: https://github.com/protesilaos/consult-denote
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
   (use-package consult-denote
