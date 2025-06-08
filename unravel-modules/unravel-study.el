@@ -36,7 +36,7 @@
     ;; easier to bind the link-related commands to the `global-map', as
     ;; shown here.  Otherwise follow the same pattern for
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
-    ("C-c d s" . denote-sort-dired)
+    ("C-c d S" . denote-sort-dired)
     ;; Bindings to personal functions (defined below)
     ("C-c d p m" . denote-publish-new-microblog-entry)
     ("C-c d p b" . denote-publish-new-blog-entry)
@@ -131,32 +131,7 @@ modifications."
       (when (not created)
         (setq created (format-time-string (org-time-stamp-format t t) (current-time)))
         (org-entry-put pos "CREATED" created))
-      id))
-
-  (defun denote-signature--split-luhman-sig (signature)
-    "Split numbers and letters in Luhmann-style SIGNATURE string."
-    (replace-regexp-in-string
-     "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
-     (replace-regexp-in-string
-      "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
-      signature)))
-
-  (defun denote-signature--pad-sig (signature)
-    "Create a new signature with padded spaces for all components"
-    (combine-and-quote-strings
-     (mapcar
-      (lambda (x)
-        (string-pad x 5 32 t))
-      (split-string (denote-signature--split-luhman-sig signature) "=" t))
-     "="))
-
-  (defun denote-signature--sort (sig1 sig2)
-    "Return non-nil if SIG1 is smaller that SIG2.
-
-  Perform the comparison with `string<'."
-    (string< (denote-signature--pad-sig sig1) (denote-signature--pad-sig sig2)))
-
-  (setq denote-sort-signature-comparison-function #'denote-signature--sort))
+      id)))
 
 (use-package denote-silo
   :ensure t
@@ -247,7 +222,18 @@ modifications."
 ;;   :ensure t)
 
 (use-package denote-sequence
-  :ensure t)
+  :ensure t
+  :bind
+  ( :map global-map
+    ("C-c d s n" . denote-sequence)
+    ("C-c d s p" . denote-sequence-new-parent)
+    ("C-c d s c" . denote-sequence-new-child-of-current)
+    ("C-c d s s" . denote-sequence-new-sibling-of-current)
+    ("C-c n s d" . denote-sequence-dired)
+    ("C-c d s f" . denote-sequence-find-dired)
+    ("C-c d s r" . denote-sequence-reparent))
+  :config
+  (setq denote-sequence-scheme 'numeric))
 
 (use-package consult-denote
   :ensure t
