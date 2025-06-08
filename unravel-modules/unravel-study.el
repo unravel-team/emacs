@@ -37,10 +37,6 @@
     ;; shown here.  Otherwise follow the same pattern for
     ;; `org-mode-map', `markdown-mode-map', and/or `text-mode-map'.
     ("C-c d S" . denote-sort-dired)
-    ;; Bindings to personal functions (defined below)
-    ("C-c d p m" . denote-publish-new-microblog-entry)
-    ("C-c d p b" . denote-publish-new-blog-entry)
-    ("C-c d p l" . denote-publish-new-linklog-entry)
     :map text-mode-map
     ("C-c d B" . denote-backlinks)
     ("C-c d b" . denote-find-backlink)
@@ -88,26 +84,6 @@
   (add-to-list 'denote-templates '(weekly_report . "weekrpt"))
   (add-to-list 'denote-templates '(sketch . "sketch"))
   (add-to-list 'denote-templates '(dayplan . "dayplan"))
-
-  (defun denote-publish-new-blog-entry (&optional date)
-    "Create a new blog entry.
-
-  With optional DATE as a prefix argument, prompt for a date.  If
-  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
-  date selection module.
-
-  When called from Lisp DATE is a string and has the same format as
-  that covered in the documentation of the `denote' function.  It
-  is internally processed by `denote-parse-date'."
-    (interactive (list (when current-prefix-arg (denote-date-prompt))))
-    (let ((internal-date (denote-parse-date date))
-          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
-      (denote
-       (denote-title-prompt)
-       '("draft")
-       nil nil date
-       ;; See YASnippet
-       "fullblog")))
 
   (defun denote--link-ol-get-id ()
     "Get the CUSTOM_ID of the current entry.
@@ -167,7 +143,11 @@ modifications."
   :ensure t
   :bind
   ( :map global-map
-    ("C-c d j" . denote-journal-new-entry))
+    ("C-c d j" . denote-journal-new-entry)
+    ;; Bindings to personal functions (defined below)
+    ("C-c d p m" . denote-personal-new-microblog-entry)
+    ("C-c d p b" . denote-personal-new-blog-entry)
+    ("C-c d p l" . denote-personal-new-linklog-entry))
   :config
   (let ((dir (getenv "DENOTE_DIRECTORY")))
     (when (not (string-empty-p dir))
@@ -175,7 +155,27 @@ modifications."
   ;; Journal settings
   (setq denote-journal-keyword "")
 
-  (defun denote-publish-new-microblog-entry (&optional date)
+  (defun denote-personal-new-blog-entry (&optional date)
+    "Create a new blog entry.
+
+  With optional DATE as a prefix argument, prompt for a date.  If
+  `denote-date-prompt-use-org-read-date' is non-nil, use the Org
+  date selection module.
+
+  When called from Lisp DATE is a string and has the same format as
+  that covered in the documentation of the `denote' function.  It
+  is internally processed by `denote-parse-date'."
+    (interactive (list (when current-prefix-arg (denote-date-prompt))))
+    (let ((internal-date (denote-parse-date date))
+          (denote-directory (file-name-as-directory (expand-file-name "published" denote-directory))))
+      (denote
+       (denote-title-prompt)
+       '("draft")
+       nil nil date
+       ;; See YASnippet
+       "fullblog")))
+
+  (defun denote-personal-new-microblog-entry (&optional date)
     "Create a new microblog entry.
   Set the title of the new entry according to the value of the user option
   `denote-journal-title-format'.
@@ -197,7 +197,7 @@ modifications."
        ;; See YASnippet
        "microblog")))
 
-  (defun denote-publish-new-linklog-entry (date)
+  (defun denote-personal-new-linklog-entry (date)
     "Create a new microblog entry.
   Set the title of the new entry according to the value of the user option
   `denote-journal-title-format'.
