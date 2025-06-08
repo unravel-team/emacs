@@ -228,6 +228,9 @@ modifications."
        ;; See YASnippet
        "linklog"))))
 
+(use-package tmr
+  :ensure t)
+
 (use-package denote-sequence
   :ensure t
   :bind

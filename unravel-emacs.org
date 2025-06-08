@@ -5996,6 +5996,15 @@ Prot is the developer and maintainer of this package.
          ;; See YASnippet
          "linklog"))))
 #+end_src
+
+*** The =unravel-study.el= section for timers (~tmr~)
+I use timers very rarely, but they are really nifty for when I want them. Mainly, I find myself using timers with ~denote-journal~ and with ~org-tree-slide~. (see: [[#h:B6449CD3-2D29-46EB-8366-7E4E70EA71CE][My personal settings for Emacs-based presentations (~org-tree-slide~)]])
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  (use-package tmr
+    :ensure t)
+#+end_src
+
 *** The =unravel-study.el= denote section on signatures (~denote-sequence~)
 :PROPERTIES:
 :CUSTOM_ID: h:8514E702-BAC9-400F-A462-D87CE17EB912
