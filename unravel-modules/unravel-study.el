@@ -67,7 +67,7 @@
 
   (setq denote-rename-confirmations nil) ; CAREFUL with this if you are not familiar with Denote!
   (setq denote-save-buffers t)
-  (setq denote-rename-buffer-format "[D] %s %t%b")
+  (setq denote-rename-buffer-format "%s %t%b")
   ;; Automatically rename Denote buffers when opening them so that
   ;; instead of their long file name they have a literal "[D]"
   ;; followed by the file's title.  Read the doc string of
