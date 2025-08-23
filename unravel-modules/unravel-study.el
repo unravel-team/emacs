@@ -56,7 +56,7 @@
 
   ;; Remember to check the doc strings of those variables.
   (let ((dir (getenv "DENOTE_DIRECTORY")))
-    (when (not (string-empty-p dir))
+    (when (and dir (not (string-empty-p dir)))
       (setq denote-directory (expand-file-name dir))))
   (setq denote-infer-keywords t)
   (setq denote-sort-keywords t)
@@ -160,7 +160,7 @@ modifications."
     ("C-c d p l" . denote-personal-new-linklog-entry))
   :config
   (let ((dir (getenv "DENOTE_DIRECTORY")))
-    (when (not (string-empty-p dir))
+    (when (and dir (not (string-empty-p dir)))
       (setq denote-journal-directory (expand-file-name "journal" denote-directory))))
   ;; Journal settings
   (setq denote-journal-keyword "")

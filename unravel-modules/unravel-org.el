@@ -50,7 +50,7 @@
   :ensure nil
   :init
   (let ((dir (getenv "ORG_DIRECTORY")))
-    (when (not (string-empty-p dir))
+    (when (and dir (not (string-empty-p dir)))
       (setq org-directory (expand-file-name dir))))
   (setq org-imenu-depth 7)
 
