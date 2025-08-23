@@ -1033,6 +1033,9 @@ Prot is the lead developer and maintainer.
 Another section defines some complementary functionality
 ([[#h:60d6aae2-6e4b-402c-b6a8-411fc49a6857][The =unravel-theme.el= section about ~variable-pitch-mode~ and font resizing]]).
 
+We use [[https://typeof.net/Iosevka/][Iosveka]] font in the setup, please install the font in your system.
+You can also choose to change the family to pick your preferred font.
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
   ;;;; Fontaine (font configurations)
   ;; Read the manual: <https://protesilaos.com/emacs/fontaine>
