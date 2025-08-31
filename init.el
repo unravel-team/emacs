@@ -116,7 +116,7 @@ making an abbreviation to a function."
   :demand t
   :config
   (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-envs '("UNRAVEL_EMACS_VEDANG" "DENOTE_DIRECTORY" "ORG_DIRECTORY" "VEDANG_PRIVATE_CONFIG_FILE")))
+  (exec-path-from-shell-copy-envs '("UNRAVEL_EMACS_VEDANG" "DENOTE_DIRECTORY" "ORG_DIRECTORY" "VEDANG_PRIVATE_CONFIG_FILE" "ANTHROPIC_API_KEY" "DEEPSEEK_API_KEY" "OPENAI_API_KEY" "GEMINI_API_KEY" "GROQ_API_KEY")))
 
 (require 'unravel-theme)
 (require 'unravel-essentials)
