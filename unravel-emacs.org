@@ -4030,7 +4030,7 @@ on how I use Org.
     :ensure nil
     :init
     (let ((dir (getenv "ORG_DIRECTORY")))
-      (when (not (string-empty-p dir))
+      (when (and dir (not (string-empty-p dir)))
         (setq org-directory (expand-file-name dir))))
     (setq org-imenu-depth 7)
 
@@ -5855,7 +5855,7 @@ Prot is the developer and maintainer of this package.
 
     ;; Remember to check the doc strings of those variables.
     (let ((dir (getenv "DENOTE_DIRECTORY")))
-      (when (not (string-empty-p dir))
+      (when (and dir (not (string-empty-p dir)))
         (setq denote-directory (expand-file-name dir))))
     (setq denote-infer-keywords t)
     (setq denote-sort-keywords t)
@@ -5985,7 +5985,7 @@ Prot is the developer and maintainer of this package.
       ("C-c d p l" . denote-personal-new-linklog-entry))
     :config
     (let ((dir (getenv "DENOTE_DIRECTORY")))
-      (when (not (string-empty-p dir))
+      (when (and dir (not (string-empty-p dir)))
         (setq denote-journal-directory (expand-file-name "journal" denote-directory))))
     ;; Journal settings
     (setq denote-journal-keyword "")
@@ -7689,7 +7689,7 @@ I use the incredible ledger-mode for all my personal finance tracking
 
 #+begin_src emacs-lisp :tangle "custom-lisp/vedang-personal.el"
   (let ((config-file (getenv "VEDANG_PRIVATE_CONFIG_FILE")))
-    (when (not (string-empty-p config-file))
+    (when (and config-file (not (string-empty-p config-file)))
       (load-file (expand-file-name config-file))))
 #+end_src
 
