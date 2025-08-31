@@ -372,6 +372,8 @@ NS is the namespace information passed into the function by cider."
 ;;; Uncomment this if you want Eglot to start automatically. I don't
 ;;; recommend it, but that's just me.
   ;; :hook ((typescript-base-mode . eglot-ensure))
+  :config
+  (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
 )
 
 (provide 'unravel-langs)

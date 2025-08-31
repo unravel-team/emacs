@@ -5693,6 +5693,9 @@ for this to continue.
 :CUSTOM_ID: h:531FC2E4-DA65-4D8B-B02B-46D7A0457449
 :CREATED:  [2025-01-06 Mon 09:14]
 :END:
+
+- =npm install -g typescript-language-server=
+- =npm install typescript-eslint-language-service -D=
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Configuration for Typescript Programming
 
@@ -5701,6 +5704,8 @@ for this to continue.
   ;;; Uncomment this if you want Eglot to start automatically. I don't
   ;;; recommend it, but that's just me.
     ;; :hook ((typescript-base-mode . eglot-ensure))
+    :config
+    (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
   )
 #+end_src
 
