@@ -118,6 +118,7 @@
   - [[#the-unravel-windowel-rules-for-displaying-buffers-display-buffer-alist][The =unravel-window.el= rules for displaying buffers (~display-buffer-alist~)]]
   - [[#the-unravel-windowel-section-about-frame-oriented-workflows-beframe][The =unravel-window.el= section about frame-oriented workflows (~beframe~)]]
   - [[#the-unravel-windowel-configuration-of-window-layouts-undelete-frame-mode-and-winner-mode][The =unravel-window.el= configuration of window layouts (~undelete-frame-mode~ and ~winner-mode~)]]
+  - [[#the-unravel-windowel-use-of-contextual-header-line-breadcrumb][The =unravel-window.el= use of contextual header line (~breadcrumb~)]]
   - [[#the-unravel-windowel-section-for-zone-zone][The =unravel-window.el= section for Zone (~zone~)]]
   - [[#the-unravel-windowel-section-for-displaying-time][The =unravel-window.el= section for displaying time]]
   - [[#finally-we-provide-the-unravel-windowel-module][Finally, we provide the =unravel-window.el= module]]
@@ -3532,12 +3533,12 @@ frame.
    ("C-x <left>" . winner-undo)))
 #+end_src
 
-** COMMENT The =unravel-window.el= use of contextual header line (~breadcrumb~)
+** The =unravel-window.el= use of contextual header line (~breadcrumb~)
 :PROPERTIES:
 :CUSTOM_ID: h:29ced61b-4b5a-4f63-af00-fe311468d1cd
 :END:
 
-~breadcrumb~ is an interesting package when demo'ing something, but not useful to me in day-to-day use. Commenting it out until I need it.
+~breadcrumb~ is an interesting package when demo'ing something, but not useful to me in day-to-day use.
 
 #+begin_quote
 The ~breadcrumb~ package by João Távora lets us display contextual
