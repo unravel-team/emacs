@@ -395,8 +395,6 @@ If WEEK-NUM is not provided, use the current week."
 ;;;; agenda
 (use-package org-agenda
   :ensure nil
-  :bind
-  ("C-c a" . org-agenda)
   :config
 
 ;;;;; Basic agenda setup
