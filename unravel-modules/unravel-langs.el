@@ -376,4 +376,12 @@ NS is the namespace information passed into the function by cider."
   (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
 )
 
+;;;; Configuration for YAML Programming
+
+(use-package yaml-mode
+  :ensure t)
+
+(use-package yaml-imenu
+  :ensure t)
+
 (provide 'unravel-langs)

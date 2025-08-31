@@ -174,6 +174,7 @@
   - [[#the-unravel-langsel-section-for-clojure][The =unravel-langs.el= section for Clojure]]
   - [[#the-unravel-langsel-section-for-emacs-lisp][The =unravel-langs.el= section for Emacs Lisp]]
   - [[#the-unravel-langsel-section-for-typescript][The =unravel-langs.el= section for Typescript]]
+  - [[#the-unravel-langsel-section-for-yaml][The =unravel-langs.el= section for YAML]]
   - [[#finally-we-provide-the-unravel-langsel-module][Finally, we provide the =unravel-langs.el= module]]
 - [[#the-unravel-studyel-module][The =unravel-study.el= module]]
   - [[#the-unravel-studyel-section-for-notes-and-file-naming-denote][The =unravel-study.el= section for notes and file-naming (~denote~)]]
@@ -5707,6 +5708,26 @@ for this to continue.
     :config
     (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
   )
+#+end_src
+
+** The =unravel-langs.el= section for YAML
+:PROPERTIES:
+:CUSTOM_ID: h:4C84A0B9-DBA3-4016-B40D-22A6C98E1A04
+:CREATED:  [2025-07-14 Mon 09:12]
+:END:
+YAML is a terrible, terrible markup language. But, as is always the
+case in this cruel world, it's something we absolutely cannot live
+without. Luckily, Emacs 30+ has treesitter support for YAML, so the
+experience is much smoother than before.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Configuration for YAML Programming
+
+  (use-package yaml-mode
+    :ensure t)
+
+  (use-package yaml-imenu
+    :ensure t)
 #+end_src
 
 ** Finally, we provide the =unravel-langs.el= module
