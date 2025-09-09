@@ -185,6 +185,7 @@
   - [[#the-unravel-studyel-section-for-flashcards-org-fc][The =unravel-study.el= section for flashcards (~org-fc~)]]
   - [[#the-unravel-studyel-section-for-table-of-contents-toc-org][The =unravel-study.el= section for table of contents (~toc-org~)]]
   - [[#the-unravel-studyel-section-for-archiving-web-content-org-board][The =unravel-study.el= section for archiving web content (~org-board~)]]
+  - [[#the-unravel-studyel-section-for-focused-work-org-pomodoro-third-time-and-third-time][The =unravel-study.el= section for focused work (~org-pomodoro-third-time~ and ~third-time~)]]
   - [[#finally-we-provide-the-unravel-studyel-module][Finally, we provide the =unravel-study.el= module]]
 - [[#custom-libraries][Custom libraries]]
   - [[#the-prot-commonel-library][The =prot-common.el= library]]
@@ -6289,6 +6290,33 @@ section for ~org-fc~ (flashcards)]]).
     :ensure t
     :bind-keymap
     ("C-c o" . org-board-keymap))
+#+end_src
+
+** The =unravel-study.el= section for focused work (~org-pomodoro-third-time~ and ~third-time~)
+:PROPERTIES:
+:CUSTOM_ID: h:B5A1252F-0BBC-4028-90E3-168EBFDF8835
+:CREATED:  [2025-09-09 Tue 22:00]
+:END:
+~org-pomodoro-third-time~ is my favorite way of using the Pomodoro
+technique. Read more about it here:
+https://www.lesswrong.com/posts/RWu8eZqbwgB9zaerh/third-time-a-better-way-to-work
+
+I'm also experimenting with =~swflint/third-time=, which is a simple
+way to track work-time without having to clock into a task in
+org-mode. This doesn't fit smoothly into my workflow yet, but it's so
+small and convenient that I'm hoping it's useful to others.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  ;;; Pomodoro
+  (use-package org-pomodoro-third-time
+    :ensure (:host github :repo "telotortium/org-pomodoro-third-time")
+    :config
+    (setq org-pomodoro-keep-killed-pomodoro-time t
+          org-pomodoro-clock-break t
+          org-pomodoro-length 45))
+
+  (use-package third-time
+    :ensure t)
 #+end_src
 
 ** Finally, we provide the =unravel-study.el= module

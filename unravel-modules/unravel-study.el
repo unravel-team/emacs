@@ -353,4 +353,15 @@ modifications."
   :bind-keymap
   ("C-c o" . org-board-keymap))
 
+;;; Pomodoro
+(use-package org-pomodoro-third-time
+  :ensure (:host github :repo "telotortium/org-pomodoro-third-time")
+  :config
+  (setq org-pomodoro-keep-killed-pomodoro-time t
+        org-pomodoro-clock-break t
+        org-pomodoro-length 45))
+
+(use-package third-time
+  :ensure t)
+
 (provide 'unravel-study)
