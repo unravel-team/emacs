@@ -170,6 +170,7 @@
   - [[#the-unravel-langsel-section-for-changing-many-things-multiple-cursors][The =unravel-langs.el= section for changing many things (~multiple-cursors~)]]
   - [[#the-unravel-langsel-section-for-editing-comments-or-docstrings-better-separedit][The =unravel-langs.el= section for editing comments or docstrings better (~separedit~)]]
   - [[#the-unravel-langsel-section-for-aider-aiderel][The =unravel-langs.el= section for aider (~aider.el~)]]
+  - [[#the-unravel-langsel-section-for-claude-code-claude-code-ideel][The =unravel-langs.el= section for Claude Code (~claude-code-ide.el~)]]
   - [[#the-unravel-langsel-section-for-python][The =unravel-langs.el= section for Python]]
   - [[#the-unravel-langsel-section-for-ziglang-zig-mode][The =unravel-langs.el= section for Ziglang (~zig-mode~)]]
   - [[#the-unravel-langsel-section-for-clojure][The =unravel-langs.el= section for Clojure]]
@@ -5373,6 +5374,26 @@ workflow.
     ;; auto revert buffer
     (global-auto-revert-mode 1)
     (auto-revert-mode 1))
+#+end_src
+
+** The =unravel-langs.el= section for Claude Code (~claude-code-ide.el~)
+:PROPERTIES:
+:CUSTOM_ID: h:252F290B-5D4C-48FD-875B-279E274E383E
+:CREATED:  [2025-09-09 Tue 21:43]
+:END:
+I'm not a big fan of Claude Code, but the world is converging on it.
+And I see a lot of value in having common conventions for things. So
+if these are Claude Code conventions, so be it.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package claude-code-ide
+    :ensure (:host github :repo "manzaltu/claude-code-ide.el")
+    :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+    :config
+    ;; Enable Emacs MCP tool
+    (claude-code-ide-emacs-tools-setup)
+    (setq claude-code-ide-vterm-render-delay 0.01)
+    (setq claude-code-ide-diagnostics-backend 'flymake))
 #+end_src
 
 ** The =unravel-langs.el= section for Python

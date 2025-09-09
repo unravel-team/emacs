@@ -194,6 +194,15 @@
   (global-auto-revert-mode 1)
   (auto-revert-mode 1))
 
+(use-package claude-code-ide
+  :ensure (:host github :repo "manzaltu/claude-code-ide.el")
+  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+  :config
+  ;; Enable Emacs MCP tool
+  (claude-code-ide-emacs-tools-setup)
+  (setq claude-code-ide-vterm-render-delay 0.01)
+  (setq claude-code-ide-diagnostics-backend 'flymake))
+
 ;;;; Configuration for Python Programming
 
 (use-package python
