@@ -232,6 +232,20 @@
   ;; other configured hook function.
   (add-hook 'python-base-mode-hook #'pet-mode -10))
 
+(use-package jupyter-ascending
+  :ensure (:host "github.com" :repo "Duncan-Britt/jupyter-ascending")
+  :hook (python-mode . (lambda ()
+                         (when (and buffer-file-name
+                                    (string-match-p "\\.sync\\.py\\'" buffer-file-name))
+                           (jupyter-ascending-mode 1))))
+  :bind (:map jupyter-ascending-mode-map
+              ("C-c C-k" . jupyter-ascending-execute-line)
+              ("C-c C-a" . jupyter-ascending-execute-all)
+              ("C-c C-n" . jupyter-ascending-next-cell)
+              ("C-c C-p" . jupyter-ascending-previous-cell)
+              ("C-c t" . jupyter-ascending-cycle-cell-type)
+              ("C-c '" . jupyter-ascending-edit-markdown-cell)))
+
 ;;;; Configuration for Zig Programming
 
 (use-package zig-mode
