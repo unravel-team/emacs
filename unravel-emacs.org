@@ -101,6 +101,7 @@
   - [[#the-unravel-searchel-setup-for-editable-grep-buffers-grep-edit-mode-or-wgrep][The =unravel-search.el= setup for editable grep buffers (~grep-edit-mode~ or ~wgrep~)]]
   - [[#the-unravel-searchel-settings-for-jumping-avy][The =unravel-search.el= settings for jumping (~avy~)]]
   - [[#the-unravel-searchel-settings-for-long-search-sessions-deadgrep][The =unravel-search.el= settings for long search sessions (~deadgrep~)]]
+  - [[#the-unravel-searchel-settings-for-semantic-searching-in-programming-ast-grep][The =unravel-search.el= settings for semantic searching in programming (~ast-grep~)]]
   - [[#finally-we-provide-the-unravel-searchel-module][Finally, we provide the =unravel-search.el= module]]
 - [[#the-unravel-diredel-module][The =unravel-dired.el= module]]
   - [[#the-unravel-diredel-settings-for-common-operations][The =unravel-dired.el= settings for common operations]]
@@ -2846,6 +2847,26 @@ some excellent features focused on search.
             (executable-find "ripgrep"))
     (use-package deadgrep
       :ensure t))
+#+end_src
+
+** The =unravel-search.el= settings for semantic searching in programming (~ast-grep~)
+:PROPERTIES:
+:CUSTOM_ID: h:B6B2ADF8-6E17-4F52-A37C-4298899620F3
+:CREATED:  [2025-09-19 Fri 11:23]
+:END:
+
+AST-Grep is amazing for complex refactoring and code transformations.
+More details at:
+- Main page: https://ast-grep.github.io/
+- Playground: https://ast-grep.github.io/playground.html
+- MCP server: https://github.com/ast-grep/ast-grep-mcp
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-search.el"
+  ;;; For searching using tree-sitter, use ast-grep
+  (when (or (executable-find "sg")
+            (executable-find "ast-grep"))
+    (use-package ast-grep
+      :ensure (:host github :repo "SunskyXH/ast-grep.el")))
 #+end_src
 
 ** Finally, we provide the =unravel-search.el= module

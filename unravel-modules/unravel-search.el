@@ -143,4 +143,10 @@
   (use-package deadgrep
     :ensure t))
 
+;;; For searching using tree-sitter, use ast-grep
+(when (or (executable-find "sg")
+          (executable-find "ast-grep"))
+  (use-package ast-grep
+    :ensure (:host github :repo "SunskyXH/ast-grep.el")))
+
 (provide 'unravel-search)
