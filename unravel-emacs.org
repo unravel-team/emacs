@@ -664,7 +664,7 @@ packages or configuration which depends on external functions).
     :demand t
     :config
     (exec-path-from-shell-initialize)
-    (exec-path-from-shell-copy-envs '("UNRAVEL_EMACS_VEDANG" "DENOTE_DIRECTORY" "ORG_DIRECTORY" "VEDANG_PRIVATE_CONFIG_FILE" "ANTHROPIC_API_KEY" "DEEPSEEK_API_KEY" "OPENAI_API_KEY" "GEMINI_API_KEY" "GROQ_API_KEY")))
+    (exec-path-from-shell-copy-envs '("UNRAVEL_EMACS_VEDANG" "DENOTE_DIRECTORY" "ORG_DIRECTORY" "VEDANG_PRIVATE_CONFIG_FILE" "ANTHROPIC_API_KEY" "CEREBRAS_API_KEY" "DEEPSEEK_API_KEY" "GEMINI_API_KEY" "GROQ_API_KEY" "MOONSHOT_API_KEY" "OPENAI_API_KEY" "OPENROUTER_API_KEY")))
 #+end_src
 
 
@@ -5364,7 +5364,7 @@ workflow.
   (use-package aider
     :ensure t
     :config
-    (setq aider-args '("--model" "sonnet" "--no-auto-accept-architect")) ;; add --no-auto-commits if you don't want it
+    (setq aider-args '("--model" "openrouter/openai/gpt-oss-120b" "--no-auto-accept-architect")) ;; add --no-auto-commits if you don't want it
     ;; Or use your personal config file
     ;; (setq aider-args `("--config" ,(expand-file-name "~/.aider.conf.yml")))
     ;; ;;
