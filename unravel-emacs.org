@@ -6041,9 +6041,13 @@ Prot is the developer and maintainer of this package.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
   (use-package denote-journal
     :ensure t
+    :commands
+    ( denote-journal-new-entry
+      denote-journal-new-or-existing-entry
+      denote-journal-link-or-create-entry )
     :bind
     ( :map global-map
-      ("C-c d j" . denote-journal-new-entry)
+      ("C-c d j" . denote-journal-new-or-existing-entry)
       ;; Bindings to personal functions (defined below)
       ("C-c d p m" . denote-personal-new-microblog-entry)
       ("C-c d p b" . denote-personal-new-blog-entry)
@@ -6053,7 +6057,7 @@ Prot is the developer and maintainer of this package.
       (when (and dir (not (string-empty-p dir)))
         (setq denote-journal-directory (expand-file-name "journal" denote-directory))))
     ;; Journal settings
-    (setq denote-journal-keyword "")
+    (setq denote-journal-keyword "journal")
 
     (defun denote-personal-new-blog-entry (&optional date)
       "Create a new blog entry.
@@ -6116,7 +6120,44 @@ Prot is the developer and maintainer of this package.
          '("draft" "linklog")
          nil nil date
          ;; See YASnippet
-         "linklog"))))
+         "linklog")))
+
+    (defvar denote-plan-keyword "standup")
+    (defvar denote-plan-directory (expand-file-name "plan" denote-directory))
+    (defun denote-new-plan-note-sequence ()
+      ;; [tag: plan-notes-are-under-51-signature]
+      (denote-sequence-get-new 'child "51"))
+  (defun denote-plan-entry-title (date)
+    (format-time-string "Plan for the day, %A, %e %B, %Y" date))
+
+  (defun denote-plan-new-entry (&optional date)
+      "Create a new plan entry. See `denote-journal-new-entry'."
+      (interactive (list (when current-prefix-arg (denote-date-prompt))))
+      (let* ((internal-date (or (denote-valid-date-p date) (current-time)))
+             (denote-journal-directory denote-plan-directory)
+             (denote-directory (denote-journal-directory))
+             (denote-journal-signature denote-new-plan-note-sequence))
+        (denote
+         (denote-plan-entry-title internal-date)
+         `(,denote-plan-keyword)
+         nil nil date
+         ;; See YASnippet
+         "dayplan"
+         (denote-journal-signature))
+        (run-hooks 'denote-journal-hook)))
+
+    (defun denote-plan-new-or-existing-entry (&optional date)
+      "Exactly like `denote-journal-new-or-existing-entry', but for plan files"
+      (interactive
+       (list
+        (when current-prefix-arg
+          (denote-date-prompt))))
+      (let ((denote-journal-keyword "standup")
+            (denote-journal-directory denote-plan-directory))
+        (if-let* ((date-to-use (or date (current-time)))
+                  (file (denote-journal-path-to-new-or-existing-entry date-to-use denote-journal-interval)))
+            (find-file file)
+          (error "Cannot get a new or existing journal entry")))))
 #+end_src
 
 *** The =unravel-study.el= section for timers (~tmr~)
