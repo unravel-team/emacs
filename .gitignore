@@ -25,3 +25,8 @@ snippets/
 .aider*
 .envrc
 private.el
+
+# Random stuff
+eww-bookmarks
+unravel-modules/example.sync.ipynb
+unravel-modules/example.sync.py
