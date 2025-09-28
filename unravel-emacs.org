@@ -177,7 +177,7 @@
   - [[#the-unravel-langsel-section-for-clojure][The =unravel-langs.el= section for Clojure]]
   - [[#the-unravel-langsel-section-for-emacs-lisp][The =unravel-langs.el= section for Emacs Lisp]]
   - [[#the-unravel-langsel-section-for-typescript][The =unravel-langs.el= section for Typescript]]
-  - [[#the-unravel-langsel-section-for-yaml][The =unravel-langs.el= section for YAML]]
+  - [[#the-unravel-langsel-section-for-yaml-and-toml][The =unravel-langs.el= section for YAML and TOML]]
   - [[#finally-we-provide-the-unravel-langsel-module][Finally, we provide the =unravel-langs.el= module]]
 - [[#the-unravel-studyel-module][The =unravel-study.el= module]]
   - [[#the-unravel-studyel-section-for-notes-and-file-naming-denote][The =unravel-study.el= section for notes and file-naming (~denote~)]]
@@ -5781,7 +5781,7 @@ for this to continue.
   )
 #+end_src
 
-** The =unravel-langs.el= section for YAML
+** The =unravel-langs.el= section for YAML and TOML
 :PROPERTIES:
 :CUSTOM_ID: h:4C84A0B9-DBA3-4016-B40D-22A6C98E1A04
 :CREATED:  [2025-07-14 Mon 09:12]
@@ -5791,6 +5791,9 @@ case in this cruel world, it's something we absolutely cannot live
 without. Luckily, Emacs 30+ has treesitter support for YAML, so the
 experience is much smoother than before.
 
+The same can be said for TOML (mostly). Though it's a bit nicer than YAML.
+
+~taplo-cli~ is a cargo-based LSP server for TOML. Start it with: ~taplo lsp stdio~
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   ;;;; Configuration for YAML Programming
 
@@ -5799,6 +5802,11 @@ experience is much smoother than before.
 
   (use-package yaml-imenu
     :ensure t)
+
+  (use-package toml-ts-mode
+    :ensure nil
+    :config
+    (add-to-list 'eglot-server-programs '((toml-ts-mode toml-mode) . ("taplo" "lsp" "stdio"))))
 #+end_src
 
 ** Finally, we provide the =unravel-langs.el= module

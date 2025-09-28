@@ -407,4 +407,9 @@ NS is the namespace information passed into the function by cider."
 (use-package yaml-imenu
   :ensure t)
 
+(use-package toml-ts-mode
+  :ensure nil
+  :config
+  (add-to-list 'eglot-server-programs '((toml-ts-mode toml-mode) . ("taplo" "lsp" "stdio"))))
+
 (provide 'unravel-langs)
