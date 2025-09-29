@@ -6144,7 +6144,7 @@ Prot is the developer and maintainer of this package.
       (let* ((internal-date (or (denote-valid-date-p date) (current-time)))
              (denote-journal-directory denote-plan-directory)
              (denote-directory (denote-journal-directory))
-             (denote-journal-signature denote-new-plan-note-sequence))
+             (denote-journal-signature #'denote-new-plan-note-sequence))
         (denote
          (denote-plan-entry-title internal-date)
          `(,denote-plan-keyword)
@@ -6156,16 +6156,16 @@ Prot is the developer and maintainer of this package.
 
     (defun denote-plan-new-or-existing-entry (&optional date)
       "Exactly like `denote-journal-new-or-existing-entry', but for plan files"
-      (interactive
-       (list
-        (when current-prefix-arg
-          (denote-date-prompt))))
-      (let ((denote-journal-keyword "standup")
+      (interactive (list (when current-prefix-arg (denote-date-prompt))))
+      (let ((denote-journal-keyword denote-plan-keyword)
             (denote-journal-directory denote-plan-directory))
-        (if-let* ((date-to-use (or date (current-time)))
-                  (file (denote-journal-path-to-new-or-existing-entry date-to-use denote-journal-interval)))
+        (if-let* ((date-to-use (or (denote-valid-date-p date) (current-time)))
+                  (internal-date (denote-journal--date-in-interval-p date-to-use denote-journal-interval))
+                  (denote-journal-directory denote-plan-directory)
+                  (files (denote-journal--get-entry internal-date denote-journal-interval))
+                  (file (denote-journal-select-file-prompt files)))
             (find-file file)
-          (error "Cannot get a new or existing journal entry")))))
+          (denote-plan-new-entry date)))))
 #+end_src
 
 *** The =unravel-study.el= section for timers (~tmr~)
