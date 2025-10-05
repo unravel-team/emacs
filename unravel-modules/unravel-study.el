@@ -154,7 +154,9 @@ modifications."
   :commands
   ( denote-journal-new-entry
     denote-journal-new-or-existing-entry
-    denote-journal-link-or-create-entry )
+    denote-journal-link-or-create-entry
+    denote-plan-new-or-existing-entry
+    denote-personal-new-microblog-entry )
   :bind
   ( :map global-map
     ("C-c d j" . denote-journal-new-or-existing-entry)
@@ -237,10 +239,10 @@ modifications."
   (defun denote-new-plan-note-sequence ()
     ;; [tag: plan-notes-are-under-51-signature]
     (denote-sequence-get-new 'child "51"))
-(defun denote-plan-entry-title (date)
-  (format-time-string "Plan for the day, %A, %e %B, %Y" date))
+  (defun denote-plan-entry-title (date)
+    (format-time-string "Plan for the day, %A, %e %B, %Y" date))
 
-(defun denote-plan-new-entry (&optional date)
+  (defun denote-plan-new-entry (&optional date)
     "Create a new plan entry. See `denote-journal-new-entry'."
     (interactive (list (when current-prefix-arg (denote-date-prompt))))
     (let* ((internal-date (or (denote-valid-date-p date) (current-time)))
@@ -284,6 +286,8 @@ modifications."
     ("C-c d s f" . denote-sequence-find-dired)
     ("C-c d s r" . denote-sequence-reparent)
     ("C-c d s C" . denote-sequence-convert))
+  :commands
+  ( denote-sequence-get-new )
   :config
   (setq denote-sequence-scheme 'numeric))
 
