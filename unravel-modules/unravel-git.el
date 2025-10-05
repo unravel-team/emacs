@@ -45,6 +45,9 @@
   (setq diff-font-lock-syntax 'hunk-also))
 
 ;;; Interactive and powerful git front-end (Magit)
+(use-package cond-let
+  :ensure (:host "github" :repo "tarsius/cond-let"))
+
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
