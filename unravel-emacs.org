@@ -179,6 +179,7 @@
   - [[#the-unravel-langsel-section-for-emacs-lisp][The =unravel-langs.el= section for Emacs Lisp]]
   - [[#the-unravel-langsel-section-for-typescript][The =unravel-langs.el= section for Typescript]]
   - [[#the-unravel-langsel-section-for-yaml-and-toml][The =unravel-langs.el= section for YAML and TOML]]
+  - [[#the-unravel-langsel-section-for-golang][The =unravel-langs.el= section for Golang]]
   - [[#finally-we-provide-the-unravel-langsel-module][Finally, we provide the =unravel-langs.el= module]]
 - [[#the-unravel-studyel-module][The =unravel-study.el= module]]
   - [[#the-unravel-studyel-section-for-notes-and-file-naming-denote][The =unravel-study.el= section for notes and file-naming (~denote~)]]
@@ -5821,6 +5822,26 @@ The same can be said for TOML (mostly). Though it's a bit nicer than YAML.
 
   (use-package yaml-mode
     :ensure t)
+
+  (use-package yaml-imenu
+    :ensure t)
+
+  (use-package toml-ts-mode
+    :ensure nil
+    :config
+    (add-to-list 'eglot-server-programs '((toml-ts-mode toml-mode) . ("taplo" "lsp" "stdio"))))
+#+end_src
+
+** The =unravel-langs.el= section for Golang
+:PROPERTIES:
+:CUSTOM_ID: h:CF89AF93-C094-42E1-A836-A1A6B6B233C1
+:CREATED:  [2025-10-07 Tue 14:30]
+:END:
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;;; Configuration for Golang Programming
+
+  (use-package go-ts-mode
+    :ensure nil)
 
   (use-package yaml-imenu
     :ensure t)
