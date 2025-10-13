@@ -68,6 +68,7 @@
   - [[#the-unravel-essentialsel-section-about-quick-copying-easy-kill][The =unravel-essentials.el= section about quick copying (~easy-kill~)]]
   - [[#the-unravel-essentialsel-section-about-auto-management-of-treesit-modules-treesit-auto][The =unravel-essentials.el= section about auto management of treesit modules (~treesit-auto~)]]
   - [[#the-unravel-essentialsel-section-about-using-tree-sitter-for-marking-expreg][The =unravel-essentials.el= section about using tree-sitter for marking (~expreg~)]]
+  - [[#the-unravel-essentialsel-section-for-code-folding-based-on-tree-sitter-treesit-fold][The =unravel-essentials.el= section for code-folding based on tree-sitter (~treesit-fold~)]]
   - [[#the-unravel-essentialsel-section-for-battery-display][The =unravel-essentials.el= section for Battery display]]
   - [[#the-unravel-essentialsel-section-for-osx-changes][The =unravel-essentials.el= section for OSX changes]]
   - [[#the-unravel-essentialsel-section-for-simpleel-changes][The =unravel-essentials.el= section for ~simple.el~ changes]]
@@ -1484,6 +1485,24 @@ I expect ~expreg~ to eventually completely replace ~easy-kill~ ()
             (prot/expreg-expand 1))
            (symbol (prot/expreg-expand 2))
            (t (expreg-expand)))))))
+#+end_src
+
+** The =unravel-essentials.el= section for code-folding based on tree-sitter (~treesit-fold~)
+:PROPERTIES:
+:CUSTOM_ID: h:DB276067-F913-4E4D-A1C6-73A5A99EBEC1
+:CREATED:  [2025-10-13 Mon 21:21]
+:END:
+I took this package from watching BG program. I expect that it will eventually completely replace my use of ~outline-minor-mode~
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-essentials.el"
+  ;;; Fold code efficiently if tree-sitter is available (treesit-fold)
+  (when (and (fboundp 'treesit-available-p)
+             (treesit-available-p))
+    (use-package treesit-fold
+      :ensure (:host github :repo "emacs-tree-sitter/treesit-fold")
+      :config
+      (global-treesit-fold-mode)
+      (setq treesit-fold-line-count-show t)
+      (treesit-fold-line-comment-mode)))
 #+end_src
 
 ** The =unravel-essentials.el= section for Battery display

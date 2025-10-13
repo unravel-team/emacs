@@ -139,6 +139,16 @@ word.  Fall back to regular `expreg-expand'."
          (symbol (prot/expreg-expand 2))
          (t (expreg-expand)))))))
 
+;;; Fold code efficiently if tree-sitter is available (treesit-fold)
+(when (and (fboundp 'treesit-available-p)
+           (treesit-available-p))
+  (use-package treesit-fold
+    :ensure (:host github :repo "emacs-tree-sitter/treesit-fold")
+    :config
+    (global-treesit-fold-mode)
+    (setq treesit-fold-line-count-show t)
+    (treesit-fold-line-comment-mode)))
+
 ;;;; Show battery status on the mode line (battery.el)
 (use-package battery
   :ensure nil
