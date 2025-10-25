@@ -233,7 +233,7 @@
   (add-hook 'python-base-mode-hook #'pet-mode -10))
 
 (use-package jupyter-ascending
-  :ensure (:host "github.com" :repo "Duncan-Britt/jupyter-ascending")
+  :ensure (:host github :repo "Duncan-Britt/jupyter-ascending")
   :hook (python-mode . (lambda ()
                          (when (and buffer-file-name
                                     (string-match-p "\\.sync\\.py\\'" buffer-file-name))

@@ -3829,7 +3829,7 @@ branches, etc.
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-git.el"
   ;;; Interactive and powerful git front-end (Magit)
   (use-package cond-let
-    :ensure (:host "github" :repo "tarsius/cond-let"))
+    :ensure (:host github :repo "tarsius/cond-let"))
 
   (use-package magit
     :ensure t
@@ -5526,7 +5526,7 @@ Note TBD
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   (use-package jupyter-ascending
-    :ensure (:host "github.com" :repo "Duncan-Britt/jupyter-ascending")
+    :ensure (:host github :repo "Duncan-Britt/jupyter-ascending")
     :hook (python-mode . (lambda ()
                            (when (and buffer-file-name
                                       (string-match-p "\\.sync\\.py\\'" buffer-file-name))

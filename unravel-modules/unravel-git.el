@@ -46,7 +46,7 @@
 
 ;;; Interactive and powerful git front-end (Magit)
 (use-package cond-let
-  :ensure (:host "github" :repo "tarsius/cond-let"))
+  :ensure (:host github :repo "tarsius/cond-let"))
 
 (use-package magit
   :ensure t
