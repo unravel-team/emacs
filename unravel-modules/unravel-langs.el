@@ -182,7 +182,7 @@
 (use-package aider
   :ensure t
   :config
-  (setq aider-args '("--model" "openrouter/openai/gpt-oss-120b" "--no-auto-accept-architect")) ;; add --no-auto-commits if you don't want it
+  (setq aider-args '("--no-auto-commits" "--no-auto-accept-architect"))
   ;; Or use your personal config file
   ;; (setq aider-args `("--config" ,(expand-file-name "~/.aider.conf.yml")))
   ;; ;;
