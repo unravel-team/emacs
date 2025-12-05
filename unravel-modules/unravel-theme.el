@@ -30,6 +30,11 @@
   (setq ef-themes-disable-other-themes t)
   (mapc #'disable-theme custom-enabled-themes))
 
+;;; Alabaster Themes!
+(use-package alabaster-themes
+  :ensure (:host github :repo "vedang/alabaster-themes")
+  :commands (alabaster-themes-select))
+
 ;;;; Lin
 ;; Read the lin manual: <https://protesilaos.com/emacs/lin>.
 (use-package lin
@@ -132,19 +137,27 @@
 ;; <https://git.sr.ht/~bboal/theme-buffet>
 (use-package theme-buffet
   :ensure t
-  :after (:any modus-themes ef-themes)
+  :after (:any modus-themes ef-themes alabaster-themes)
   :config
   (let ((modus-themes-p (featurep 'modus-themes))
-        (ef-themes-p (featurep 'ef-themes)))
+        (ef-themes-p (featurep 'ef-themes))
+        (alabaster-themes-p (featurep 'alabaster-themes)))
     (setq theme-buffet-menu 'end-user)
     (setq theme-buffet-time-offset 0)
+    ;; My list of themes when I want to use ef-themes
+    ;; (setq theme-buffet-end-user
+    ;;       '( :night     (ef-dark ef-winter ef-autumn ef-night ef-duo-dark ef-symbiosis ef-owl)
+    ;;          :morning   (ef-light ef-cyprus ef-spring ef-frost ef-duo-light ef-eagle)
+    ;;          :afternoon (ef-arbutus ef-day ef-kassio ef-summer ef-elea-light ef-maris-light ef-melissa-light ef-trio-light ef-reverie)
+    ;;          :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
+    ;; My list of themes when I want to use alabaster
     (setq theme-buffet-end-user
-          '( :night     (ef-dark ef-winter ef-autumn ef-night ef-duo-dark ef-symbiosis ef-owl)
-             :morning   (ef-light ef-cyprus ef-spring ef-frost ef-duo-light ef-eagle)
-             :afternoon (ef-arbutus ef-day ef-kassio ef-summer ef-elea-light ef-maris-light ef-melissa-light ef-trio-light ef-reverie)
-             :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
+          '( :night     (alabaster-dark alabaster-dark-mono)
+             :morning   (alabaster-bg alabaster)
+             :afternoon (alabaster-bg alabaster)
+             :evening   (alabaster-dark)))
 
-    (when (or modus-themes-p ef-themes-p)
+    (when (or alabaster-themes-p modus-themes-p ef-themes-p)
       (theme-buffet-timer-hours 2)
       (theme-buffet-a-la-carte))))
 

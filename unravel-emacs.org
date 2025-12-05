@@ -46,6 +46,7 @@
   - [[#finally-the-initel-section-for-local-variables][Finally, the =init.el= section for local variables]]
 - [[#the-unravel-themeel-module][The =unravel-theme.el= module]]
   - [[#the-unravel-themeel-section-for-cool-modern-themes-ef-themes][The =unravel-theme.el= section for cool, modern themes (~ef-themes~)]]
+  - [[#the-unravel-themeel-section-for-my-minimal-highlight-themes-alabaster-themes][The =unravel-theme.el= section for my minimal highlight themes (~alabaster-themes~)]]
   - [[#the-unravel-themeel-section-for-highlighting-lines-lin][The =unravel-theme.el= section for highlighting lines (~lin~)]]
   - [[#the-unravel-themeel-section-for-padding-spacious-padding][The =unravel-theme.el= section for padding (~spacious-padding~)]]
   - [[#the-unravel-themeel-section-for-color-previews-rainbow-mode][The =unravel-theme.el= section for color previews (~rainbow-mode~)]]
@@ -754,7 +755,7 @@ This module defines everything related to the aesthetics of Emacs.
 :CUSTOM_ID: h:2b2a27a1-6d2e-4b59-bf60-94682e173f2f
 :END:
 
-I use themes from the ~ef-themes~ package exclusively.
+I use themes from the ~ef-themes~ package when I want "cool" themes.
 
 Prot is the lead developer and maintainer of this package.
 
@@ -795,6 +796,33 @@ Prot is the lead developer and maintainer of this package.
             (t . (variable-pitch 1.1))))
     (setq ef-themes-disable-other-themes t)
     (mapc #'disable-theme custom-enabled-themes))
+#+end_src
+
+** The =unravel-theme.el= section for my minimal highlight themes (~alabaster-themes~)
+:PROPERTIES:
+:CUSTOM_ID: h:E259D8CD-6FE7-43A2-A8A6-FFE3872CAC27
+:CREATED:  [2025-12-21 Sun 12:48]
+:END:
+
+I fell in love with Tonsky's Alabaster Theme philosophy and built an
+equivalent for Emacs. These are my go-to themes now.
+
+Refer to the README file of the ~alabaster-themes~ package for more details.
+
+I am the lead developer and maintainer of this package, it is inspired
+directly from Tonsky's Sublime Alabaster theme and from Prot's
+~ef-themes~ package.
+
++ Package name (GNU ELPA): ~alabaster-themes~
++ Change log: <https://github.com/vedang/alabaster-themes/blob/main/CHANGELOG.org>
++ Git repositories:
+  - GitHub: <https://github.com/vedang/alabaster-themes>
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
+  ;;; Alabaster Themes!
+  (use-package alabaster-themes
+    :ensure (:host github :repo "vedang/alabaster-themes")
+    :commands (alabaster-themes-select))
 #+end_src
 
 ** The =unravel-theme.el= section for highlighting lines (~lin~)
@@ -995,19 +1023,27 @@ Bruno Boal is the lead developer and Prot is a co-maintainer.
   ;; <https://git.sr.ht/~bboal/theme-buffet>
   (use-package theme-buffet
     :ensure t
-    :after (:any modus-themes ef-themes)
+    :after (:any modus-themes ef-themes alabaster-themes)
     :config
     (let ((modus-themes-p (featurep 'modus-themes))
-          (ef-themes-p (featurep 'ef-themes)))
+          (ef-themes-p (featurep 'ef-themes))
+          (alabaster-themes-p (featurep 'alabaster-themes)))
       (setq theme-buffet-menu 'end-user)
       (setq theme-buffet-time-offset 0)
+      ;; My list of themes when I want to use ef-themes
+      ;; (setq theme-buffet-end-user
+      ;;       '( :night     (ef-dark ef-winter ef-autumn ef-night ef-duo-dark ef-symbiosis ef-owl)
+      ;;          :morning   (ef-light ef-cyprus ef-spring ef-frost ef-duo-light ef-eagle)
+      ;;          :afternoon (ef-arbutus ef-day ef-kassio ef-summer ef-elea-light ef-maris-light ef-melissa-light ef-trio-light ef-reverie)
+      ;;          :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
+      ;; My list of themes when I want to use alabaster
       (setq theme-buffet-end-user
-            '( :night     (ef-dark ef-winter ef-autumn ef-night ef-duo-dark ef-symbiosis ef-owl)
-               :morning   (ef-light ef-cyprus ef-spring ef-frost ef-duo-light ef-eagle)
-               :afternoon (ef-arbutus ef-day ef-kassio ef-summer ef-elea-light ef-maris-light ef-melissa-light ef-trio-light ef-reverie)
-               :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
+            '( :night     (alabaster-dark alabaster-dark-mono)
+               :morning   (alabaster-bg alabaster)
+               :afternoon (alabaster-bg alabaster)
+               :evening   (alabaster-dark)))
 
-      (when (or modus-themes-p ef-themes-p)
+      (when (or alabaster-themes-p modus-themes-p ef-themes-p)
         (theme-buffet-timer-hours 2)
         (theme-buffet-a-la-carte))))
 #+end_src
