@@ -183,16 +183,11 @@
   :ensure t
   :config
   (setq aider-args '("--no-auto-commits" "--no-auto-accept-architect"))
-  ;; Or use your personal config file
-  ;; (setq aider-args `("--config" ,(expand-file-name "~/.aider.conf.yml")))
-  ;; ;;
   ;; Optional: Set a key binding for the transient menu
-  (global-set-key (kbd "C-c a") 'aider-transient-menu) ;; for wider screen
+  (global-set-key (kbd "C-c i") 'aider-transient-menu) ;; for wider screen
   ;; or use aider-transient-menu-2cols / aider-transient-menu-1col, for narrow screen
   (aider-magit-setup-transients) ;; add aider magit function to magit menu
-  ;; auto revert buffer
-  (global-auto-revert-mode 1)
-  (auto-revert-mode 1))
+  )
 
 (use-package claude-code-ide
   :ensure (:host github :repo "manzaltu/claude-code-ide.el")
@@ -202,6 +197,46 @@
   (claude-code-ide-emacs-tools-setup)
   (setq claude-code-ide-vterm-render-delay 0.01)
   (setq claude-code-ide-diagnostics-backend 'flymake))
+
+;; install required inheritenv dependency:
+(use-package inheritenv
+  :ensure (:host github :repo "purcell/inheritenv"))
+
+;; for eat terminal backend:
+(use-package eat
+  :ensure (:type git
+                 :host codeberg
+                 :repo "akib/emacs-eat"
+                 :files ("*.el" ("term" "term/*.el") "*.texi"
+                         "*.ti" ("terminfo/e" "terminfo/e/*")
+                         ("terminfo/65" "terminfo/65/*")
+                         ("integration" "integration/*")
+                         (:exclude ".dir-locals.el" "*-tests.el"))))
+
+;; install claude-code.el, using :depth 1 to reduce download size:
+(use-package claude-code
+  :ensure (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
+                 :files ("*.el" (:exclude "images/*")))
+  :after (vterm inheritenv)
+  :config
+  (claude-code-mode))
+
+(use-package ai-code-interface
+  :ensure (:host github :repo "tninja/ai-code-interface.el")
+  :after (claude-code)
+  :config
+  (ai-code-set-backend  'claude-code-ide) ;; use claude-code-ide as backend
+  ;; Enable global keybinding for the main menu
+  (global-set-key (kbd "C-c a") #'ai-code-menu)
+  ;; Optional: Use vterm if you prefer, by default it is eat
+  ;; for openai codex, github copilot cli, opencode; for claude-code-ide.el and gemini-cli.el, you can check their config
+  (setq claude-code-terminal-backend 'vterm)
+  ;; Optional: Turn on auto-revert buffer, so that the AI code change automatically appears in the buffer
+  (global-auto-revert-mode 1)
+  (setq auto-revert-interval 1) ;; set to 1 second for faster update
+  ;; Optional: Set up Magit integration for AI commands in Magit popups
+  (with-eval-after-load 'magit
+    (ai-code-magit-setup-transients)))
 
 ;;;; Configuration for Python Programming
 
