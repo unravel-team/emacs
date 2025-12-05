@@ -5600,26 +5600,26 @@ The built-in Python mode for Emacs goes a long way. I use the
 following stack when programming Python:
 
 - =uv= for package and venv management
-- =pyright= as the language server
+- =basedpyright= as the language server
 - =ruff= as the linting and formatting tool
 
 Run the following commands in every virtualenv environment to setup
 the necessary developer tooling:
 
-- =uv add ruff pyright --group dev=
+- =uv add ruff basedpyright --group dev=
   + Ruff is an extremely fast Python linter, and code formatter,
     written in Rust. Ruff is also a langauge server, but it only
     provides functionality related to formating and linting. As it
     adds more over time (like go-to definition), I may make it my
     primary language server
-  + Pyright (provides the binary ~pyright~) is the Python Language Server created by Microsoft.
+  + BasedPyright (provides the binary ~basedpyright~) is a popular fork of the Python Language Server created by Microsoft.
 - =uv add pytest --group dev=
 
 If you want to setup this tooling globally, so that ~M-x eglot~ just
 works in any Python project you clone, then run the following commands:
 
 - =uv tool install ruff=
-- =uv tool install pyright=
+- =uv tool install basedpyright=
 
 Uv takes care of setting up the venv properly, so if you replace the
 default commands with uv versions, you are good to go. In practice,
