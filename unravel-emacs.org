@@ -6405,9 +6405,12 @@ Prot is the developer of this package.
 :END:
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-study.el"
+  (use-package denote-regexp
+    :ensure t)
+
   (use-package denote-explore
     :ensure t
-    :after denote
+    :after (denote denote-regexp)
     :config
     (setq denote-explore-network-directory (expand-file-name "denote-explore-network" denote-directory))
     (setq denote-explore-network-filename "denote-network")

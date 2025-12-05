@@ -291,9 +291,12 @@ modifications."
   :config
   (setq denote-sequence-scheme 'numeric))
 
+(use-package denote-regexp
+  :ensure t)
+
 (use-package denote-explore
   :ensure t
-  :after denote
+  :after (denote denote-regexp)
   :config
   (setq denote-explore-network-directory (expand-file-name "denote-explore-network" denote-directory))
   (setq denote-explore-network-filename "denote-network")
