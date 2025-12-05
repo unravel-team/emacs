@@ -198,9 +198,9 @@
           (t
            ;; See the fontaine manual for the technicalities:
            ;; <https://protesilaos.com/emacs/fontaine>.
-           :default-family "Iosevka"
+           :default-family "FantasqueSansMono Nerd Font" ;; "Fira Code" or "Iosevka"
            :default-weight normal
-           :variable-pitch-family "Iosevka"
+           :variable-pitch-family "FantasqueSansMono Nerd Font" ;; "Fira Code" or "Iosevka"
            :variable-pitch-height 1.05)))
 
   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
