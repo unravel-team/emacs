@@ -198,6 +198,49 @@
   (setq claude-code-ide-vterm-render-delay 0.01)
   (setq claude-code-ide-diagnostics-backend 'flymake))
 
+(use-package gptel
+  :ensure (:host github :repo "karthink/gptel")
+  :bind ("C-c e" . gptel-send)
+  :config
+  (defun gptel-api-key-from-os-env ()
+    "Dynamically get the key based on the active backend."
+    (let ((backend-name (gptel-backend-name gptel-backend)))
+      (cond
+       ((string= backend-name "OpenRouter") (getenv "OPENROUTER_API_KEY"))
+       ((string= backend-name "Cerebras")   (getenv "CEREBRAS_API_KEY"))
+       ((string= backend-name "Moonshot")   (getenv "MOONSHOT_API_KEY"))
+       (t (message "Warning: No key defined for backend %s" backend-name)))))
+
+  (setq gptel-model   'zai-glm-4.6
+        gptel-api-key #'gptel-api-key-from-os-env
+        gptel-backend
+        (gptel-make-openai "Cerebras"
+                           :host "api.cerebras.ai"
+                           :endpoint "/v1/chat/completions"
+                           :stream nil
+                           :key #'gptel-api-key
+                           :models '(zai-glm-4.6)))
+
+  (gptel-make-openai "OpenRouter"
+                     :host "openrouter.ai"
+                     :endpoint "/api/v1/chat/completions"
+                     :stream t
+                     :key #'gptel-api-key
+                     :models '(moonshotai/kimi-k2-0905
+                               x-ai/grok-code-fast-1
+                               deepseek/deepseek-v3.2-exp
+                               x-ai/grok-4.1-fast:free
+                               qwen/qwen3-next-80b-a3b-instruct
+                               openai/gpt-oss-120b
+                               google/gemini-2.5-pro
+                               google/gemini-3-pro-preview))
+
+  (gptel-make-openai "Moonshot"
+                     :host "api.moonshot.ai"
+                     :key #'gptel-api-key
+                     :stream t
+                     :models '(kimi-k2-thinking-turbo)))
+
 ;; install required inheritenv dependency:
 (use-package inheritenv
   :ensure (:host github :repo "purcell/inheritenv"))
