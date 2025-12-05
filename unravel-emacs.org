@@ -5931,6 +5931,10 @@ for this to continue.
     :bind
     ( :map ielm-map
       ("C-j" . newline-and-indent)))
+
+  ;;; Buttercup for testing my Emacs packages
+  (use-package buttercup
+    :ensure t)
 #+end_src
 ** The =unravel-langs.el= section for Typescript
 :PROPERTIES:

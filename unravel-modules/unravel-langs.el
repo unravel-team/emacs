@@ -466,6 +466,10 @@ NS is the namespace information passed into the function by cider."
   ( :map ielm-map
     ("C-j" . newline-and-indent)))
 
+;;; Buttercup for testing my Emacs packages
+(use-package buttercup
+  :ensure t)
+
 ;;;; Configuration for Typescript Programming
 
 (use-package typescript-ts-mode
