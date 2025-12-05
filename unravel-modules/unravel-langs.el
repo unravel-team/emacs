@@ -295,9 +295,9 @@
   ;; Python code.
   (with-eval-after-load 'apheleia
     (setf (alist-get 'python-mode apheleia-mode-alist)
-          '(ruff-isort ruff))
+          '(ruff ruff-isort))
     (setf (alist-get 'python-ts-mode apheleia-mode-alist)
-          '(ruff-isort ruff))))
+          '(ruff ruff-isort))))
 
 (use-package pet
   :ensure (:host github :repo "vedang/emacs-pet" :branch "fix-eglot-integration"
