@@ -5488,94 +5488,44 @@ if these are Claude Code conventions, so be it.
     :bind ("C-c e" . gptel-send)
     :config
 
-    (defun gptel-api-key-from-os-env ()
-      "Dynamically get the key based on the active backend name.
-  Reads from standard environment variables matching the providers supported by gptel.
-
-  NOTE: Name your backends exactly as described inside this function for it to work."
-      (if (not (boundp 'gptel-backend))
-          (error "gptel-backend is not bound; cannot determine API key")
-        (let ((backend-name (gptel-backend-name gptel-backend)))
-          (cond
-           ;; --- NOTE: backend-name must match exactly ---
-           ((string= backend-name "ChatGPT")        (getenv "OPENAI_API_KEY"))
-           ((string= backend-name "Claude")         (getenv "ANTHROPIC_API_KEY"))
-           ((string= backend-name "Gemini")         (getenv "GOOGLE_API_KEY"))
-           ((string= backend-name "OpenRouter")     (getenv "OPENROUTER_API_KEY"))
-           ((string= backend-name "Groq")           (getenv "GROQ_API_KEY"))
-           ((string= backend-name "Mistral")        (getenv "MISTRAL_API_KEY"))
-           ((string= backend-name "Perplexity")     (getenv "PERPLEXITY_API_KEY"))
-           ((string= backend-name "DeepSeek")       (getenv "DEEPSEEK_API_KEY"))
-           ((string= backend-name "Cerebras")       (getenv "CEREBRAS_API_KEY"))
-           ((string= backend-name "Moonshot")       (getenv "MOONSHOT_API_KEY"))
-           ((string= backend-name "Together")       (getenv "TOGETHER_API_KEY"))
-           ((string= backend-name "Anyscale")       (getenv "ANYSCALE_API_KEY"))
-           ((string= backend-name "Novita AI")      (getenv "NOVITA_API_KEY"))
-           ((string= backend-name "xAI")            (getenv "XAI_API_KEY"))
-           ((string= backend-name "Sambanova")      (getenv "SAMBANOVA_API_KEY"))
-           ((string= backend-name "AI/ML API")      (getenv "AIML_API_KEY"))
-
-           ;; --- Kagi ---
-           ;; Matches "Kagi FastGPT" or "Kagi Summarizer"
-           ((string-prefix-p "Kagi" backend-name)   (getenv "KAGI_API_KEY"))
-
-           ;; --- Microsoft / GitHub ---
-           ((string= backend-name "Azure")          (getenv "AZURE_OPENAI_API_KEY"))
-           ((member backend-name '("Github Models" "GitHub Copilot"))
-            (getenv "GITHUB_TOKEN"))
-
-           ;; --- Local / No-Key Required ---
-           ;; These usually do not require an API key in the configuration
-           ;; returning nil is safe for local instances.
-           ((member backend-name '("Ollama"
-                                   "Llama.cpp"
-                                   "Llamafile"
-                                   "GPT4All"
-                                   "PrivateGPT"
-                                   "Open WebUI"))
-            nil)
-
-           ;; --- Fallback ---
-           (t (message "Warning: No environment variable mapping found for backend '%s'. Please check `gptel-api-key-from-os-env`." backend-name))))))
-
-    (defun gptel-api-key-from-os-env ()
-      "Dynamically get the key based on the active backend."
-      (let ((backend-name (gptel-backend-name gptel-backend)))
-        (cond
-         ((string= backend-name "OpenRouter") (getenv "OPENROUTER_API_KEY"))
-         ((string= backend-name "Cerebras")   (getenv "CEREBRAS_API_KEY"))
-         ((string= backend-name "Moonshot")   (getenv "MOONSHOT_API_KEY"))
-         (t (message "Warning: No key defined for backend %s" backend-name)))))
+    (defun gptel-api-key-from-environment (&optional var)
+      (lambda ()
+        (getenv (or var                  ;provided key
+                    (thread-first        ;or fall back to <TYPE>_API_KEY
+                      (type-of gptel-backend)
+                      (symbol-name)
+                      (substring 6)
+                      (upcase)
+                      (concat "_API_KEY"))))))
 
     (setq gptel-model   'zai-glm-4.6
-          gptel-api-key #'gptel-api-key-from-os-env
           gptel-backend
           (gptel-make-openai "Cerebras"
-                             :host "api.cerebras.ai"
-                             :endpoint "/v1/chat/completions"
-                             :stream nil
-                             :key #'gptel-api-key
-                             :models '(zai-glm-4.6)))
+            :host "api.cerebras.ai"
+            :endpoint "/v1/chat/completions"
+            :stream nil
+            :key (gptel-api-key-from-environment "CEREBRAS_API_KEY")
+            :models '(zai-glm-4.6)))
 
     (gptel-make-openai "OpenRouter"
-                       :host "openrouter.ai"
-                       :endpoint "/api/v1/chat/completions"
-                       :stream t
-                       :key #'gptel-api-key
-                       :models '(moonshotai/kimi-k2-0905
-                                 x-ai/grok-code-fast-1
-                                 deepseek/deepseek-v3.2-exp
-                                 x-ai/grok-4.1-fast:free
-                                 qwen/qwen3-next-80b-a3b-instruct
-                                 openai/gpt-oss-120b
-                                 google/gemini-2.5-pro
-                                 google/gemini-3-pro-preview))
+      :host "openrouter.ai"
+      :endpoint "/api/v1/chat/completions"
+      :stream t
+      :key (gptel-api-key-from-environment "OPENROUTER_API_KEY")
+      :models '(moonshotai/kimi-k2-0905
+                x-ai/grok-code-fast-1
+                deepseek/deepseek-v3.2-exp
+                x-ai/grok-4.1-fast:free
+                qwen/qwen3-next-80b-a3b-instruct
+                openai/gpt-oss-120b
+                google/gemini-2.5-pro
+                google/gemini-3-pro-preview))
 
     (gptel-make-openai "Moonshot"
-                       :host "api.moonshot.ai"
-                       :key #'gptel-api-key
-                       :stream t
-                       :models '(kimi-k2-thinking-turbo)))
+      :host "api.moonshot.ai"
+      :key (gptel-api-key-from-environment "MOONSHOT_API_KEY")
+      :stream t
+      :models '(kimi-k2-thinking-turbo)))
 #+end_src
 
 *** The =unravel-langs.el= section for AI Code Interface (~ai-code-interface.el~)
