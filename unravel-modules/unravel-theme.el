@@ -152,10 +152,10 @@
     ;;          :evening   (ef-rosa ef-elea-dark ef-maris-dark ef-melissa-dark ef-trio-dark ef-dream)))
     ;; My list of themes when I want to use alabaster
     (setq theme-buffet-end-user
-          '( :night     (alabaster-dark alabaster-dark-mono)
-             :morning   (alabaster-bg alabaster)
-             :afternoon (alabaster-bg alabaster)
-             :evening   (alabaster-dark)))
+          '( :night     (alabaster-themes-dark alabaster-themes-dark-mono)
+             :morning   (alabaster-themes-light-bg alabaster-themes-light)
+             :afternoon (alabaster-themes-light-bg alabaster-themes-light)
+             :evening   (alabaster-themes-dark)))
 
     (when (or alabaster-themes-p modus-themes-p ef-themes-p)
       (theme-buffet-timer-hours 2)
