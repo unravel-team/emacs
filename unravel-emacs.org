@@ -91,6 +91,7 @@
   - [[#the-unravel-completionel-section-for-performing-actions-in-context-embark][The =unravel-completion.el= section for performing actions in context (~embark~)]]
   - [[#the-unravel-completionel-section-to-configure-completion-annotations-marginalia][The =unravel-completion.el= section to configure completion annotations (~marginalia~)]]
   - [[#the-unravel-completionel-section-for-vertical-minibuffer-layout-vertico][The =unravel-completion.el= section for vertical minibuffer layout (~vertico~)]]
+  - [[#the-unravel-completionel-section-for-tagref-completions-tagrefel][The =unravel-completion.el= section for tagref completions (~tagref.el~)]]
   - [[#finally-we-provide-the-unravel-completionel-module][Finally, we provide the ~unravel-completion.el~ module]]
 - [[#the-unravel-searchel-module][The =unravel-search.el= module]]
   - [[#the-unravel-searchel-section-for-heading-navigation-imenu][The =unravel-search.el= section for heading navigation (~imenu~)]]
@@ -2527,6 +2528,30 @@ I use ~vertico-repeat~ and ~vertico-suspend~ to mimic the functionality that ~he
             ("M-S" . vertico-suspend)
             ("C-x c b" . vertico-suspend)))
 #+end_src
+** The =unravel-completion.el= section for tagref completions (~tagref.el~)
+:PROPERTIES:
+:CUSTOM_ID: h:A4C07D86-58EC-44BB-B8DE-52AF86A7C598
+:CREATED:  [2026-01-08 Thu 21:52]
+:END:
+
+Stephan Boyer's tagref is a go-to tool for me in all the professional
+code I write. It's a small but incredibly elegant tool for writing
+clean documentation.
+
+I wrote ~tagref.el~ to make it easy to use tagref from inside Emacs.
+Refer to the README file of the ~tagref.el~ package for more details.
+
++ Package name: ~tagref.el~
++ Git repositories:
+  - GitHub: <https://github.com/vedang/tagref.el>
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"
+  ;;; Tagref Support!
+  (use-package tagref
+    :ensure (:host github :repo "vedang/tagref.el")
+    :commands (tagref-check))
+#+end_src
+
 ** Finally, we provide the ~unravel-completion.el~ module
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-completion.el"

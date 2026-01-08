@@ -417,4 +417,9 @@
           ("M-S" . vertico-suspend)
           ("C-x c b" . vertico-suspend)))
 
+;;; Tagref Support!
+(use-package tagref
+  :ensure (:host github :repo "vedang/tagref.el")
+  :commands (tagref-check))
+
 (provide 'unravel-completion)
