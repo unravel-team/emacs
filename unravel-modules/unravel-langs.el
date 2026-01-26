@@ -500,4 +500,14 @@ NS is the namespace information passed into the function by cider."
 (use-package go-ts-mode
   :ensure nil)
 
+;;;; Configuration for Dafny Programming
+
+(use-package boogie-friends
+  :ensure t
+  :mode ("\\.dfy\\'" . dafny-mode)
+;;; Uncomment this if you want Eglot to start automatically.
+  ;; :hook ((dafny-mode . eglot-ensure))
+  :config
+  (add-to-list 'eglot-server-programs '(dafny-mode . ("dafny" "server"))))
+
 (provide 'unravel-langs)
