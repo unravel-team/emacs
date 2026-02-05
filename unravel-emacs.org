@@ -7841,7 +7841,7 @@ I want this section to contain all the personal configuration that anyone using 
           org-capture-templates))
 #+end_src
 
-*** Sales and CRM settings for ~org-capture~
+*** COMMENT Sales and CRM settings for ~org-capture~
 :PROPERTIES:
 :CUSTOM_ID: h:B1F1472D-7D4A-4620-973C-08FAE263A9F1
 :CREATED:  [2024-12-24 Tue 12:40]
