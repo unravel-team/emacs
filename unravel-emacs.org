@@ -5967,6 +5967,11 @@ for this to continue.
     :config
     (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
   )
+
+  (use-package svelte-ts-mode
+    :ensure (:host github :repo "leafOfTree/svelte-ts-mode")
+    :config
+    (add-to-list 'eglot-server-programs '(svelte-ts-mode . ("svelteserver" "--stdio"))))
 #+end_src
 
 ** The =unravel-langs.el= section for YAML and TOML

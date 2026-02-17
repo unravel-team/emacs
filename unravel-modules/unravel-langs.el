@@ -482,6 +482,11 @@ NS is the namespace information passed into the function by cider."
   (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
 )
 
+(use-package svelte-ts-mode
+  :ensure (:host github :repo "leafOfTree/svelte-ts-mode")
+  :config
+  (add-to-list 'eglot-server-programs '(svelte-ts-mode . ("svelteserver" "--stdio"))))
+
 ;;;; Configuration for YAML Programming
 
 (use-package yaml-mode
