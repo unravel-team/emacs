@@ -5602,6 +5602,20 @@ if these are Claude Code conventions, so be it.
   ;;     (ai-code-magit-setup-transients)))
 #+end_src
 
+*** The =unravel-langs.el= section for Pi-coding-agent (~pi-coding-agent.el~)
+
+A way to run and work with Pi from inside Emacs. Lets see how it goes for a bit.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  ;;; Pi Coding Agent, from inside Emacs
+  (use-package md-ts-mode
+    :ensure (:host github :repo "dnouri/md-ts-mode" :branch "main"))
+
+  (use-package pi-coding-agent
+    :ensure (:host github :repo "dnouri/pi-coding-agent" :branch "master")
+    :config
+    (defalias 'pi 'pi-coding-agent))
+#+end_src
 ** The =unravel-langs.el= section for Python
 :PROPERTIES:
 :CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618
