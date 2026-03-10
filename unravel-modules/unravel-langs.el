@@ -282,6 +282,15 @@
   (with-eval-after-load 'magit
     (ai-code-magit-setup-transients)))
 
+;;; Pi Coding Agent, from inside Emacs
+(use-package md-ts-mode
+  :ensure (:host github :repo "dnouri/md-ts-mode" :branch "main"))
+
+(use-package pi-coding-agent
+  :ensure (:host github :repo "dnouri/pi-coding-agent" :branch "master")
+  :config
+  (defalias 'pi 'pi-coding-agent))
+
 ;;;; Configuration for Python Programming
 
 (use-package python
