@@ -29,7 +29,7 @@
 (use-package eglot
   :ensure nil
   :demand t ;; Not a mistake, we need to load Eglot elisp code before
-            ;; we open any Python file.
+  ;; we open any Python file.
   :functions (eglot-ensure)
   :commands (eglot)
   :bind
@@ -246,36 +246,22 @@
 (use-package inheritenv
   :ensure (:host github :repo "purcell/inheritenv"))
 
-;; for eat terminal backend:
-(use-package eat
-  :ensure (:type git
-                 :host codeberg
-                 :repo "akib/emacs-eat"
-                 :files ("*.el" ("term" "term/*.el") "*.texi"
-                         "*.ti" ("terminfo/e" "terminfo/e/*")
-                         ("terminfo/65" "terminfo/65/*")
-                         ("integration" "integration/*")
-                         (:exclude ".dir-locals.el" "*-tests.el"))))
-
 ;; install claude-code.el, using :depth 1 to reduce download size:
 (use-package claude-code
   :ensure (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
                  :files ("*.el" (:exclude "images/*")))
   :after (vterm inheritenv)
+  :custom
+  (claude-code-terminal-backend 'vterm)
   :config
   (claude-code-mode))
 
 (use-package ai-code
-  :ensure (:host github :repo "tninja/ai-code-interface.el" :main "ai-code.el")
+  :ensure t
   :after (claude-code)
   :config
-  (ai-code-set-backend  'claude-code-ide) ;; use claude-code-ide as backend
-  ;; Enable global keybinding for the main menu
+  (ai-code-set-backend  'codex)
   (global-set-key (kbd "C-c a") #'ai-code-menu)
-  ;; Optional: Use vterm if you prefer, by default it is eat
-  ;; for openai codex, github copilot cli, opencode; for claude-code-ide.el and gemini-cli.el, you can check their config
-  (setq claude-code-terminal-backend 'vterm)
-  ;; Optional: Turn on auto-revert buffer, so that the AI code change automatically appears in the buffer
   (global-auto-revert-mode 1)
   (setq auto-revert-interval 1) ;; set to 1 second for faster update
   ;; Optional: Set up Magit integration for AI commands in Magit popups
@@ -297,7 +283,7 @@
   :ensure nil
 ;;; Uncomment this if you want Eglot to start automatically. I prefer
 ;;; calling `M-x eglot' myself.
-;;  :hook ((python-base-mode . eglot-ensure))
+  ;;  :hook ((python-base-mode . eglot-ensure))
   :config
   (setq python-shell-dedicated 'project)
   ;; Apheleia is an Emacs package for formatting code as you save
@@ -374,12 +360,12 @@
 Try each known extension in order. If no file exists, create one with .clj extension."
     (interactive)
     (let* ((filename (format "%s/src/%s"
-                            (locate-dominating-file buffer-file-name "test/")
-                            (kr--implementation-for (clojure-find-ns))))
+                             (locate-dominating-file buffer-file-name "test/")
+                             (kr--implementation-for (clojure-find-ns))))
            (extensions '(".clj" ".cljc" ".cljs" ".cljd" ".bb"))
            (existing-file (seq-find (lambda (ext)
-                                    (file-exists-p (concat filename ext)))
-                                  extensions)))
+                                      (file-exists-p (concat filename ext)))
+                                    extensions)))
       (find-file (concat filename (or existing-file ".clj")))))
 
   (defun kr--implementation-for (namespace)
@@ -489,7 +475,7 @@ NS is the namespace information passed into the function by cider."
   ;; :hook ((typescript-base-mode . eglot-ensure))
   :config
   (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
-)
+  )
 
 (use-package svelte-ts-mode
   :ensure (:host github :repo "leafOfTree/svelte-ts-mode")
