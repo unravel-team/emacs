@@ -28,7 +28,7 @@
             (project-vc-dir "VC-Dir")
             (project-shell "Shell")
             (keyboard-quit "Quit")))
-  (setq project-vc-extra-root-markers '(".project")) ; Emacs 29
+  (setq project-vc-extra-root-markers '(".project" ".jj")) ; Emacs 29
   (setq project-key-prompt-style t)) ; Emacs 30
 
 ;;;; `diff-mode'

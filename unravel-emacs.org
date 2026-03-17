@@ -1088,17 +1088,17 @@ Prot is the lead developer and maintainer.
 Another section defines some complementary functionality
 ([[#h:60d6aae2-6e4b-402c-b6a8-411fc49a6857][The =unravel-theme.el= section about ~variable-pitch-mode~ and font resizing]]).
 
-We use FantasqueSansMono Nerd Font when it is available, falling back
-on [[https://typeof.net/Iosevka/][Iosevka]] on other systems.
+We try FantasqueSansM Nerd Font first, then FantasqueSansMono Nerd Font.
+If neither is available, we use [[https://typeof.net/Iosevka/][Iosevka]].
 
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-theme.el"
   ;;;; Fontaine (font configurations)
   ;; Read the manual: <https://protesilaos.com/emacs/fontaine>
   (defun unravel-font-family ()
     "Return the preferred available font family."
-    (if (find-font (font-spec :family "FantasqueSansMono Nerd Font"))
-        "FantasqueSansMono Nerd Font"
-      "Iosevka"))
+    (or (seq-find (lambda (family) (find-font (font-spec :family family)))
+                  '("FantasqueSansM Nerd Font" "FantasqueSansMono Nerd Font"))
+        "Iosevka"))
 
   (use-package fontaine
     :ensure t
@@ -3787,9 +3787,10 @@ the defaults as it is a version control system supported by the
 built-in =vc.el= ([[#h:50add1d8-f0f4-49be-9e57-ab280a4aa300][The =unravel-git.el= section about =vc.el= and related]]).
 
 We can specify more project roots as a list of strings in the user
-option ~project-vc-extra-root-markers~. I work exclusively with Git
-repositories, so I just add there a =.project= file in case I ever
-need to register a project without it being controlled by ~git~. In
+option ~project-vc-extra-root-markers~. I work with Git repositories,
+but also use Jujutsu (=jj=) version control in some projects, so I
+add the =.jj= marker. I also include a =.project= file in case I ever
+need to register a project without it being controlled by a VCS. In
 that case, the =.project= file is just an empty file in a directory
 that I want to treat as the root of this project.
 
@@ -3844,7 +3845,7 @@ limited to that frame ([[#h:77e4f174-0c86-460d-8a54-47545f922ae9][The =unravel-w
               (project-vc-dir "VC-Dir")
               (project-shell "Shell")
               (keyboard-quit "Quit")))
-    (setq project-vc-extra-root-markers '(".project")) ; Emacs 29
+    (setq project-vc-extra-root-markers '(".project" ".jj")) ; Emacs 29
     (setq project-key-prompt-style t)) ; Emacs 30
 #+end_src
 
@@ -5196,7 +5197,7 @@ the necessary functions.
   (use-package eglot
     :ensure nil
     :demand t ;; Not a mistake, we need to load Eglot elisp code before
-              ;; we open any Python file.
+    ;; we open any Python file.
     :functions (eglot-ensure)
     :commands (eglot)
     :bind
@@ -5581,36 +5582,22 @@ if these are Claude Code conventions, so be it.
   (use-package inheritenv
     :ensure (:host github :repo "purcell/inheritenv"))
 
-  ;; for eat terminal backend:
-  (use-package eat
-    :ensure (:type git
-                   :host codeberg
-                   :repo "akib/emacs-eat"
-                   :files ("*.el" ("term" "term/*.el") "*.texi"
-                           "*.ti" ("terminfo/e" "terminfo/e/*")
-                           ("terminfo/65" "terminfo/65/*")
-                           ("integration" "integration/*")
-                           (:exclude ".dir-locals.el" "*-tests.el"))))
-
   ;; install claude-code.el, using :depth 1 to reduce download size:
   (use-package claude-code
     :ensure (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
                    :files ("*.el" (:exclude "images/*")))
     :after (vterm inheritenv)
+    :custom
+    (claude-code-terminal-backend 'vterm)
     :config
     (claude-code-mode))
 
   (use-package ai-code
-    :ensure (:host github :repo "tninja/ai-code-interface.el" :main "ai-code.el")
+    :ensure t
     :after (claude-code)
     :config
-    (ai-code-set-backend  'claude-code-ide) ;; use claude-code-ide as backend
-    ;; Enable global keybinding for the main menu
+    (ai-code-set-backend  'codex)
     (global-set-key (kbd "C-c a") #'ai-code-menu)
-    ;; Optional: Use vterm if you prefer, by default it is eat
-    ;; for openai codex, github copilot cli, opencode; for claude-code-ide.el and gemini-cli.el, you can check their config
-    (setq claude-code-terminal-backend 'vterm)
-    ;; Optional: Turn on auto-revert buffer, so that the AI code change automatically appears in the buffer
     (global-auto-revert-mode 1)
     (setq auto-revert-interval 1) ;; set to 1 second for faster update
     ;; Optional: Set up Magit integration for AI commands in Magit popups
@@ -5684,7 +5671,7 @@ NOTE: Exactly the same instructions also work for Poetry, just replace
     :ensure nil
   ;;; Uncomment this if you want Eglot to start automatically. I prefer
   ;;; calling `M-x eglot' myself.
-  ;;  :hook ((python-base-mode . eglot-ensure))
+    ;;  :hook ((python-base-mode . eglot-ensure))
     :config
     (setq python-shell-dedicated 'project)
     ;; Apheleia is an Emacs package for formatting code as you save
@@ -5821,12 +5808,12 @@ for this to continue.
   Try each known extension in order. If no file exists, create one with .clj extension."
       (interactive)
       (let* ((filename (format "%s/src/%s"
-                              (locate-dominating-file buffer-file-name "test/")
-                              (kr--implementation-for (clojure-find-ns))))
+                               (locate-dominating-file buffer-file-name "test/")
+                               (kr--implementation-for (clojure-find-ns))))
              (extensions '(".clj" ".cljc" ".cljs" ".cljd" ".bb"))
              (existing-file (seq-find (lambda (ext)
-                                      (file-exists-p (concat filename ext)))
-                                    extensions)))
+                                        (file-exists-p (concat filename ext)))
+                                      extensions)))
         (find-file (concat filename (or existing-file ".clj")))))
 
     (defun kr--implementation-for (namespace)
@@ -5996,7 +5983,7 @@ for this to continue.
     ;; :hook ((typescript-base-mode . eglot-ensure))
     :config
     (add-to-list 'project-vc-extra-root-markers "tsconfig.json")
-  )
+    )
 
   (use-package svelte-ts-mode
     :ensure (:host github :repo "leafOfTree/svelte-ts-mode")

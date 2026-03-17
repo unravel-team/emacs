@@ -165,9 +165,9 @@
 ;; Read the manual: <https://protesilaos.com/emacs/fontaine>
 (defun unravel-font-family ()
   "Return the preferred available font family."
-  (if (find-font (font-spec :family "FantasqueSansMono Nerd Font"))
-      "FantasqueSansMono Nerd Font"
-    "Iosevka"))
+  (or (seq-find (lambda (family) (find-font (font-spec :family family)))
+                '("FantasqueSansM Nerd Font" "FantasqueSansMono Nerd Font"))
+      "Iosevka"))
 
 (use-package fontaine
   :ensure t
