@@ -110,6 +110,10 @@ modifications."
         (org-entry-put pos "CREATED" created))
       id)))
 
+(with-eval-after-load 'info
+  (add-to-list 'Info-additional-directory-list
+               (expand-file-name "info/" user-emacs-directory)))
+
 (use-package denote-org
   :ensure t
   :bind
