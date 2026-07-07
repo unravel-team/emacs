@@ -356,7 +356,13 @@
   ;; ## Convert the Front-Matter from org to md format.
 
   (setq vm-base-dir (expand-file-name "~/Tresors/Documents/diary/notes/published"))
-  (setq vm-publishing-dir (expand-file-name "~/src/prototypes/vedang.me/v7/components/content/resources/content"))
+  (setq vm-publishing-dir (expand-file-name "~/src/vedang/vedang.me/vedang.me.root/components/content/resources/content"))
+
+  ;; Make `denote-publish-promote' (move a note into the published
+  ;; folder, adding the export slug) and `denote-publish-file' use the
+  ;; same directories as the org-publish project below.
+  (setq denote-publish-default-base-dir vm-base-dir)
+  (setq denote-publish-default-output-dir vm-publishing-dir)
 
   (setq org-publish-project-alist
         `(("vedangme" .
