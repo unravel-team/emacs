@@ -452,6 +452,74 @@ list with overruling parameters for `org-list-to-generic'."
   (setq org-tree-slide-skip-comments 'inherit)
   (setq org-tree-slide-skip-outline-level 2))
 
+;;; Visual daily calendar
+
+;; Install my Calfw fork first.  `:wait t' ensures that calfw-blocks
+;; sees this version instead of installing another Calfw package.
+(use-package calfw
+  :ensure (:host github
+                 :repo "vedang/emacs-calfw"
+                 :files ("calfw.el" "calfw-org.el")
+                 :wait t)
+  :demand t)
+
+;; calfw-org.el comes from same repository.
+(use-package calfw-org
+  :ensure nil
+  :after (calfw org)
+  :demand t)
+
+;; Time-proportional day and week views.
+;;
+;; Do not load `calfw-blocks-org'.  Its agenda adapter is stale.
+;; We use Calfw's typed file source directly instead.
+(use-package calfw-blocks
+  :ensure (:host github
+                 :repo "haji-ali/calfw-blocks"
+                 :wait t)
+  :after (calfw calfw-org)
+  :demand t
+  :config
+  (setq calfw-blocks-initial-visible-time '(8 0)
+        calfw-blocks-earliest-visible-time '(8 0)
+        calfw-blocks-lines-per-hour 4
+        calfw-blocks-hour-shrink-size 4
+        calfw-blocks-show-time-grid t
+        calfw-blocks-variable-blocks nil)
+
+  (defun vedang-calfw-plan-file (&optional time)
+    "Return latest standup plan file for TIME, defaulting to today."
+    (let* ((time (or time (current-time)))
+           (date-prefix (format-time-string "%Y%m%dT" time))
+           (regexp
+            (concat "\\`"
+                    (regexp-quote date-prefix)
+                    ".*__standup\\.org\\'"))
+           (files
+            (directory-files denote-plan-directory t regexp t)))
+      (car (sort files #'string>))))
+
+  (defun vedang-calfw-open-my-day (&optional time)
+    "Display the tagged daily plan for TIME in a block calendar."
+    (interactive)
+    (let* ((time (or time (current-time)))
+           (file (vedang-calfw-plan-file time)))
+      (unless file
+        (user-error "No standup plan found for %s"
+                    (format-time-string "%F" time)))
+      (calfw-open-calendar-buffer
+       :date (calfw-emacs-to-calendar time)
+       :view 'block-day
+       :custom-map calfw-org-schedule-map
+       :sorter #'calfw-sorter-start-time
+       :contents-sources
+       (list
+        (calfw-org-create-file-source
+         "My Day Today"
+         file
+         "MediumPurple"
+         "calfw_day"))))))
+
 (let ((config-file (getenv "VEDANG_PRIVATE_CONFIG_FILE")))
   (when (and config-file (not (string-empty-p config-file)))
     (load-file (expand-file-name config-file))))
