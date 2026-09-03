@@ -163,6 +163,12 @@
 
 ;;;; Fontaine (font configurations)
 ;; Read the manual: <https://protesilaos.com/emacs/fontaine>
+(defun unravel-font-family ()
+  "Return the preferred available font family."
+  (if (find-font (font-spec :family "FantasqueSansMono Nerd Font"))
+      "FantasqueSansMono Nerd Font"
+    "Iosevka"))
+
 (use-package fontaine
   :ensure t
   :if (display-graphic-p)
@@ -177,31 +183,32 @@
   ;; completeness.
   (setq fontaine-latest-state-file (locate-user-emacs-file "fontaine-latest-state.eld"))
 
-  (setq fontaine-presets
-        '((small
-           :default-height 130)
-          (regular
-           :default-height 150)
-          (medium
-           :default-weight semilight
-           :default-height 170
-           :bold-weight extrabold)
-          (large
-           :inherit medium
-           :default-height 190)
-          (presentation
-           :inherit medium
-           :default-height 250)
-          (jumbo
-           :inherit medium
-           :default-height 330)
-          (t
-           ;; See the fontaine manual for the technicalities:
-           ;; <https://protesilaos.com/emacs/fontaine>.
-           :default-family "FantasqueSansMono Nerd Font" ;; "Fira Code" or "Iosevka"
-           :default-weight normal
-           :variable-pitch-family "FantasqueSansMono Nerd Font" ;; "Fira Code" or "Iosevka"
-           :variable-pitch-height 1.05)))
+  (let ((font-family (unravel-font-family)))
+    (setq fontaine-presets
+          `((small
+             :default-height 130)
+            (regular
+             :default-height 150)
+            (medium
+             :default-weight semilight
+             :default-height 170
+             :bold-weight extrabold)
+            (large
+             :inherit medium
+             :default-height 190)
+            (presentation
+             :inherit medium
+             :default-height 250)
+            (jumbo
+             :inherit medium
+             :default-height 330)
+            (t
+             ;; See the fontaine manual for the technicalities:
+             ;; <https://protesilaos.com/emacs/fontaine>.
+             :default-family ,font-family
+             :default-weight normal
+             :variable-pitch-family ,font-family
+             :variable-pitch-height 1.05))))
 
   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
   (fontaine-mode 1))
