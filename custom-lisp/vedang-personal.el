@@ -2,7 +2,8 @@
 (use-package emacs
   :ensure nil
   :config
-  (setq user-mail-address "vedang@unravel.tech"))
+  (setq user-mail-address "vedang@unravel.tech")
+  (setq debug-on-error t))
 
 (use-package org
   :ensure nil

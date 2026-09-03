@@ -7529,7 +7529,8 @@ I want this section to contain all the personal configuration that anyone using 
   (use-package emacs
     :ensure nil
     :config
-    (setq user-mail-address "vedang@unravel.tech"))
+    (setq user-mail-address "vedang@unravel.tech")
+    (setq debug-on-error t))
 
 #+end_src
 
