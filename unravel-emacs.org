@@ -526,22 +526,22 @@ packages (=package.el=)]] and re-export all the code-blocks.
 #+begin_src emacs-lisp :tangle "init.el"
   ;;; Install Elpaca
 
-  (defvar elpaca-installer-version 0.8)
+  (defvar elpaca-installer-version 0.12)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-  (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+  (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil :depth 1
+                                :ref nil :depth 1 :inherit ignore
                                 :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                                :build (:not elpaca--activate-package)))
-  (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+                                :build (:not elpaca-activate)))
+  (let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
          (build (expand-file-name "elpaca/" elpaca-builds-directory))
          (order (cdr elpaca-order))
          (default-directory repo))
     (add-to-list 'load-path (if (file-exists-p build) build repo))
     (unless (file-exists-p repo)
       (make-directory repo t)
-      (when (< emacs-major-version 28) (require 'subr-x))
+      (when (<= emacs-major-version 28) (require 'subr-x))
       (condition-case-unless-debug err
           (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
                     ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
@@ -561,7 +561,7 @@ packages (=package.el=)]] and re-export all the code-blocks.
     (unless (require 'elpaca-autoloads nil t)
       (require 'elpaca)
       (elpaca-generate-autoloads "elpaca" repo)
-      (load "./elpaca-autoloads")))
+      (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
   (add-hook 'after-init-hook #'elpaca-process-queues)
   (elpaca `(,@elpaca-order))
 
@@ -569,6 +569,16 @@ packages (=package.el=)]] and re-export all the code-blocks.
   (elpaca elpaca-use-package
     ;; Enable use-package :ensure support for Elpaca.
     (elpaca-use-package-mode))
+
+  ;; Emacs bundles an older Compat that lacks the newer backports (e.g.
+  ;; `set-local' from compat-31).  Built-ins such as `track-changes' and
+  ;; `diff-mode' `require' Compat early -- before Elpaca activates its
+  ;; newer Compat -- so the stale bundled copy provides the `compat'
+  ;; feature and permanently shadows the good one, leaving functions like
+  ;; `set-local' void (which breaks corfu/vertico, e.g. `project-find-file').
+  ;; Install and load Elpaca's Compat first, blocking, so it wins.
+  (elpaca compat (require 'compat))
+  (elpaca-wait)
 #+end_src
 
 ** The =init.el= macro to do nothing with Elisp code (~prot-emacs-comment~)
@@ -1265,8 +1275,7 @@ in the function ~prot/enable-variable-pitch~.
     (setq kill-do-not-save-duplicates t)
     (setq scroll-error-top-bottom t)
     (setq echo-keystrokes-help t) ; Emacs 30
-    (setq epa-keys-select-method 'minibuffer) ; Emacs 30
-    (setq debug-on-error t))
+    (setq epa-keys-select-method 'minibuffer)) ; Emacs 30
 #+end_src
 
 ** The =unravel-essentials.el= configuration to track recently visited files (~recentf~)
@@ -5561,7 +5570,7 @@ if these are Claude Code conventions, so be it.
       :models '(kimi-k2-thinking-turbo)))
 #+end_src
 
-*** The =unravel-langs.el= section for AI Code Interface (~ai-code-interface.el~)
+*** The =unravel-langs.el= section for AI Code (~ai-code.el~)
 :PROPERTIES:
 :CUSTOM_ID: h:BF9DD23B-8B26-4ACD-867A-ED977F9DD57F
 :CREATED:  [2025-12-03 Wed 18:20]
@@ -5591,22 +5600,22 @@ if these are Claude Code conventions, so be it.
     :config
     (claude-code-mode))
 
-  ;; (use-package ai-code-interface
-  ;;   :ensure (:host github :repo "tninja/ai-code-interface.el")
-  ;;   :after (claude-code)
-  ;;   :config
-  ;;   (ai-code-set-backend  'claude-code-ide) ;; use claude-code-ide as backend
-  ;;   ;; Enable global keybinding for the main menu
-  ;;   (global-set-key (kbd "C-c a") #'ai-code-menu)
-  ;;   ;; Optional: Use vterm if you prefer, by default it is eat
-  ;;   ;; for openai codex, github copilot cli, opencode; for claude-code-ide.el and gemini-cli.el, you can check their config
-  ;;   (setq claude-code-terminal-backend 'vterm)
-  ;;   ;; Optional: Turn on auto-revert buffer, so that the AI code change automatically appears in the buffer
-  ;;   (global-auto-revert-mode 1)
-  ;;   (setq auto-revert-interval 1) ;; set to 1 second for faster update
-  ;;   ;; Optional: Set up Magit integration for AI commands in Magit popups
-  ;;   (with-eval-after-load 'magit
-  ;;     (ai-code-magit-setup-transients)))
+  (use-package ai-code
+    :ensure (:host github :repo "tninja/ai-code-interface.el" :main "ai-code.el")
+    :after (claude-code)
+    :config
+    (ai-code-set-backend  'claude-code-ide) ;; use claude-code-ide as backend
+    ;; Enable global keybinding for the main menu
+    (global-set-key (kbd "C-c a") #'ai-code-menu)
+    ;; Optional: Use vterm if you prefer, by default it is eat
+    ;; for openai codex, github copilot cli, opencode; for claude-code-ide.el and gemini-cli.el, you can check their config
+    (setq claude-code-terminal-backend 'vterm)
+    ;; Optional: Turn on auto-revert buffer, so that the AI code change automatically appears in the buffer
+    (global-auto-revert-mode 1)
+    (setq auto-revert-interval 1) ;; set to 1 second for faster update
+    ;; Optional: Set up Magit integration for AI commands in Magit popups
+    (with-eval-after-load 'magit
+      (ai-code-magit-setup-transients)))
 #+end_src
 
 *** The =unravel-langs.el= section for Pi-coding-agent (~pi-coding-agent.el~)
