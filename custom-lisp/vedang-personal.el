@@ -11,10 +11,10 @@
         (expand-file-name "brain/daily.org" org-directory))
   (setq org-blogpost-file
         (expand-file-name "brain/projects/blogposts.org" org-directory))
-  (setq org-crm-file
-        (expand-file-name "brain/projects/crm.org" org-directory))
-  (setq org-sales-file
-        (expand-file-name "brain/projects/sales.org" org-directory))
+  ;; (setq org-crm-file
+  ;;       (expand-file-name "brain/projects/crm.org" org-directory))
+  ;; (setq org-sales-file
+  ;;       (expand-file-name "brain/projects/sales.org" org-directory))
   (setq org-company-file
         (expand-file-name "brain/daily.org" org-directory))
   (setq org-agenda-files
