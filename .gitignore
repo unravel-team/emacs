@@ -30,3 +30,5 @@ private.el
 eww-bookmarks
 unravel-modules/example.sync.ipynb
 unravel-modules/example.sync.py
+.pi/subagents/
+.agents/plans/
