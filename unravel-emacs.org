@@ -5483,10 +5483,13 @@ change the mode to something else (like markdown).
 :CREATED:  [2025-12-05 Fri 09:22]
 :END:
 
+Use =C-c G s= to send a prompt with gptel. The capital =G= leaves
+=C-c e= for Eglot and avoids the lowercase =C-c g= used by Magit.
+
 #+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
   (use-package gptel
     :ensure (:host github :repo "karthink/gptel")
-    :bind ("C-c e" . gptel-send)
+    :bind ("C-c G s" . gptel-send)
     :config
 
     (defun gptel-api-key-from-environment (&optional var)

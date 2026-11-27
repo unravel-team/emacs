@@ -181,7 +181,7 @@
 
 (use-package gptel
   :ensure (:host github :repo "karthink/gptel")
-  :bind ("C-c e" . gptel-send)
+  :bind ("C-c G s" . gptel-send)
   :config
 
   (defun gptel-api-key-from-environment (&optional var)
