@@ -5532,6 +5532,43 @@ Use =C-c G s= to send a prompt with gptel. The capital =G= leaves
       :models '(kimi-k2-thinking-turbo)))
 #+end_src
 
+*** The =unravel-langs.el= section for inline suggestions (~minuet~)
+
+Run =M-x minuet-show-suggestion= in a scratch file first, because Minuet
+sends the text around point to Anthropic. If the suggestions help, turn
+=M-x minuet-auto-suggestion-mode= on for that buffer and off after the
+trial. Haiku is the faster choice, but you can change the model string
+to =claude-opus-5-5= for stronger, slower suggestions.
+
+#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
+  (use-package minuet
+    :ensure (:host github :repo "milanglacier/minuet-ai.el")
+    :commands (minuet-show-suggestion minuet-auto-suggestion-mode)
+    :bind (:map minuet-active-mode-map
+                ("C-c G a" . minuet-accept-suggestion)
+                ("C-c G l" . minuet-accept-suggestion-line)
+                ("C-c G x" . minuet-dismiss-suggestion))
+    :custom
+    (minuet-provider 'claude)
+    (minuet-n-completions 1)
+    (minuet-context-window 2400)
+    (minuet-auto-suggestion-debounce-delay 0.4)
+    (minuet-auto-suggestion-throttle-delay 1.5)
+    :defines (minuet-active-mode-map minuet-claude-options minuet-request-timeout)
+    :config
+    (let* ((model "claude-haiku-5-5")
+           (haiku (equal model "claude-haiku-5-5")))
+      (setq minuet-request-timeout (if haiku 2.5 4.0))
+      (setf (plist-get minuet-claude-options :model) model
+            (plist-get minuet-claude-options :api-key) "ANTHROPIC_API_KEY"
+            (plist-get minuet-claude-options :max_tokens) (if haiku 128 1024)
+            ;; Send no sampling parameters. Opus does not let us disable thinking.
+            (plist-get minuet-claude-options :optional)
+            (if haiku
+                '(:thinking (:type "disabled"))
+              '(:output_config (:effort "low"))))))
+#+end_src
+
 ** The =unravel-langs.el= section for Python
 :PROPERTIES:
 :CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618
