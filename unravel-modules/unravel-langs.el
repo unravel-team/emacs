@@ -223,6 +223,33 @@
     :stream t
     :models '(kimi-k2-thinking-turbo)))
 
+(use-package minuet
+  :ensure (:host github :repo "milanglacier/minuet-ai.el")
+  :commands (minuet-show-suggestion minuet-auto-suggestion-mode)
+  :bind (:map minuet-active-mode-map
+              ("C-c G a" . minuet-accept-suggestion)
+              ("C-c G l" . minuet-accept-suggestion-line)
+              ("C-c G x" . minuet-dismiss-suggestion))
+  :custom
+  (minuet-provider 'claude)
+  (minuet-n-completions 1)
+  (minuet-context-window 2400)
+  (minuet-auto-suggestion-debounce-delay 0.4)
+  (minuet-auto-suggestion-throttle-delay 1.5)
+  :defines (minuet-active-mode-map minuet-claude-options minuet-request-timeout)
+  :config
+  (let* ((model "claude-haiku-5-5")
+         (haiku (equal model "claude-haiku-5-5")))
+    (setq minuet-request-timeout (if haiku 2.5 4.0))
+    (setf (plist-get minuet-claude-options :model) model
+          (plist-get minuet-claude-options :api-key) "ANTHROPIC_API_KEY"
+          (plist-get minuet-claude-options :max_tokens) (if haiku 128 1024)
+          ;; Send no sampling parameters. Opus does not let us disable thinking.
+          (plist-get minuet-claude-options :optional)
+          (if haiku
+              '(:thinking (:type "disabled"))
+            '(:output_config (:effort "low"))))))
+
 ;;;; Configuration for Python Programming
 
 (use-package python
