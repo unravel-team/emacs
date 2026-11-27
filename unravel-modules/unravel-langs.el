@@ -179,25 +179,6 @@
   ;; mode to something else, like markdown.
   (setq separedit-default-mode 'org-mode))
 
-(use-package aider
-  :ensure t
-  :config
-  (setq aider-args '("--no-auto-commits" "--no-auto-accept-architect"))
-  ;; Optional: Set a key binding for the transient menu
-  (global-set-key (kbd "C-c i") 'aider-transient-menu) ;; for wider screen
-  ;; or use aider-transient-menu-2cols / aider-transient-menu-1col, for narrow screen
-  (aider-magit-setup-transients) ;; add aider magit function to magit menu
-  )
-
-(use-package claude-code-ide
-  :ensure (:host github :repo "manzaltu/claude-code-ide.el")
-  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
-  :config
-  ;; Enable Emacs MCP tool
-  (claude-code-ide-emacs-tools-setup)
-  (setq claude-code-ide-vterm-render-delay 0.01)
-  (setq claude-code-ide-diagnostics-backend 'flymake))
-
 (use-package gptel
   :ensure (:host github :repo "karthink/gptel")
   :bind ("C-c e" . gptel-send)
@@ -241,41 +222,6 @@
     :key (gptel-api-key-from-environment "MOONSHOT_API_KEY")
     :stream t
     :models '(kimi-k2-thinking-turbo)))
-
-;; install required inheritenv dependency:
-(use-package inheritenv
-  :ensure (:host github :repo "purcell/inheritenv"))
-
-;; install claude-code.el, using :depth 1 to reduce download size:
-(use-package claude-code
-  :ensure (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
-                 :files ("*.el" (:exclude "images/*")))
-  :after (vterm inheritenv)
-  :custom
-  (claude-code-terminal-backend 'vterm)
-  :config
-  (claude-code-mode))
-
-(use-package ai-code
-  :ensure t
-  :after (claude-code)
-  :config
-  (ai-code-set-backend  'codex)
-  (global-set-key (kbd "C-c a") #'ai-code-menu)
-  (global-auto-revert-mode 1)
-  (setq auto-revert-interval 1) ;; set to 1 second for faster update
-  ;; Optional: Set up Magit integration for AI commands in Magit popups
-  (with-eval-after-load 'magit
-    (ai-code-magit-setup-transients)))
-
-;;; Pi Coding Agent, from inside Emacs
-(use-package md-ts-mode
-  :ensure (:host github :repo "dnouri/md-ts-mode" :branch "main"))
-
-(use-package pi-coding-agent
-  :ensure (:host github :repo "dnouri/pi-coding-agent" :branch "master")
-  :config
-  (defalias 'pi 'pi-coding-agent))
 
 ;;;; Configuration for Python Programming
 

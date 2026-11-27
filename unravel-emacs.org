@@ -5477,48 +5477,6 @@ change the mode to something else (like markdown).
 :CUSTOM_ID: h:3B793A7F-C085-4DAC-A594-06F0CEF09936
 :CREATED:  [2025-12-05 Fri 09:20]
 :END:
-*** The =unravel-langs.el= section for aider (~aider.el~)
-:PROPERTIES:
-:CUSTOM_ID: h:890A51B7-F064-415B-8E20-C21525A7E420
-:CREATED:  [2025-07-13 Sun 11:17]
-:END:
-I love =aider= and have been using it for ages. While my preference is
-still to directly use Aider with [[https://aider.chat/docs/usage/watch.html][AI Commands]], I am experimenting with
-=aider.el= to see if the embedded prompts add value to my coding
-workflow.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  (use-package aider
-    :ensure t
-    :config
-    (setq aider-args '("--no-auto-commits" "--no-auto-accept-architect"))
-    ;; Optional: Set a key binding for the transient menu
-    (global-set-key (kbd "C-c i") 'aider-transient-menu) ;; for wider screen
-    ;; or use aider-transient-menu-2cols / aider-transient-menu-1col, for narrow screen
-    (aider-magit-setup-transients) ;; add aider magit function to magit menu
-    )
-#+end_src
-
-*** The =unravel-langs.el= section for Claude Code (~claude-code-ide.el~)
-:PROPERTIES:
-:CUSTOM_ID: h:252F290B-5D4C-48FD-875B-279E274E383E
-:CREATED:  [2025-09-09 Tue 21:43]
-:END:
-I'm not a big fan of Claude Code, but the world is converging on it.
-And I see a lot of value in having common conventions for things. So
-if these are Claude Code conventions, so be it.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  (use-package claude-code-ide
-    :ensure (:host github :repo "manzaltu/claude-code-ide.el")
-    :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
-    :config
-    ;; Enable Emacs MCP tool
-    (claude-code-ide-emacs-tools-setup)
-    (setq claude-code-ide-vterm-render-delay 0.01)
-    (setq claude-code-ide-diagnostics-backend 'flymake))
-#+end_src
-
 *** The =unravel-langs.el= section for generic LLM stuff in Emacs (~gptel~)
 :PROPERTIES:
 :CUSTOM_ID: h:1D48C505-CBBD-43C3-84BB-81AFB7AB46D4
@@ -5571,54 +5529,6 @@ if these are Claude Code conventions, so be it.
       :models '(kimi-k2-thinking-turbo)))
 #+end_src
 
-*** The =unravel-langs.el= section for AI Code (~ai-code.el~)
-:PROPERTIES:
-:CUSTOM_ID: h:BF9DD23B-8B26-4ACD-867A-ED977F9DD57F
-:CREATED:  [2025-12-03 Wed 18:20]
-:END:
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  ;; install required inheritenv dependency:
-  (use-package inheritenv
-    :ensure (:host github :repo "purcell/inheritenv"))
-
-  ;; install claude-code.el, using :depth 1 to reduce download size:
-  (use-package claude-code
-    :ensure (:type git :host github :repo "stevemolitor/claude-code.el" :branch "main" :depth 1
-                   :files ("*.el" (:exclude "images/*")))
-    :after (vterm inheritenv)
-    :custom
-    (claude-code-terminal-backend 'vterm)
-    :config
-    (claude-code-mode))
-
-  (use-package ai-code
-    :ensure t
-    :after (claude-code)
-    :config
-    (ai-code-set-backend  'codex)
-    (global-set-key (kbd "C-c a") #'ai-code-menu)
-    (global-auto-revert-mode 1)
-    (setq auto-revert-interval 1) ;; set to 1 second for faster update
-    ;; Optional: Set up Magit integration for AI commands in Magit popups
-    (with-eval-after-load 'magit
-      (ai-code-magit-setup-transients)))
-#+end_src
-
-*** The =unravel-langs.el= section for Pi-coding-agent (~pi-coding-agent.el~)
-
-A way to run and work with Pi from inside Emacs. Lets see how it goes for a bit.
-
-#+begin_src emacs-lisp :tangle "unravel-modules/unravel-langs.el"
-  ;;; Pi Coding Agent, from inside Emacs
-  (use-package md-ts-mode
-    :ensure (:host github :repo "dnouri/md-ts-mode" :branch "main"))
-
-  (use-package pi-coding-agent
-    :ensure (:host github :repo "dnouri/pi-coding-agent" :branch "master")
-    :config
-    (defalias 'pi 'pi-coding-agent))
-#+end_src
 ** The =unravel-langs.el= section for Python
 :PROPERTIES:
 :CUSTOM_ID: h:EA5EA223-F97D-4EE9-8663-99822A037618
